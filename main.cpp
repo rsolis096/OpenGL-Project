@@ -1,13 +1,25 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <glad/glad.h> //Opengl functions
+#include <GLFW/glfw3.h> //Window functions
 #include <iostream>
 #include "Shader.h"
 #include "Texture.h"
-#include "stb_image.h"
+#include "Vendors/stb_image.h"
+#include "Camera.h"
+
+//Matrix Multiplication
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // settings
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
+
+float deltaTime = 0.0f;	// Time between current frame and last frame
+float lastFrame = 0.0f; // Time of last frame
+
+//Initialize Camera
+Camera myCamera;
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
@@ -23,10 +35,28 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-    {
-        std::cout << "ASHfa" << std::endl;
-    }
+
+    //Mouse Input
+    //const float movementSpeed = 0.05f; // adjust accordingly
+    const float cameraSpeed = 0.05f;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        myCamera.processInput(cameraSpeed, GLFW_KEY_W);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        myCamera.processInput(-1.0f * cameraSpeed, GLFW_KEY_S);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        myCamera.processInput(-1.0f * cameraSpeed, GLFW_KEY_A);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        myCamera.processInput(cameraSpeed, GLFW_KEY_D);
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    myCamera.processMouse(xpos, ypos);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    myCamera.processScroll(xoffset, yoffset);
 }
 
 int main()
@@ -49,6 +79,13 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    //Enable cursor and scroll wheel input
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+    //Enable mouse input
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+
 
     // glad: load all OpenGL function pointers (Initialize GLAD)
     // ---------------------------------------
@@ -58,49 +95,89 @@ int main()
         return -1;
     }
 
+    //Enable Z-Buffer
+    glEnable(GL_DEPTH_TEST);
+
     //Compile and link shaders
     Shader myShader("shader.vert", "shader.frag");
 
-    //Rectangle
     float vertices[] = {
-        // positions          // colors           // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-    };
-    unsigned int indices[] = {
-    0, 1, 3, // first triangle
-    1, 2, 3  // second triangle
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
-    unsigned int VBO, VAO, EBO;
+    glm::vec3 cubePositions[] = {
+    glm::vec3(0.0f,  0.0f,  0.0f),
+    glm::vec3(2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3(2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3(1.3f, -2.0f, -2.5f),
+    glm::vec3(1.5f,  2.0f, -2.5f),
+    glm::vec3(1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
+    unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
-
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    // Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    // Texture attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    // texture coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
 
+    
     // load and create a texture 
     std::vector<Texture> myTextures{
         {"Assets/container.jpg", true, GL_RGB},
-        {"Assets/awesomeface.png", false, GL_RGBA}
+        {"Assets/monito.png", false, GL_RGBA}
     };
 
     // tell OpenGL to which texture unit each shader sampler belongs
@@ -108,45 +185,73 @@ int main()
     glUniform1i(glGetUniformLocation(myShader.ID, "texture1"), 0); // Apply texture to sampler2d texture1
     glUniform1i(glGetUniformLocation(myShader.ID, "texture2"), 1); // Apply texture to sampler2d texture2
 
+
+
+
     // render loop 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable this line for wireframe display
+    
+
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+
+        //View Matrix
+        glm::mat4 view = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        view = glm::lookAt(myCamera.cameraPos, myCamera.cameraPos + myCamera.cameraFront, myCamera.cameraUp);
+
+        //Projection Matrix (fov change with scroll wheel)
+        glm::mat4 projection;
+        projection = glm::perspective(glm::radians(myCamera.fov), 1280.0f / 720.0f, 0.1f, 150.0f);
+
+        //Send View and Projection matrices to shader
+        myShader.setMat4("view", view);
+        myShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
+
+        //Bind texture and render to VAO (rectangle)
+        glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glBindTexture(GL_TEXTURE_2D, myTextures[0].ID);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, myTextures[1].ID);
+
         // input
         // -----
         processInput(window);
 
         // render (render to back buffer)
         // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //sets the clear color for the color buffer
-        glClear(GL_COLOR_BUFFER_BIT);//The back buffer currently only contains the color buffer, this clears and updates it with the colour specified by glClearColor.
-
-        //Update Recatngle with Interpolated Colours
-        float timeValue = glfwGetTime();
-        float redValue = sin(timeValue) / 2.0f + 0.5f;
-        float greenValue = cos(timeValue) / 2.0f + 0.5f;
-        float blueValue = 1.0 - greenValue;
-        //std::cout << redValue << " " << greenValue << std::endl;
-        vertices[3] = redValue;
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-        glBindVertexArray(0);   
-
-        //Render Triangle
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//The back buffer currently only contains the color buffer, this clears and updates it with the colour specified by glClearColor.
+        // ^ clear depth buffer (z-buffer)
+    
+        //Bind program, Update Opacity of value of float opacity in fragment shader
         myShader.use();
+        float redValue = abs(sin(glfwGetTime()));
         glUniform1f(glGetUniformLocation(myShader.ID, "opacity"), redValue);
-        //Bind texture and render to VAO (rectangle)
 
-        glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, myTextures[0].ID);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, myTextures[1].ID);
 
+
+        //Set Render Target (Rectangle)
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        //Draw 10 triangles
+        for (unsigned int i = 0; i < 10; i++)
+        {
+            // calculate the model matrix for each object and pass it to shader before drawing
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            if (i % 2 == 0)  // every 3rd iteration (including the first) we set the angle using GLFW's time function.
+            {
+                angle = glfwGetTime() * 25.0f;
+            }
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            myShader.setMat4("model", model);
 
-        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0); //UNBIND VAO (at the moment, this step is redundant)
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -158,7 +263,6 @@ int main()
     // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------

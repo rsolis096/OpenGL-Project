@@ -1,4 +1,4 @@
-#include "stb_image.h"
+#include "Vendors/stb_image.h"
 #include <glad/glad.h>
 #include <vector>
 
