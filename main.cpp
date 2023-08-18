@@ -5,6 +5,8 @@
 #include "Texture.h"
 #include "Vendors/stb_image.h"
 #include "Camera.h"
+#include "Cube.h"
+#include "Sphere.h"
 
 //Matrix Multiplication
 #include <glm/glm.hpp>
@@ -14,6 +16,7 @@
 // settings
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
+
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
@@ -158,21 +161,8 @@ int main()
     glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // Texture attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
+    Cube *myCube = new Cube(vertices, sizeof(vertices));
+    Sphere mySphere;
     
     // load and create a texture 
     std::vector<Texture> myTextures{
@@ -186,18 +176,13 @@ int main()
     glUniform1i(glGetUniformLocation(myShader.ID, "texture2"), 1); // Apply texture to sampler2d texture2
 
 
-
-
     // render loop 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable this line for wireframe display
-    
-
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
 
         //View Matrix
         glm::mat4 view = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
@@ -232,15 +217,18 @@ int main()
         float redValue = abs(sin(glfwGetTime()));
         glUniform1f(glGetUniformLocation(myShader.ID, "opacity"), redValue);
 
-
-
-        //Set Render Target (Rectangle)
-        glBindVertexArray(VAO);
-        //Draw 10 triangles
+        glm::mat4 model = glm::mat4(1.0f);
+        myShader.setMat4("model", model);
+        mySphere.render();
+        /*
+        //Set Render Target (Cube)    
+        myCube->bind();
+        //Draw 10 Cubes
+        
         for (unsigned int i = 0; i < 10; i++)
         {
             // calculate the model matrix for each object and pass it to shader before drawing
-            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
             if (i % 2 == 0)  // every 3rd iteration (including the first) we set the angle using GLFW's time function.
@@ -252,7 +240,7 @@ int main()
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
-
+        */
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);//swap back frame buffer with front frame buffer.
@@ -261,8 +249,8 @@ int main()
     }
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    delete myCube;
+    myCube = nullptr;
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------

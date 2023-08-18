@@ -137,9 +137,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Cube.cpp" />
     <ClCompile Include="Dependencies\includes\glad\glad.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Vendors\stb_image.cpp" />
   </ItemGroup>
@@ -150,7 +152,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Cube.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Sphere.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vendors\stb_image.h" />
   </ItemGroup>
