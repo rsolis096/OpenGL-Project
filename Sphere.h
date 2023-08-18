@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <glad/glad.h>
+#include <glad/glad.h> 
 
 #define PI 3.141592653589793238462643383279502884197
 
@@ -11,11 +11,13 @@ class Sphere
         std::vector<float>texCoords;
         std::vector<unsigned int>indices;
         std::vector<float>interleavedVertices;
+        Texture* texture;
         unsigned int m_vao, m_vboVertices, m_ebo;
 
 
 	Sphere()
 	{      
+        texture = new Texture("Assets/globe.jpg", false, GL_RGB);
         generateSphere(30, 30, 1.0f);
 
         //Setup VAO and VBO
@@ -45,27 +47,6 @@ class Sphere
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        /*
-        //See Index
-        for (int i = 0; i < indices.size(); i += 3)
-        {
-            std::cout << i <<", " << indices[i] << ", " << indices[i + 1] << ", " << indices[i + 2] << std::endl;
-        }
-        std::cout <<"Size: " << indices.size() << std::endl;
-        */
-
-        for (int i = 0; i < interleavedVertices.size(); i += 5)
-        {
-            std::cout << 
-                interleavedVertices[i] << ", " <<
-                interleavedVertices[i + 1] << ", " <<
-                interleavedVertices[i + 2] << ", " <<
-                interleavedVertices[i + 3] << ", " <<
-                interleavedVertices[i + 4] <<
-                std::endl;
-        }
-        std::cout << "Size: " << interleavedVertices.size() << std::endl;
 	}
 
     ~Sphere()
@@ -76,16 +57,26 @@ class Sphere
         glDeleteVertexArrays(1, &m_vao);
     }
 
-    void render()
+    void render(float time)
     {
+        //Bind texture and render to VAO
+        glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glBindTexture(GL_TEXTURE_2D, texture->ID);
+
         //Bind object to render (sphere indices)
         glBindVertexArray(m_vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+
+        //Rotate Sphere
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model, glm::radians(time * 15.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+        glUniformMatrix4fv(glGetUniformLocation(Shader::ID, "model"), 1, GL_FALSE, &model[0][0]);
 
         //Render the object
         glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, 0);
 
     }
+
 
     private:
         void generateSphere(int stackCount, int sectorCount, float radius)

@@ -162,13 +162,7 @@ int main()
     };
 
     Cube *myCube = new Cube(vertices, sizeof(vertices));
-    Sphere mySphere;
-    
-    // load and create a texture 
-    std::vector<Texture> myTextures{
-        {"Assets/container.jpg", true, GL_RGB},
-        {"Assets/monito.png", false, GL_RGBA}
-    };
+    Sphere* mySphere = new Sphere();
 
     // tell OpenGL to which texture unit each shader sampler belongs
     myShader.use(); // don't forget to activate the shader before setting uniforms!  
@@ -178,53 +172,41 @@ int main()
 
     // render loop 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable this line for wireframe display
+
+    //Initialize MVP
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 projection;
+
     while (!glfwWindowShouldClose(window))
     {
+        // input
+        // -----
+        processInput(window);
+
+        //Use this to get framerate info
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
         //View Matrix
-        glm::mat4 view = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        view = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         view = glm::lookAt(myCamera.cameraPos, myCamera.cameraPos + myCamera.cameraFront, myCamera.cameraUp);
-
         //Projection Matrix (fov change with scroll wheel)
-        glm::mat4 projection;
         projection = glm::perspective(glm::radians(myCamera.fov), 1280.0f / 720.0f, 0.1f, 150.0f);
-
-        //Send View and Projection matrices to shader
+        //Send View and Projection matrices to shader (for camera)
         myShader.setMat4("view", view);
         myShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
-
-        //Bind texture and render to VAO (rectangle)
-        glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, myTextures[0].ID);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, myTextures[1].ID);
-
-        // input
-        // -----
-        processInput(window);
-
-        // render (render to back buffer)
-        // ------
+       
+        //Rendering Starts Here
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//The back buffer currently only contains the color buffer, this clears and updates it with the colour specified by glClearColor.
-        // ^ clear depth buffer (z-buffer)
-    
-        //Bind program, Update Opacity of value of float opacity in fragment shader
-        myShader.use();
-        float redValue = abs(sin(glfwGetTime()));
-        glUniform1f(glGetUniformLocation(myShader.ID, "opacity"), redValue);
-
-        glm::mat4 model = glm::mat4(1.0f);
-        myShader.setMat4("model", model);
-        mySphere.render();
-        /*
-        //Set Render Target (Cube)    
-        myCube->bind();
-        //Draw 10 Cubes
         
+        //Render Globe
+        mySphere->render(glfwGetTime());
+          
+        //Render 10 Monito Cubes
+        myCube->bind();
         for (unsigned int i = 0; i < 10; i++)
         {
             // calculate the model matrix for each object and pass it to shader before drawing
@@ -238,9 +220,9 @@ int main()
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             myShader.setMat4("model", model);
 
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            myCube->render(1);
         }
-        */
+        
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);//swap back frame buffer with front frame buffer.
@@ -251,6 +233,10 @@ int main()
     // ------------------------------------------------------------------------
     delete myCube;
     myCube = nullptr;
+    delete mySphere;
+    mySphere = nullptr;
+
+
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------

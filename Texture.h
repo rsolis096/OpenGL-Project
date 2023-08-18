@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Vendors/stb_image.h"
 #include <glad/glad.h>
 #include <vector>
@@ -9,7 +11,7 @@ public:
 	unsigned int ID;
 	int m_Width, m_Height, m_nrChannels;
 	Texture(const char* filePath, bool flipOnY, unsigned int format);
-	//~Texture();
+	~Texture();
 	//void Bind() const;
 };
 

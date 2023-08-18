@@ -32,3 +32,7 @@ Texture::Texture(const char* filePath, bool flipOnY, unsigned int format)
     }
     stbi_image_free(data);
 }
+
+Texture::~Texture()
+{
+}

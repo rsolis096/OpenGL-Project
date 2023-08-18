@@ -2,6 +2,7 @@
 
 Cube::Cube(float inputVertices[], int size)
 {
+	texture = new Texture("Assets/monito.png", false, GL_RGBA);
 	//Generate VAO and VBO
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_vbo);
@@ -24,6 +25,16 @@ Cube::~Cube()
 {
 	glDeleteVertexArrays(1, &m_vao);
 	glDeleteBuffers(1, &m_vbo);
+}
+
+void Cube::render(int quantity)
+{
+	//Bind texture and render to VAO
+	glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
+	glBindTexture(GL_TEXTURE_2D, texture->ID);
+
+	//Render the cube
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 void Cube::bind()
