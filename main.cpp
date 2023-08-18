@@ -161,14 +161,9 @@ int main()
     glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
-    Cube *myCube = new Cube(vertices, sizeof(vertices));
+    Cube *myCube = new Cube(vertices, sizeof(vertices), myShader.ID);
+    Cube* myCube2 = new Cube(vertices, sizeof(vertices), myShader.ID);
     Sphere* mySphere = new Sphere();
-
-    // tell OpenGL to which texture unit each shader sampler belongs
-    myShader.use(); // don't forget to activate the shader before setting uniforms!  
-    glUniform1i(glGetUniformLocation(myShader.ID, "texture1"), 0); // Apply texture to sampler2d texture1
-    glUniform1i(glGetUniformLocation(myShader.ID, "texture2"), 1); // Apply texture to sampler2d texture2
-
 
     // render loop 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable this line for wireframe display
@@ -203,25 +198,25 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//The back buffer currently only contains the color buffer, this clears and updates it with the colour specified by glClearColor.
         
         //Render Globe
-        mySphere->render(glfwGetTime());
+        //mySphere->render(glfwGetTime());
           
         //Render 10 Monito Cubes
-        myCube->bind();
-        for (unsigned int i = 0; i < 10; i++)
-        {
-            // calculate the model matrix for each object and pass it to shader before drawing
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
-            if (i % 2 == 0)  // every 3rd iteration (including the first) we set the angle using GLFW's time function.
-            {
-                angle = glfwGetTime() * 25.0f;
-            }
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            myShader.setMat4("model", model);
 
-            myCube->render(1);
-        }
+        myCube->bind();
+        //Set model matrix and translate
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        myShader.setMat4("model", model);
+        myCube->render();
+
+        myCube2->bind();
+        //Set model matrix and translate
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-3.0f, 0.0f, -3.0f));
+        myShader.setMat4("model", model);
+
+        myCube2->render();
+
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

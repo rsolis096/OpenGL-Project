@@ -6,15 +6,17 @@
 class Cube {
 public:
     // Constructor to initialize the cube's properties
-    Cube(float inputVertices[], int size);
+    Cube(float inputVertices[], int size, const char* texturePath, unsigned int sId);
+    Cube(float inputVertices[], int size, unsigned int sId);
 
     // Destructor to release any resources
     ~Cube();   
 
     // Function to render the cube
-    void render(int quantity);
+    void render();
     void bind();
 private:
+    void initializeCube();
     // Cube properties
     std::vector<float> vertices;
     Texture* texture;
@@ -26,6 +28,8 @@ private:
     // Vertex array object (VAO) and vertex buffer object (VBO)
     GLuint m_vao;
     GLuint m_vbo;
+    unsigned int shaderID;
+    bool hasTexture;
 
     // Other private functions for setting up VAO, VBO, etc.
 };
