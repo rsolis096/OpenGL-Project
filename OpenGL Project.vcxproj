@@ -146,6 +146,10 @@
     <ClCompile Include="Vendors\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="1.colors.frag" />
+    <None Include="1.colors.vert" />
+    <None Include="1.light_cube.frag" />
+    <None Include="1.light_cube.vert" />
     <None Include="backup.text" />
     <None Include="shader.frag" />
     <None Include="shader.vert" />

@@ -6,8 +6,8 @@
 class Cube {
 public:
     // Constructor to initialize the cube's properties
-    Cube(float inputVertices[], int size, const char* texturePath, unsigned int sId);
-    Cube(float inputVertices[], int size, unsigned int sId);
+    Cube(float inputVertices[], float inputNormals[],  const char* texturePath, unsigned int sId);
+    Cube(float inputVertices[], float inputNormals[],  unsigned int sId);
 
     // Destructor to release any resources
     ~Cube();   
@@ -16,9 +16,11 @@ public:
     void render();
     void bind();
 private:
-    void initializeCube();
+    void buildInterleavedVertices();
     // Cube properties
     std::vector<float> vertices;
+    std::vector<float> normals;
+    std::vector<float> interleavedVertices;
     Texture* texture;
 
     //std::vector<float> uvCoords;

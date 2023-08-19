@@ -47,6 +47,18 @@
     <None Include="shader.frag">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="1.colors.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="1.colors.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="1.light_cube.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="1.light_cube.vert">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">

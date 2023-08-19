@@ -121,7 +121,7 @@ class Sphere
         //Rotate Sphere
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::rotate(model, glm::radians(time * 15.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-        glUniformMatrix4fv(glGetUniformLocation(Shader::ID, "model"), 1, GL_FALSE, &model[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"), 1, GL_FALSE, &model[0][0]);
 
         //Render the object
         glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, 0);

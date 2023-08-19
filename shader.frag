@@ -8,17 +8,26 @@ in vec2 TexCoord;
 uniform sampler2D texture1;
 uniform bool hasTexture;
 
+uniform vec3 objectColor;
+uniform vec3 lightColor;
+
 void main()
 {
 	vec2 myVec2 = vec2(0.5, 0.7);
-	//FragColor = vec4(myVec2, 0.0f, 1.0f);
-	//FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 1.0f);
+
 	if(hasTexture)
 	{
 		FragColor = texture(texture1, TexCoord);
 	}
 	else
 	{
-		FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	    FragColor = vec4(lightColor * objectColor, 1.0);
+		//FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 	}
-};
+};	
+
+
+
+
+//FragColor = vec4(myVec2, 0.0f, 1.0f);
+//FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 1.0f);
