@@ -20,6 +20,10 @@ const unsigned int SCR_HEIGHT = 720;
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
+bool firstMouse = true;
+float lastX = SCR_WIDTH / 2.0f;
+float lastY = SCR_HEIGHT / 2.0f;
+
 
 //Initialize Camera
 Camera myCamera;
@@ -44,20 +48,36 @@ void processInput(GLFWwindow* window)
 
     //Mouse Input
     //const float movementSpeed = 0.05f; // adjust accordingly
-    const float cameraSpeed = 0.05f;
+    const float cameraSpeed = 2.5 * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        myCamera.processInput(cameraSpeed, GLFW_KEY_W);
+        myCamera.processKeyboard(cameraSpeed, GLFW_KEY_W);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        myCamera.processInput(-1.0f * cameraSpeed, GLFW_KEY_S);
+        myCamera.processKeyboard(-1.0f * cameraSpeed, GLFW_KEY_S);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        myCamera.processInput(-1.0f * cameraSpeed, GLFW_KEY_A);
+        myCamera.processKeyboard(-1.0f * cameraSpeed, GLFW_KEY_A);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        myCamera.processInput(cameraSpeed, GLFW_KEY_D);
+        myCamera.processKeyboard(cameraSpeed, GLFW_KEY_D);
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
-    myCamera.processMouse(xpos, ypos);
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    myCamera.processMouse(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -198,8 +218,8 @@ int main()
     };
 
     Cube *myCube = new Cube(vertices, normals, lightingShader.ID);
+    Sphere* mySphere = new Sphere(lightingShader.ID, "Assets/globe.jpg");
     Cube *lightSource = new Cube(vertices, normals, lightCubeShader.ID);
-    //Sphere* mySphere = new Sphere(lightCubeShader.ID);
 
     // render loop 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable this line for wireframe display
@@ -221,13 +241,13 @@ int main()
         lastFrame = currentFrame;
 
         //Rendering Starts Here
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//The back buffer currently only contains the color buffer, this clears and updates it with the colour specified by glClearColor.
 
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
         lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        lightingShader.setVec3("lightColor", 1.0f, 1.0f, 0.0f);
+        lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lightingShader.setVec3("lightPos", lightPos);
         lightingShader.setVec3("viewPos", myCamera.cameraPos);
 
@@ -235,8 +255,7 @@ int main()
 
 
         //View Matrix
-        view = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        view = glm::lookAt(myCamera.cameraPos, myCamera.cameraPos + myCamera.cameraFront, myCamera.cameraUp);
+        view = view = myCamera.GetViewMatrix();
         //Projection Matrix (fov change with scroll wheel)
         projection = glm::perspective(glm::radians(myCamera.fov), 1280.0f / 720.0f, 0.1f, 150.0f);
         //Send View and Projection matrices to shader (for camera)]]
@@ -248,8 +267,10 @@ int main()
         lightingShader.setMat4("model", model);
 
         //Render Cube
-        myCube->bind();
-        myCube->render();
+        //myCube->bind();
+        //myCube->render();
+
+        mySphere->render(currentFrame);
 
         //Draw Lamp Object
         lightCubeShader.use();

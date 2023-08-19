@@ -1,12 +1,16 @@
-#include <GLFW/glfw3.h> //Window functions
 //Matrix Multiplication
+
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <iostream>
+#include <vector>
 
-//Constants
-
+//Default Camera Values
+const float YAW = -90.0f;
+const float PITCH = 0.0f;
+const float SPEED = 2.5f;
+const float SENSITIVITY = 0.1f;
+const float FOV = 60.0f;
 
 class Camera
 {
@@ -16,30 +20,38 @@ public:
     glm::vec3 cameraPos;
     glm::vec3 cameraFront;
     glm::vec3 cameraUp;
+    glm::vec3 worldUp;
+
+    float movementSpeed;
+    float mouseSensitivity;
     float fov;
-    float lastX;
-    float lastY;
-    bool firstMouse;
+
     float yaw;
     float pitch;
 
-    Camera()
-    {
-        //Initialize camera vectors
-        cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
-        cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-        cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-        //Initialize constants
-        fov = 45.0f;
-        lastX = 640.0f;
-        lastY = 360.0f;
-        firstMouse = true;
-        yaw = -90.0f;
-        pitch = 0.0f;
+    // constructor with vectors
+    
+    Camera() 
+        : direction(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), fov(FOV)
+    {
+        cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
+        worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+        cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+        cameraFront = direction;
+        yaw = YAW;
+        pitch = PITCH;
     }
 
-    void processInput(float changeValue, unsigned int keyPressed)
+    // returns the view matrix calculated using Euler Angles and the LookAt Matrix
+    glm::mat4 GetViewMatrix()
+    {
+        return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    }
+
+    
+
+    void processKeyboard(float changeValue, unsigned int keyPressed)
     {
         if(keyPressed == GLFW_KEY_S  || keyPressed == GLFW_KEY_W)
             cameraPos += changeValue * cameraFront;
@@ -47,38 +59,28 @@ public:
             cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * changeValue;
     }
 
-    void processMouse(double xpos, double ypos)
+    void processMouse(double xpos, double ypos, GLboolean constrainPitch = true)
     {
-
-        if (firstMouse) // initially set to true
-        {
-            lastX = xpos;
-            lastY = ypos;
-            firstMouse = false;
-        }
-
-        float xoffset = xpos - lastX;
-        float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
-        lastX = xpos;
-        lastY = ypos;
-
         const float sensitivity = 0.1f;
-        xoffset *= sensitivity;
-        yoffset *= sensitivity;
+        xpos *= sensitivity;
+        ypos *= sensitivity;
 
         //Add the offset values to the globally declared pitch and yaw values:
-        yaw += xoffset;
-        pitch += yoffset;
+        yaw += xpos;
+        pitch += ypos;
 
-        if (pitch > 89.0f)
-            pitch = 89.0f;
-        if (pitch < -89.0f)
-            pitch = -89.0f;
+        // make sure that when pitch is out of bounds, screen doesn't get flipped
+        if (constrainPitch)
+        {
+            if (pitch > 89.0f)
+                pitch = 89.0f;
+            if (pitch < -89.0f)
+                pitch = -89.0f;
+        }
 
-        direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-        direction.y = sin(glm::radians(pitch));
-        direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-        cameraFront = glm::normalize(direction);
+
+        // update Front, Right and Up Vectors using the updated Euler angles
+        updateCameraVectors();
 
     }
 
@@ -89,6 +91,15 @@ public:
             fov = 1.0f;
         if (fov > 45.0f)
             fov = 45.0f;
+    }
+
+private:
+    void updateCameraVectors()
+    {
+        direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+        direction.y = sin(glm::radians(pitch));
+        direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        cameraFront = glm::normalize(direction);
     }
 
 };
