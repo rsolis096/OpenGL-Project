@@ -13,11 +13,15 @@ class Sphere
         std::vector<float>interleavedVertices;
         Texture* texture;
         unsigned int m_vao, m_vboVertices, m_ebo;
+        unsigned int shaderID;
+        bool hasTexture;
 
 
-	Sphere()
+	Sphere(const char* texturePath, unsigned int sId)
 	{      
-        texture = new Texture("Assets/globe.jpg", false, GL_RGB);
+        shaderID = sId;
+        hasTexture = true;
+        texture = new Texture(texturePath, false, GL_RGB);
         generateSphere(30, 30, 1.0f);
 
         //Setup VAO and VBO
@@ -49,6 +53,41 @@ class Sphere
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
+    Sphere(unsigned int sId)
+    {
+        shaderID = sId;
+        hasTexture = false;
+        generateSphere(30, 30, 1.0f);
+
+        //Setup VAO and VBO
+        glGenVertexArrays(1, &m_vao);
+        glGenBuffers(1, &m_vboVertices);
+        glGenBuffers(1, &m_ebo);
+
+        //Bind VAO
+        glBindVertexArray(m_vao);
+
+        //Bind and fill VBOs with data
+        glBindBuffer(GL_ARRAY_BUFFER, m_vboVertices);
+        glBufferData(GL_ARRAY_BUFFER, interleavedVertices.size() * sizeof(float), interleavedVertices.data(), GL_STATIC_DRAW);
+
+        // Bind and fill EBO with indices
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
+
+        // Set up vertex attribute pointers (vertices and texcoords)
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * sizeof(float), (void*)0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * sizeof(float), (void*)(sizeof(float) * 3));
+
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+
+        // unbind VAO and VBOs
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
     ~Sphere()
     {
         // Clean up
@@ -60,8 +99,20 @@ class Sphere
     void render(float time)
     {
         //Bind texture and render to VAO
-        glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, texture->ID);
+        if (hasTexture)
+        {
+            glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
+            glBindTexture(GL_TEXTURE_2D, texture->ID);
+
+            glUseProgram(shaderID);
+            glUniform1i(glGetUniformLocation(shaderID, "hasTexture"), true);
+        }
+        else
+        {
+            glUseProgram(shaderID);
+            glUniform1i(glGetUniformLocation(shaderID, "hasTexture"), false);
+        }
+
 
         //Bind object to render (sphere indices)
         glBindVertexArray(m_vao);
@@ -74,6 +125,10 @@ class Sphere
 
         //Render the object
         glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, 0);
+
+        // Unbind buffers and reset state
+        glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
 
     }
 

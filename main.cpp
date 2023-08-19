@@ -163,7 +163,7 @@ int main()
 
     Cube *myCube = new Cube(vertices, sizeof(vertices), myShader.ID);
     Cube* myCube2 = new Cube(vertices, sizeof(vertices), myShader.ID);
-    Sphere* mySphere = new Sphere();
+    Sphere* mySphere = new Sphere("Assets/globe.jpg", myShader.ID);
 
     // render loop 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable this line for wireframe display
@@ -198,7 +198,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//The back buffer currently only contains the color buffer, this clears and updates it with the colour specified by glClearColor.
         
         //Render Globe
-        //mySphere->render(glfwGetTime());
+        mySphere->render(glfwGetTime());
           
         //Render 10 Monito Cubes
 
