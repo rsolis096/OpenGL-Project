@@ -261,7 +261,7 @@ int main()
          0.0f, 1.0f
     };
 
-    Cube* myCube = new Cube(vertices, normals, texCoords,  "Assets/container.jpg", lightingShader.ID);
+    Cube* myCube = new Cube(vertices, normals, lightingShader.ID);
     Sphere* mySphere = new Sphere(lightingShader.ID, "Assets/monito.png");
     Cube *lightSource = new Cube(vertices, normals, lightCubeShader.ID);
 
@@ -293,16 +293,20 @@ int main()
         lightingShader.setVec3("lightPos", lightPos);
         lightingShader.setVec3("viewPos", myCamera.cameraPos);
 
-        //Set Fragment Shdaer uniforms
+        //Set Cube Material
         lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        lightingShader.setVec3("material.ambient", 1.0f, 1.0f, 1.0f);
-        lightingShader.setVec3("material.diffuse", 1.0f, 1.0f, 1.0f);
-        lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+        lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+        lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f); // specular lighting doesn't have full effect on this object's material
+        lightingShader.setFloat("material.shininess", 32.0f);
+        lightingShader.setFloat("material.shininess", 32.0f);
+
+
         lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
         lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darken diffuse light a bit
         lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
-        lightingShader.setFloat("material.shininess", 32.0f);
+
 
 
 
@@ -324,6 +328,9 @@ int main()
 
         //Shift sphere and shrink
         lightingShader.use();
+        lightingShader.setVec3("material.ambient", 1.0f, 1.0f, 1.0f);
+        lightingShader.setVec3("material.diffuse", 1.0f, 1.0f, 1.0f);
+        lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(10.0f, 10.0f, -3.0f));
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
@@ -364,6 +371,3 @@ int main()
     glfwTerminate();
     return 0;
 }
-
-
-

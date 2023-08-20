@@ -14,4 +14,3 @@ public:
 	~Texture();
 	//void Bind() const;
 };
-

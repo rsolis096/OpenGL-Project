@@ -6,8 +6,8 @@
 class Cube {
 public:
     // Constructor to initialize the cube's properties
-    Cube(float inputVertices[], float inputNormals[], float inputIndices[], const char* texturePath, unsigned int sId);
-    Cube(float inputVertices[], float inputNormals[],  unsigned int sId);
+    Cube(float inputVertices[], float inputNormals[], float inputTexCoords[], const char* texturePath, unsigned int sId);
+    Cube(float inputVertices[], float inputNormals[], unsigned int sId);
 
     // Destructor to release any resources
     ~Cube();   
