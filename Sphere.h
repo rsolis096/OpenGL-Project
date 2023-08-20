@@ -22,7 +22,7 @@ class Sphere
 	{      
         shaderID = sId;
         hasTexture = true;
-        texture = new Texture(texturePath, false, GL_RGB);
+        texture = new Texture(texturePath, false, GL_RGBA);
         generateSphere(30, 30, 1.0f);
 
         //Setup VAO and VBO
@@ -124,11 +124,6 @@ class Sphere
         //Bind object to render (sphere indices)
         glBindVertexArray(m_vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-
-        //Rotate Sphere
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(time * 15.0f), glm::vec3(0.7f, 0.3f, 0.5f));
-        glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"), 1, GL_FALSE, &model[0][0]);
 
         //Render the object
         glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, 0);

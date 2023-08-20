@@ -217,8 +217,52 @@ int main()
          0.0f,  1.0f,  0.0f
     };
 
-    Cube *myCube = new Cube(vertices, normals, lightingShader.ID);
-    Sphere* mySphere = new Sphere(lightingShader.ID, "Assets/globe.jpg");
+    float texCoords[] = {
+       0.0f, 0.0f,
+       1.0f, 0.0f,
+       1.0f, 1.0f,
+       1.0f, 1.0f,
+       0.0f, 1.0f,
+       0.0f, 0.0f,
+
+       0.0f, 0.0f,
+       1.0f, 0.0f,
+       1.0f, 1.0f,
+       1.0f, 1.0f,
+       0.0f, 1.0f,
+       0.0f, 0.0f,
+
+        1.0f, 0.0f,
+       1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 1.0f,
+         0.0f, 0.0f,
+         1.0f, 0.0f,
+
+        1.0f, 0.0f,
+         1.0f, 1.0f,
+         0.0f, 1.0f,
+          0.0f, 1.0f,
+          0.0f, 0.0f,
+          1.0f, 0.0f,
+
+        0.0f, 1.0f,
+          1.0f, 1.0f,
+         1.0f, 0.0f,
+         1.0f, 0.0f,
+          0.0f, 0.0f,
+         0.0f, 1.0f,
+
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+          1.0f, 0.0f,
+          0.0f, 0.0f,
+         0.0f, 1.0f
+    };
+
+    Cube* myCube = new Cube(vertices, normals, texCoords,  "Assets/container.jpg", lightingShader.ID);
+    Sphere* mySphere = new Sphere(lightingShader.ID, "Assets/monito.png");
     Cube *lightSource = new Cube(vertices, normals, lightCubeShader.ID);
 
     // render loop 
@@ -241,23 +285,32 @@ int main()
         lastFrame = currentFrame;
 
         //Rendering Starts Here
-        glClearColor(0.5f, 0.5f, 0.5f, 1.0f); //sets the clear color for the color buffer
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//The back buffer currently only contains the color buffer, this clears and updates it with the colour specified by glClearColor.
 
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
-        lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lightingShader.setVec3("lightPos", lightPos);
         lightingShader.setVec3("viewPos", myCamera.cameraPos);
+
+        //Set Fragment Shdaer uniforms
+        lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        lightingShader.setVec3("material.ambient", 1.0f, 1.0f, 1.0f);
+        lightingShader.setVec3("material.diffuse", 1.0f, 1.0f, 1.0f);
+        lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+        lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+        lightingShader.setFloat("material.shininess", 32.0f);
 
 
 
 
         //View Matrix
-        view = view = myCamera.GetViewMatrix();
+        view = myCamera.GetViewMatrix();
         //Projection Matrix (fov change with scroll wheel)
-        projection = glm::perspective(glm::radians(myCamera.fov), 1280.0f / 720.0f, 0.1f, 150.0f);
+        projection = glm::perspective(glm::radians(myCamera.m_FOV), 1280.0f / 720.0f, 0.1f, 150.0f);
         //Send View and Projection matrices to shader (for camera)]]
         lightingShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.    
         lightingShader.setMat4("view", view);
@@ -267,9 +320,15 @@ int main()
         lightingShader.setMat4("model", model);
 
         //Render Cube
-        //myCube->bind();
-        //myCube->render();
+        myCube->render();
 
+        //Shift sphere and shrink
+        lightingShader.use();
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(10.0f, 10.0f, -3.0f));
+        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+        model = glm::rotate(model, glm::radians(currentFrame * 15.0f), glm::vec3(0.7f, 0.3f, 0.5f));
+        lightingShader.setMat4("model", model);
         mySphere->render(currentFrame);
 
         //Draw Lamp Object

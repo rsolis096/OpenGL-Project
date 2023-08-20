@@ -22,25 +22,24 @@ public:
     glm::vec3 cameraUp;
     glm::vec3 worldUp;
 
-    float movementSpeed;
-    float mouseSensitivity;
-    float fov;
-
-    float yaw;
-    float pitch;
+    float m_MovementSpeed;
+    float m_MouseSensitivity;
+    float m_FOV;
+    float m_Yaw;
+    float m_Pitch;
 
 
     // constructor with vectors
     
     Camera() 
-        : direction(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), fov(FOV)
+        : direction(glm::vec3(0.0f, 0.0f, -1.0f)), m_MovementSpeed(SPEED), m_MouseSensitivity(SENSITIVITY), m_FOV(FOV)
     {
         cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
         worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
         cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
         cameraFront = direction;
-        yaw = YAW;
-        pitch = PITCH;
+        m_Yaw = YAW;
+        m_Pitch = PITCH;
     }
 
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
@@ -66,16 +65,16 @@ public:
         ypos *= sensitivity;
 
         //Add the offset values to the globally declared pitch and yaw values:
-        yaw += xpos;
-        pitch += ypos;
+        m_Yaw += xpos;
+        m_Pitch += ypos;
 
         // make sure that when pitch is out of bounds, screen doesn't get flipped
         if (constrainPitch)
         {
-            if (pitch > 89.0f)
-                pitch = 89.0f;
-            if (pitch < -89.0f)
-                pitch = -89.0f;
+            if (m_Pitch > 89.0f)
+                m_Pitch = 89.0f;
+            if (m_Pitch < -89.0f)
+                m_Pitch = -89.0f;
         }
 
 
@@ -86,19 +85,19 @@ public:
 
     void processScroll(double xoffset, double yoffset)
     {
-        fov -= (float)yoffset;
-        if (fov < 1.0f)
-            fov = 1.0f;
-        if (fov > 45.0f)
-            fov = 45.0f;
+        m_FOV -= (float)yoffset;
+        if (m_FOV < 1.0f)
+            m_FOV = 1.0f;
+        if (m_FOV > 45.0f)
+            m_FOV = 45.0f;
     }
 
 private:
     void updateCameraVectors()
     {
-        direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-        direction.y = sin(glm::radians(pitch));
-        direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        direction.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
+        direction.y = sin(glm::radians(m_Pitch));
+        direction.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
         cameraFront = glm::normalize(direction);
     }
 

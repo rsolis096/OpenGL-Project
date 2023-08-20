@@ -1,10 +1,30 @@
 #include "Cube.h"
 
-Cube::Cube(float inputVertices[], float inputNormals[], const char* texturePath, unsigned int sID)
+Cube::Cube(float inputVertices[], float inputNormals[], float inputTexCoords[], const char* texturePath, unsigned int sID)
 {
+
+	for (int i = 0; i < 108; i++)
+	{
+		vertices.push_back(inputVertices[i]);
+		normals.push_back(inputNormals[i]);
+	}
+
+	for (int i = 0; i < 72 ; i++)
+	{
+		texCoords.push_back(inputTexCoords[i]);
+	}
+	for (int i = 0; i < texCoords.size(); i += 2)
+	{
+		std::cout << texCoords[i] << ", " << 
+		texCoords[i + 1] << std::endl;
+	}
+
+	//Build interleaved Vertices
+	buildInterleavedVerticesWithTexCoords();
+
 	shaderID = sID;
 	hasTexture = true;
-	texture = new Texture("Assets/monito.png", false, GL_RGBA);
+	texture = new Texture(texturePath, false, GL_RGB);
 	//Generate VAO and VBO
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_vbo);
@@ -12,22 +32,27 @@ Cube::Cube(float inputVertices[], float inputNormals[], const char* texturePath,
 	//Assign vertices to object
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, interleavedVertices.size(), interleavedVertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * interleavedVertices.size(), interleavedVertices.data(), GL_STATIC_DRAW);
 
-	// Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	// Set up vertex attribute pointers (vertices, normals, texcoords)
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 6));
+
 	glEnableVertexAttribArray(0);
-
-	//Normals
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+
+	// unbind VAO and VBOs
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 }
 
 Cube::Cube(float inputVertices[], float inputNormals[], unsigned int sID)
 {
 	for (int i = 0; i < 108; i++)
-	{
-		
+	{	
 		vertices.push_back(inputVertices[i]);
 		normals.push_back(inputNormals[i]);
 	}
@@ -79,6 +104,9 @@ void Cube::render()
 		glUniform1i(glGetUniformLocation(shaderID, "hasTexture"), false);
 	}
 
+	//Bind
+	glBindVertexArray(m_vao);
+
 	//Render the cube
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -110,16 +138,25 @@ void Cube::buildInterleavedVertices()
 		interleavedVertices.push_back(normals[i + 2]);
 
 	}
-	/*
-	std::cout << "=================" << std::endl;
-	for (int k = 0; k < interleavedVertices.size(); k+=6)
+}
+
+void Cube::buildInterleavedVerticesWithTexCoords()
+{
+	std::vector<float>().swap(interleavedVertices);
+
+	std::size_t i, j;
+	std::size_t count = vertices.size();
+	for (i = 0, j = 0; i < count; i += 3, j+=2)
 	{
-		std::cout << interleavedVertices[k] << ", "
-			<< interleavedVertices[k + 1] << ", "
-			<< interleavedVertices[k + 2] << ", "
-			<< interleavedVertices[k + 3] << ", "
-			<< interleavedVertices[k + 4] << ", "
-			<< interleavedVertices[k + 5] << std::endl;
+		interleavedVertices.push_back(vertices[i]);
+		interleavedVertices.push_back(vertices[i + 1]);
+		interleavedVertices.push_back(vertices[i + 2]);
+
+		interleavedVertices.push_back(normals[i]);
+		interleavedVertices.push_back(normals[i + 1]);
+		interleavedVertices.push_back(normals[i + 2]);
+
+		interleavedVertices.push_back(texCoords[j]);
+		interleavedVertices.push_back(texCoords[j + 1]);
 	}
-	*/
 }
