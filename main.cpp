@@ -1,3 +1,7 @@
+#include "Vendors/imgui/imgui.h"
+#include "Vendors/imgui/imgui_impl_glfw.h"
+#include "Vendors/imgui/imgui_impl_opengl3.h"
+
 #include <glad/glad.h> //Opengl functions
 #include <GLFW/glfw3.h> //Window functions
 #include <iostream>
@@ -23,6 +27,15 @@ float lastFrame = 0.0f; // Time of last frame
 bool firstMouse = true;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
+bool cursorLocked = true;
+
+//For key input (debounce timer)
+double lastKeyPressTime = 0.0;
+double debounceThreshold = 0.2; // Adjust this value based on your needs
+
+//Save cursor location for unlock/lock
+double mouseX = 0, mouseY = 0;
+float xpos = 0, ypos = 0;
 
 
 //Initialize Camera
@@ -46,38 +59,94 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
+    //Return mouse movement when tab is pressed
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+    {
+        double currentTime = glfwGetTime();
+        if (currentTime - lastKeyPressTime > debounceThreshold)
+        {
+            if (cursorLocked)
+            {
+                //Save previous mouse location
+                mouseX = xpos;
+                mouseY = ypos;
+                //Unlock mouse
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                cursorLocked = false;
+                //Set mouse to center
+                glfwSetCursorPos(window, SCR_WIDTH/2, SCR_HEIGHT/2);
+            }
+            else
+            {
+                //Place mouse on middle of screen
+                glfwSetCursorPos(window, mouseX, mouseY);
+                //Lock mouse
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                cursorLocked = true;
+                //Reset last position for mouse
+                mouseX = 0;
+                mouseY = 0;
+
+            }
+            lastKeyPressTime = currentTime; // Update debounce timer
+        }
+    }
+
     //Mouse Input
     //const float movementSpeed = 0.05f; // adjust accordingly
-    const float cameraSpeed = 2.5 * deltaTime;
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        myCamera.processKeyboard(cameraSpeed, GLFW_KEY_W);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        myCamera.processKeyboard(-1.0f * cameraSpeed, GLFW_KEY_S);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        myCamera.processKeyboard(-1.0f * cameraSpeed, GLFW_KEY_A);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        myCamera.processKeyboard(cameraSpeed, GLFW_KEY_D);
+    if (cursorLocked)
+    {
+        const float cameraSpeed = 2.5 * deltaTime;
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            myCamera.processKeyboard(cameraSpeed, GLFW_KEY_W);
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            myCamera.processKeyboard(-1.0f * cameraSpeed, GLFW_KEY_S);
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            myCamera.processKeyboard(-1.0f * cameraSpeed, GLFW_KEY_A);
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            myCamera.processKeyboard(cameraSpeed, GLFW_KEY_D);
+    }
 }
 
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-
-    if (firstMouse)
+    //Only change camera if cursor is locked
+    if (cursorLocked)
     {
+        //Cursor is locked, save current mouse positon
+        xpos = xposIn;
+        ypos = yposIn;
+        //If this call is immedietly after unlock/lock, set mouse to previous position before unlock (mouseX and mouseY)
+        if (mouseX != 0 && mouseY != 0)
+        {
+            xpos = static_cast<float>(mouseX);
+            ypos = static_cast<float>(mouseY);
+            mouseX = 0;
+            mouseY = 0;
+        }
+        //if this call is done during cursor lock, set mouse position to new xposIn, yposIn
+        else
+        {
+            xpos = static_cast<float>(xposIn);
+            ypos = static_cast<float>(yposIn);
+        }
+
+
+        if (firstMouse)
+        {
+            lastX = xpos;
+            lastY = ypos;
+            firstMouse = false;
+        }
+
+        float xoffset = xpos - lastX;
+        float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
         lastX = xpos;
         lastY = ypos;
-        firstMouse = false;
+
+        myCamera.processMouse(xoffset, yoffset);
     }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    lastX = xpos;
-    lastY = ypos;
-
-    myCamera.processMouse(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -111,8 +180,6 @@ int main()
     //Enable mouse input
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-
-
     // glad: load all OpenGL function pointers (Initialize GLAD)
     // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -120,6 +187,17 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    ImGui_ImplOpenGL3_Init();
 
     //Enable Z-Buffer
     glEnable(GL_DEPTH_TEST);
@@ -129,7 +207,7 @@ int main()
     Shader lightingShader("1.colors.vert", "1.colors.frag");
     Shader lightCubeShader("1.light_cube.vert", "1.light_cube.frag");
 
-    float vertices[] = {
+    std::vector<float> vertices = {
     -0.5f, -0.5f, -0.5f,
      0.5f, -0.5f, -0.5f,
      0.5f,  0.5f, -0.5f,
@@ -173,7 +251,7 @@ int main()
     -0.5f,  0.5f, -0.5f
     };
 
-    float normals[] = {
+    std::vector<float> normals = {
         0.0f,  0.0f, -1.0f,
         0.0f,  0.0f, -1.0f,
         0.0f,  0.0f, -1.0f,
@@ -217,7 +295,7 @@ int main()
          0.0f,  1.0f,  0.0f
     };
 
-    float texCoords[] = {
+    std::vector<float> texCoords = {
        0.0f, 0.0f,
        1.0f, 0.0f,
        1.0f, 1.0f,
@@ -261,8 +339,10 @@ int main()
          0.0f, 1.0f
     };
 
-    Cube* myCube = new Cube(vertices, normals, lightingShader.ID);
-    Sphere* mySphere = new Sphere(lightingShader.ID, "Assets/monito.png");
+    //Initialize objects
+    Cube* myCube = new Cube(vertices, normals, texCoords, "Assets/container2.png", "Assets/container2_specular.png", lightingShader.ID);
+    Cube* myCube2 = new Cube(vertices, normals, lightingShader.ID);
+    Sphere* mySphere = new Sphere(lightingShader.ID );//,"Assets/monito.png");
     Cube *lightSource = new Cube(vertices, normals, lightCubeShader.ID);
 
     // render loop 
@@ -272,6 +352,13 @@ int main()
     glm::mat4 model;
     glm::mat4 view;
     glm::mat4 projection;
+
+    // shader configuration
+    // --------------------
+    lightingShader.use();
+    lightingShader.setInt("material.diffuse", 0);
+    lightingShader.setInt("material.specular", 1);
+
 
     while (!glfwWindowShouldClose(window))
     {
@@ -288,54 +375,41 @@ int main()
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//The back buffer currently only contains the color buffer, this clears and updates it with the colour specified by glClearColor.
 
-        // be sure to activate shader when setting uniforms/drawing objects
+        // light properties
         lightingShader.use();
-        lightingShader.setVec3("lightPos", lightPos);
+        lightingShader.setVec3("light.position", lightPos);
         lightingShader.setVec3("viewPos", myCamera.cameraPos);
-
-        //Set Cube Material
-        lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-        lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-        lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f); // specular lighting doesn't have full effect on this object's material
-        lightingShader.setFloat("material.shininess", 32.0f);
-        lightingShader.setFloat("material.shininess", 32.0f);
-
-
         lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-        lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+        lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
         lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
-
-
-
+        // material properties
+        lightingShader.setFloat("material.shininess", 64.0f);
 
 
         //View Matrix
         view = myCamera.GetViewMatrix();
         //Projection Matrix (fov change with scroll wheel)
-        projection = glm::perspective(glm::radians(myCamera.m_FOV), 1280.0f / 720.0f, 0.1f, 150.0f);
+        projection = glm::perspective(glm::radians(myCamera.m_FOV), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 150.0f);
         //Send View and Projection matrices to shader (for camera)]]
         lightingShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.    
-        lightingShader.setMat4("view", view);
-       
-        //World Transformation
+        lightingShader.setMat4("view", view);   
+        //World Transformation (For Cube)
         model = glm::mat4(1.0f);
         lightingShader.setMat4("model", model);
-
         //Render Cube
         myCube->render();
 
-        //Shift sphere and shrink
+        //Shift sphere and shrink (Note that this one does not have any special lighting)
         lightingShader.use();
-        lightingShader.setVec3("material.ambient", 1.0f, 1.0f, 1.0f);
-        lightingShader.setVec3("material.diffuse", 1.0f, 1.0f, 1.0f);
-        lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        lightingShader.setVec3("light.diffuse", 0.0f, 0.3f, 0.7f);
+        lightingShader.setVec3("objectColor", glm::vec3(1.0f));
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(10.0f, 10.0f, -3.0f));
+        model = glm::translate(model, glm::vec3(6.0f, 6.0f, -3.0f));
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        model = glm::rotate(model, glm::radians(currentFrame * 15.0f), glm::vec3(0.7f, 0.3f, 0.5f));
+        model = glm::rotate(model, glm::radians(currentFrame * 15.0f), glm::vec3(0.7f, 0.7f, 0.7f));
         lightingShader.setMat4("model", model);
+        //myCube2->render();
         mySphere->render(currentFrame);
 
         //Draw Lamp Object
@@ -347,10 +421,23 @@ int main()
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
         lightCubeShader.setMat4("model", model);
-        lightSource->bind();
         lightSource->render();
 
         
+
+
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::ShowDemoWindow(); // Show demo window! :)
+
+        // Rendering
+        // (Your code clears your framebuffer, renders your other stuff etc.)
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);//swap back frame buffer with front frame buffer.
@@ -361,8 +448,15 @@ int main()
     // ------------------------------------------------------------------------
     delete myCube;
     myCube = nullptr;
-    //delete mySphere;
-    //mySphere = nullptr;
+    delete lightSource;
+    lightSource = nullptr;
+    delete mySphere;
+    mySphere = nullptr;
+
+    //imgui: terminate
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
 
 

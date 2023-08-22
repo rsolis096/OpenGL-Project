@@ -143,6 +143,13 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Vendors\imgui\imgui.cpp" />
+    <ClCompile Include="Vendors\imgui\imgui_demo.cpp" />
+    <ClCompile Include="Vendors\imgui\imgui_draw.cpp" />
+    <ClCompile Include="Vendors\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="Vendors\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Vendors\imgui\imgui_tables.cpp" />
+    <ClCompile Include="Vendors\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Vendors\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +167,15 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Vendors\imgui\imconfig.h" />
+    <ClInclude Include="Vendors\imgui\imgui.h" />
+    <ClInclude Include="Vendors\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="Vendors\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="Vendors\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="Vendors\imgui\imgui_internal.h" />
+    <ClInclude Include="Vendors\imgui\imstb_rectpack.h" />
+    <ClInclude Include="Vendors\imgui\imstb_textedit.h" />
+    <ClInclude Include="Vendors\imgui\imstb_truetype.h" />
     <ClInclude Include="Vendors\stb_image.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

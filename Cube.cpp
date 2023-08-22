@@ -1,9 +1,10 @@
 #include "Cube.h"
 
-Cube::Cube(float inputVertices[], float inputNormals[], float inputTexCoords[], const char* texturePath, unsigned int sID)
+Cube::Cube(std::vector<float> inputVertices, std::vector<float> inputNormals, std::vector<float> inputTexCoords, const char* texturePathDiffuse, const char* texturePathSpecular
+	, unsigned int sID)
 {
 
-	for (int i = 0; i < 108; i++)
+	for (int i = 0; i < inputVertices.size(); i++)
 	{
 		vertices.push_back(inputVertices[i]);
 		normals.push_back(inputNormals[i]);
@@ -13,18 +14,25 @@ Cube::Cube(float inputVertices[], float inputNormals[], float inputTexCoords[], 
 	{
 		texCoords.push_back(inputTexCoords[i]);
 	}
-	for (int i = 0; i < texCoords.size(); i += 2)
-	{
-		std::cout << texCoords[i] << ", " << 
-		texCoords[i + 1] << std::endl;
-	}
 
 	//Build interleaved Vertices
 	buildInterleavedVerticesWithTexCoords();
 
 	shaderID = sID;
 	hasTexture = true;
-	texture = new Texture(texturePath, false, GL_RGB);
+
+	//Open and load diffuse map
+	if(std::strstr(texturePathDiffuse, ".jpg"))
+		diffuseMap = new Texture(texturePathDiffuse, false, GL_RGB);
+	else
+		diffuseMap = new Texture(texturePathDiffuse, false, GL_RGBA);
+
+	//Open and load specular map
+	if (std::strstr(texturePathSpecular, ".jpg"))
+		specularMap = new Texture(texturePathSpecular, false, GL_RGB);
+	else
+		specularMap = new Texture(texturePathSpecular, false, GL_RGBA);
+
 	//Generate VAO and VBO
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_vbo);
@@ -49,9 +57,9 @@ Cube::Cube(float inputVertices[], float inputNormals[], float inputTexCoords[], 
 
 }
 
-Cube::Cube(float inputVertices[], float inputNormals[], unsigned int sID)
+Cube::Cube(std::vector<float> inputVertices, std::vector<float> inputNormals, unsigned int sID)
 {
-	for (int i = 0; i < 108; i++)
+	for (int i = 0; i < inputVertices.size(); i++)
 	{	
 		vertices.push_back(inputVertices[i]);
 		normals.push_back(inputNormals[i]);
@@ -93,7 +101,9 @@ void Cube::render()
 	if (hasTexture)
 	{
 		glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
-		glBindTexture(GL_TEXTURE_2D, texture->ID);
+		glBindTexture(GL_TEXTURE_2D, diffuseMap->ID);
+		glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
+		glBindTexture(GL_TEXTURE_2D, specularMap->ID);
 
 		glUseProgram(shaderID);
 		glUniform1i(glGetUniformLocation(shaderID, "hasTexture"), true);
@@ -113,11 +123,6 @@ void Cube::render()
 	// Unbind buffers and reset state
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-void Cube::bind()
-{
-	glBindVertexArray(m_vao);
 }
 
 void Cube::buildInterleavedVertices()
