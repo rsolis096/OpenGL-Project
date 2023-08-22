@@ -28,6 +28,7 @@ bool firstMouse = true;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool cursorLocked = true;
+bool isWindowHidden = true;
 
 //For key input (debounce timer)
 double lastKeyPressTime = 0.0;
@@ -65,6 +66,7 @@ void processInput(GLFWwindow* window)
         double currentTime = glfwGetTime();
         if (currentTime - lastKeyPressTime > debounceThreshold)
         {
+            isWindowHidden = !isWindowHidden;
             if (cursorLocked)
             {
                 //Save previous mouse location
@@ -353,13 +355,16 @@ int main()
     glm::mat4 view;
     glm::mat4 projection;
 
+    glm::vec3 colorSlider = glm::vec3(1.0f);
+
     // shader configuration
     // --------------------
     lightingShader.use();
     lightingShader.setInt("material.diffuse", 0);
     lightingShader.setInt("material.specular", 1);
 
-
+    //Set window size of ImGUI window
+    ImGui::SetNextWindowSize(ImVec2(100, 75)); // Set the desired width and height
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -402,8 +407,8 @@ int main()
 
         //Shift sphere and shrink (Note that this one does not have any special lighting)
         lightingShader.use();
-        lightingShader.setVec3("light.diffuse", 0.0f, 0.3f, 0.7f);
-        lightingShader.setVec3("objectColor", glm::vec3(1.0f));
+        lightingShader.setVec3("light.diffuse", colorSlider);
+        lightingShader.setVec3("objectColor", colorSlider);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(6.0f, 6.0f, -3.0f));
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
@@ -423,19 +428,23 @@ int main()
         lightCubeShader.setMat4("model", model);
         lightSource->render();
 
-        
+        if (!isWindowHidden)
+        {
+            // Start the Dear ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
 
+            // Rendering
+            // (Your code clears your framebuffer, renders your other stuff etc.)
+            ImGui::Begin("OpenGL Project");
+            ImGui::Text("Hello World");
+            ImGui::ColorEdit3("color", &colorSlider[0]);
+            ImGui::End();
 
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        ImGui::ShowDemoWindow(); // Show demo window! :)
-
-        // Rendering
-        // (Your code clears your framebuffer, renders your other stuff etc.)
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        }
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
