@@ -348,7 +348,7 @@ int main()
     PointLight* pointLight = new PointLight(vertices, normals, "cube", lightingShader, lightCubeShader);
     Cube* myCube = new Cube(vertices, normals, texCoords, "Assets/container2.png", "Assets/container2_specular.png", lightingShader.ID);
     Cube* myCube2 = new Cube(vertices, normals, lightingShader.ID);
-    Sphere* mySphere = new Sphere(lightingShader.ID);//,"Assets/monito.png");
+    Sphere* mySphere = new Sphere(lightingShader.ID,"Assets/monito.png");
     Cube *lightSource = new Cube(vertices, normals, lightCubeShader.ID);
 
     // render loop 
@@ -384,17 +384,20 @@ int main()
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//The back buffer currently only contains the color buffer, this clears and updates it with the colour specified by glClearColor.
 
+        //Point Light (initialize light sets light properties that may change every frame)
         pointLight->initializeLight(myCamera.cameraPos);
+        //Change the color the light emits
         pointLight->setDiffuse(glm::vec3(abs(sin(currentFrame)), abs(cos(currentFrame)), abs(sin(currentFrame) * cos(currentFrame))));
 
-        //View Matrix
+        //View Matrix (Do after camera)
         view = myCamera.GetViewMatrix();
         //Projection Matrix (fov change with scroll wheel)
         projection = glm::perspective(glm::radians(myCamera.m_FOV), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 150.0f);
         //Send View and Projection matrices to shader (for camera)]]
         lightingShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.    
-        lightingShader.setMat4("view", view);   
-        //World Transformation (For Cube)
+        lightingShader.setMat4("view", view);
+
+        //World Transformation (For Cube) - set the cube position to default
         model = glm::mat4(1.0f);
         lightingShader.setMat4("model", model);
         //Render Cube
@@ -402,7 +405,7 @@ int main()
 
         //Shift sphere and shrink (Note that this one does not have any special lighting)
         mySphere->translatePosition(glm::vec3(abs(sin(currentFrame)) / 100));
-        mySphere->render(currentFrame);
+        mySphere->render();
 
         //Draw Lamp Object
         pointLight->renderLight(projection, view);

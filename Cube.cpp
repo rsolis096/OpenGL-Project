@@ -1,46 +1,27 @@
 #include "Cube.h"
 
 Cube::Cube(std::vector<float> inputVertices, std::vector<float> inputNormals, std::vector<float> inputTexCoords, const char* texturePathDiffuse, const char* texturePathSpecular
-	, unsigned int sID)
+	, unsigned int sID) : Object(sID, texturePathDiffuse, texturePathSpecular)
 {
 
 	for (int i = 0; i < inputVertices.size(); i++)
 	{
-		vertices.push_back(inputVertices[i]);
-		normals.push_back(inputNormals[i]);
+		m_Vertices.push_back(inputVertices[i]);
+		m_Normals.push_back(inputNormals[i]);
 	}
 
-	for (int i = 0; i < 72 ; i++)
+	for (int i = 0; i < inputTexCoords.size(); i++)
 	{
-		texCoords.push_back(inputTexCoords[i]);
+		m_TexCoords.push_back(inputTexCoords[i]);
 	}
 
 	//Build interleaved Vertices
 	buildInterleavedVerticesWithTexCoords();
 
-	shaderID = sID;
-	hasTexture = true;
-
-	//Open and load diffuse map
-	if(std::strstr(texturePathDiffuse, ".jpg"))
-		diffuseMap = new Texture(texturePathDiffuse, false, GL_RGB);
-	else
-		diffuseMap = new Texture(texturePathDiffuse, false, GL_RGBA);
-
-	//Open and load specular map
-	if (std::strstr(texturePathSpecular, ".jpg"))
-		specularMap = new Texture(texturePathSpecular, false, GL_RGB);
-	else
-		specularMap = new Texture(texturePathSpecular, false, GL_RGBA);
-
-	//Generate VAO and VBO
-	glGenVertexArrays(1, &m_vao);
-	glGenBuffers(1, &m_vbo);
-
 	//Assign vertices to object
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * interleavedVertices.size(), interleavedVertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_InterleavedVertices.size(), m_InterleavedVertices.data(), GL_STATIC_DRAW);
 
 	// Set up vertex attribute pointers (vertices, normals, texcoords)
 	glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
@@ -57,19 +38,18 @@ Cube::Cube(std::vector<float> inputVertices, std::vector<float> inputNormals, st
 
 }
 
-Cube::Cube(std::vector<float> inputVertices, std::vector<float> inputNormals, unsigned int sID)
+Cube::Cube(std::vector<float> inputVertices, std::vector<float> inputNormals, unsigned int sID) : Object(sID)
 {
 	for (int i = 0; i < inputVertices.size(); i++)
 	{	
-		vertices.push_back(inputVertices[i]);
-		normals.push_back(inputNormals[i]);
+		m_Vertices.push_back(inputVertices[i]);
+		m_Normals.push_back(inputNormals[i]);
 	}
 
 	//Build interleaved Vertices
 	buildInterleavedVertices();
 
-	shaderID = sID;
-	hasTexture = false;
+	m_hasTexture = false;
 	//Generate VAO and VBO
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_vbo);
@@ -77,7 +57,7 @@ Cube::Cube(std::vector<float> inputVertices, std::vector<float> inputNormals, un
 
 	//Assign vertices to object
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, interleavedVertices.size() * sizeof(float), interleavedVertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_InterleavedVertices.size() * sizeof(float), m_InterleavedVertices.data(), GL_STATIC_DRAW);
 
 	// Position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
@@ -94,6 +74,7 @@ Cube::~Cube()
 	glDeleteVertexArrays(1, &m_vao);
 	glDeleteBuffers(1, &m_vbo);
 }
+/*
 
 void Cube::render()
 {
@@ -125,43 +106,4 @@ void Cube::render()
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Cube::buildInterleavedVertices()
-{
-	std::vector<float>().swap(interleavedVertices);
-
-	std::size_t i, j;
-	std::size_t count = vertices.size();
-	for (i = 0, j = 0; i < count; i += 3)
-	{
-		interleavedVertices.push_back(vertices[i]);
-		interleavedVertices.push_back(vertices[i + 1]);
-		interleavedVertices.push_back(vertices[i + 2]);
-
-
-		interleavedVertices.push_back(normals[i]);
-		interleavedVertices.push_back(normals[i + 1]);
-		interleavedVertices.push_back(normals[i + 2]);
-
-	}
-}
-
-void Cube::buildInterleavedVerticesWithTexCoords()
-{
-	std::vector<float>().swap(interleavedVertices);
-
-	std::size_t i, j;
-	std::size_t count = vertices.size();
-	for (i = 0, j = 0; i < count; i += 3, j+=2)
-	{
-		interleavedVertices.push_back(vertices[i]);
-		interleavedVertices.push_back(vertices[i + 1]);
-		interleavedVertices.push_back(vertices[i + 2]);
-
-		interleavedVertices.push_back(normals[i]);
-		interleavedVertices.push_back(normals[i + 1]);
-		interleavedVertices.push_back(normals[i + 2]);
-
-		interleavedVertices.push_back(texCoords[j]);
-		interleavedVertices.push_back(texCoords[j + 1]);
-	}
-}
+*/

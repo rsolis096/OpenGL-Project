@@ -1,59 +1,31 @@
-#include <iostream>
-#include <vector>
-#include "Shader.h"
-
+#include "Object.h"
 #define PI 3.141592653589793238462643383279502884197
 
-class Sphere
+class Sphere : public Object
 {
     public:
-        std::vector<float>vertices;
-        std::vector<float>texCoords;
-        std::vector<float>normals;
-        std::vector<unsigned int>indices;
-        std::vector<float>interleavedVertices;
-
-        //Object color properties
-        glm::vec3 ambient;
-        glm::vec3 diffuse;
-        glm::vec3 specular;
-
-        //World Properties
-        glm::vec3 position;
-
-        Texture* texture;
-        unsigned int m_vao, m_vboVertices, m_ebo;
-        unsigned int shaderID;
-        bool hasTexture;
 
 
-	Sphere(unsigned int sId, const char* texturePath)
+	Sphere(unsigned int sId, const char* texturePath) : Object(sId, texturePath, texturePath)
 	{      
-        ambient = glm::vec3(1.0f);
-        diffuse = glm::vec3(1.0f);
-        specular = glm::vec3(1.0f);
-
-
-        shaderID = sId;
-        hasTexture = true;
-        texture = new Texture(texturePath, false, GL_RGBA);
+        m_useEBO = true;
         generateSphere(30, 30, 1.0f);
 
         //Setup VAO and VBO
         glGenVertexArrays(1, &m_vao);
-        glGenBuffers(1, &m_vboVertices);
+        glGenBuffers(1, &m_vbo);
         glGenBuffers(1, &m_ebo);
         
         //Bind VAO
         glBindVertexArray(m_vao);
 
         //Bind and fill VBOs with data
-        glBindBuffer(GL_ARRAY_BUFFER, m_vboVertices);
-        glBufferData(GL_ARRAY_BUFFER, interleavedVertices.size() * sizeof(float), interleavedVertices.data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+        glBufferData(GL_ARRAY_BUFFER, m_InterleavedVertices.size() * sizeof(float), m_InterleavedVertices.data(), GL_STATIC_DRAW);
 
         // Bind and fill EBO with indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * m_Indices.size(), m_Indices.data(), GL_STATIC_DRAW);
 
         // Set up vertex attribute pointers (vertices, normals, texcoords)
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
@@ -71,32 +43,26 @@ class Sphere
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-    Sphere(unsigned int sId)
+    Sphere(unsigned int sId) : Object(sId)
     {
-        ambient = glm::vec3(0.2f);
-        diffuse = glm::vec3(0.2f);
-        specular = glm::vec3(0.2f);
-        position = glm::vec3(2.0f, 0.0f, 0.0f);
-
-        shaderID = sId;
-        hasTexture = false;
+        m_useEBO = true;
         generateSphere(30, 30, 1.0f);
 
         //Setup VAO and VBO
         glGenVertexArrays(1, &m_vao);
-        glGenBuffers(1, &m_vboVertices);
+        glGenBuffers(1, &m_vbo);
         glGenBuffers(1, &m_ebo);
 
         //Bind VAO
         glBindVertexArray(m_vao);
 
         //Bind and fill VBOs with data
-        glBindBuffer(GL_ARRAY_BUFFER, m_vboVertices);
-        glBufferData(GL_ARRAY_BUFFER, interleavedVertices.size() * sizeof(float), interleavedVertices.data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+        glBufferData(GL_ARRAY_BUFFER, m_InterleavedVertices.size() * sizeof(float), m_InterleavedVertices.data(), GL_STATIC_DRAW);
 
         // Bind and fill EBO with indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * m_Indices.size(), m_Indices.data(), GL_STATIC_DRAW);
 
         // Set up vertex attribute pointers (vertices, normals, texcoords)
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
@@ -107,7 +73,6 @@ class Sphere
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
 
-
         // unbind VAO and VBOs
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -117,45 +82,9 @@ class Sphere
     ~Sphere()
     {
         // Clean up
-        glDeleteBuffers(1, &m_vboVertices);
+        glDeleteBuffers(1, &m_vbo);
         glDeleteBuffers(1, &m_ebo);
         glDeleteVertexArrays(1, &m_vao);
-    }
-
-    void render(float time)
-    {
-
-        glUseProgram(shaderID);
-        glUniform3fv(glGetUniformLocation(shaderID, "object.ambient"), 1, &ambient[0]);
-        glUniform3fv(glGetUniformLocation(shaderID, "object.diffuse"), 1, &diffuse[0]);
-        glUniform3fv(glGetUniformLocation(shaderID, "object.specular"), 1, &specular[0]);
-
-        //Bind texture and render to VAO
-        if (hasTexture)
-        {
-            glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
-            glBindTexture(GL_TEXTURE_2D, texture->ID);
-
-            glUseProgram(shaderID);
-            glUniform1i(glGetUniformLocation(shaderID, "hasTexture"), true);
-        }
-        else
-        {
-            glUseProgram(shaderID);
-            glUniform1i(glGetUniformLocation(shaderID, "hasTexture"), false);
-        }
-
-        //Bind object to render (sphere indices)
-        glBindVertexArray(m_vao);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-
-        //Render the object
-        glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, 0);
-
-        // Unbind buffers and reset state
-        glBindVertexArray(0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-
     }
     
     //Teleport to specified location
@@ -163,21 +92,21 @@ class Sphere
     {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, newPosition);
-        glUseProgram(shaderID);
-        glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"), 1, GL_FALSE, &model[0][0]);
+        glUseProgram(m_shaderID);
+        glUniformMatrix4fv(glGetUniformLocation(m_shaderID, "model"), 1, GL_FALSE, &model[0][0]);
     }
 
     //Translate by parameter (Used to move some direction from current position)
     void translatePosition(glm::vec3 newPosition)
     {
-        position[0] += newPosition[0];
-        position[1] += newPosition[1];
-        position[2] += newPosition[2];
+        m_Position[0] += newPosition[0];
+        m_Position[1] += newPosition[1];
+        m_Position[2] += newPosition[2];
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, position);
-        glUseProgram(shaderID);
-        glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"), 1, GL_FALSE, &model[0][0]);
+        model = glm::translate(model, m_Position);
+        glUseProgram(m_shaderID);
+        glUniformMatrix4fv(glGetUniformLocation(m_shaderID, "model"), 1, GL_FALSE, &model[0][0]);
 
     }
 
@@ -186,9 +115,9 @@ class Sphere
         void generateSphere(int stackCount, int sectorCount, float radius)
         {
             //Algorithm provided by site given in assignment (http://www.songho.ca/opengl/gl_sphere.html)
-            std::vector<float>().swap(vertices);
-            std::vector<float>().swap(normals);
-            std::vector<float>().swap(texCoords);
+            std::vector<float>().swap(m_Vertices);
+            std::vector<float>().swap(m_Normals);
+            std::vector<float>().swap(m_TexCoords);
 
             float x, y, z, xy;                              // vertex position
             float s, t;                                     // vertex texCoord
@@ -212,23 +141,23 @@ class Sphere
                     // vertex position (x, y, z)
                     x = radius * cosf(stackAngle) * cosf(sectorAngle);
                     y = radius * cosf(stackAngle) * sinf(sectorAngle);
-                    vertices.push_back(x);
-                    vertices.push_back(y);
-                    vertices.push_back(z);
+                    m_Vertices.push_back(x);
+                    m_Vertices.push_back(y);
+                    m_Vertices.push_back(z);
 
                     // normalized vertex normal (nx, ny, nz)
                     nx = x * lengthInv;
                     ny = y * lengthInv;
                     nz = z * lengthInv;
-                    normals.push_back(nx);
-                    normals.push_back(ny);
-                    normals.push_back(nz);
+                    m_Normals.push_back(nx);
+                    m_Normals.push_back(ny);
+                    m_Normals.push_back(nz);
 
                     // vertex tex coord (s, t) range between [0, 1]
                     s = (float)j / sectorCount;
                     t = (float)i / stackCount;
-                    texCoords.push_back(s);
-                    texCoords.push_back(t);
+                    m_TexCoords.push_back(s);
+                    m_TexCoords.push_back(t);
                 }
             }
 
@@ -244,46 +173,23 @@ class Sphere
                     // k1 => k2 => k1+1
                     if (i != 0)
                     {
-                        indices.push_back(k1);
-                        indices.push_back(k2);
-                        indices.push_back(k1 + 1);
+                        m_Indices.push_back(k1);
+                        m_Indices.push_back(k2);
+                        m_Indices.push_back(k1 + 1);
                     }
 
                     // k1+1 => k2 => k2+1
                     if (i != (stackCount - 1))
                     {
-                        indices.push_back(k1 + 1);
-                        indices.push_back(k2);
-                        indices.push_back(k2 + 1);
+                        m_Indices.push_back(k1 + 1);
+                        m_Indices.push_back(k2);
+                        m_Indices.push_back(k2 + 1);
                     }
                 }
             }
 
             // generate interleaved vertex array as well
-            buildInterleavedVertices();
+            buildInterleavedVerticesWithTexCoords();
 
         }
-
-        void buildInterleavedVertices()
-        {
-            std::vector<float>().swap(interleavedVertices);
-
-            std::size_t i, j;
-            std::size_t count = vertices.size();
-            for (i = 0, j = 0; i < count; i += 3, j += 2)
-            {
-                interleavedVertices.push_back(vertices[i]);
-                interleavedVertices.push_back(vertices[i + 1]);
-                interleavedVertices.push_back(vertices[i + 2]);
-
-                interleavedVertices.push_back(normals[i]);
-                interleavedVertices.push_back(normals[i+1]);
-                interleavedVertices.push_back(normals[i+2]);
-
-                interleavedVertices.push_back(texCoords[j]);
-                interleavedVertices.push_back(texCoords[j + 1]);
-            }
-
-        }
-
 };
