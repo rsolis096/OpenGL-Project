@@ -9,8 +9,11 @@
 #include "Texture.h"
 #include "Vendors/stb_image.h"
 #include "Camera.h"
-#include "Cube.h"
-#include "Sphere.h"
+
+//Objects
+//#include "Cube.h"
+//#include "Sphere.h"
+#include "PointLight.h"
 
 //Matrix Multiplication
 #include <glm/glm.hpp>
@@ -342,9 +345,10 @@ int main()
     };
 
     //Initialize objects
+    PointLight* pointLight = new PointLight(vertices, normals, "cube", lightingShader, lightCubeShader);
     Cube* myCube = new Cube(vertices, normals, texCoords, "Assets/container2.png", "Assets/container2_specular.png", lightingShader.ID);
     Cube* myCube2 = new Cube(vertices, normals, lightingShader.ID);
-    Sphere* mySphere = new Sphere(lightingShader.ID );//,"Assets/monito.png");
+    Sphere* mySphere = new Sphere(lightingShader.ID);//,"Assets/monito.png");
     Cube *lightSource = new Cube(vertices, normals, lightCubeShader.ID);
 
     // render loop 
@@ -380,17 +384,8 @@ int main()
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//The back buffer currently only contains the color buffer, this clears and updates it with the colour specified by glClearColor.
 
-        // light properties
-        lightingShader.use();
-        lightingShader.setVec3("light.position", lightPos);
-        lightingShader.setVec3("viewPos", myCamera.cameraPos);
-        lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-        lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
-        lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
-        // material properties
-        lightingShader.setFloat("material.shininess", 64.0f);
-
+        pointLight->initializeLight(myCamera.cameraPos);
+        pointLight->setDiffuse(glm::vec3(abs(sin(currentFrame)), abs(cos(currentFrame)), abs(sin(currentFrame) * cos(currentFrame))));
 
         //View Matrix
         view = myCamera.GetViewMatrix();
@@ -407,26 +402,19 @@ int main()
 
         //Shift sphere and shrink (Note that this one does not have any special lighting)
         lightingShader.use();
-        lightingShader.setVec3("light.diffuse", colorSlider);
-        lightingShader.setVec3("objectColor", colorSlider);
+        //lightingShader.setVec3("light.diffuse", colorSlider);
+        //lightingShader.setVec3("objectColor", colorSlider);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(6.0f, 6.0f, -3.0f));
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+        model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.7f)); // a smaller cube
         model = glm::rotate(model, glm::radians(currentFrame * 15.0f), glm::vec3(0.7f, 0.7f, 0.7f));
         lightingShader.setMat4("model", model);
         //myCube2->render();
         mySphere->render(currentFrame);
 
         //Draw Lamp Object
-        lightCubeShader.use();
-        lightCubeShader.setMat4("projection", projection);
-        lightCubeShader.setMat4("view", view);
-        //Make the lamp smaller
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        lightCubeShader.setMat4("model", model);
-        lightSource->render();
+        pointLight->renderLight(projection, view);
+
 
         if (!isWindowHidden)
         {

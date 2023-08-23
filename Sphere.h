@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <glad/glad.h> 
+#include "Shader.h"
 
 #define PI 3.141592653589793238462643383279502884197
 
@@ -12,6 +12,12 @@ class Sphere
         std::vector<float>normals;
         std::vector<unsigned int>indices;
         std::vector<float>interleavedVertices;
+
+        //Object color properties
+        glm::vec3 ambient;
+        glm::vec3 diffuse;
+        glm::vec3 specular;
+
         Texture* texture;
         unsigned int m_vao, m_vboVertices, m_ebo;
         unsigned int shaderID;
@@ -20,6 +26,11 @@ class Sphere
 
 	Sphere(unsigned int sId, const char* texturePath)
 	{      
+        ambient = glm::vec3(1.0f);
+        diffuse = glm::vec3(1.0f);
+        specular = glm::vec3(1.0f);
+
+
         shaderID = sId;
         hasTexture = true;
         texture = new Texture(texturePath, false, GL_RGBA);
@@ -59,6 +70,10 @@ class Sphere
 
     Sphere(unsigned int sId)
     {
+        ambient = glm::vec3(0.2f);
+        diffuse = glm::vec3(0.2f);
+        specular = glm::vec3(0.2f);
+
         shaderID = sId;
         hasTexture = false;
         generateSphere(30, 30, 1.0f);
@@ -84,7 +99,6 @@ class Sphere
         glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 3));
         glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 6));
 
-
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
@@ -106,6 +120,12 @@ class Sphere
 
     void render(float time)
     {
+
+        glUseProgram(shaderID);
+        glUniform3fv(glGetUniformLocation(shaderID, "object.ambient"), 1, &ambient[0]);
+        glUniform3fv(glGetUniformLocation(shaderID, "object.diffuse"), 1, &diffuse[0]);
+        glUniform3fv(glGetUniformLocation(shaderID, "object.specular"), 1, &specular[0]);
+
         //Bind texture and render to VAO
         if (hasTexture)
         {
