@@ -401,15 +401,7 @@ int main()
         myCube->render();
 
         //Shift sphere and shrink (Note that this one does not have any special lighting)
-        lightingShader.use();
-        //lightingShader.setVec3("light.diffuse", colorSlider);
-        //lightingShader.setVec3("objectColor", colorSlider);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.7f)); // a smaller cube
-        model = glm::rotate(model, glm::radians(currentFrame * 15.0f), glm::vec3(0.7f, 0.7f, 0.7f));
-        lightingShader.setMat4("model", model);
-        //myCube2->render();
+        mySphere->translatePosition(glm::vec3(abs(sin(currentFrame)) / 100));
         mySphere->render(currentFrame);
 
         //Draw Lamp Object

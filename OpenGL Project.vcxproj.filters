@@ -80,9 +80,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="backup.text">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="shader.vert">
       <Filter>Resource Files</Filter>
     </None>

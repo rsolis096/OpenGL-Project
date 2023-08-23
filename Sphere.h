@@ -18,6 +18,9 @@ class Sphere
         glm::vec3 diffuse;
         glm::vec3 specular;
 
+        //World Properties
+        glm::vec3 position;
+
         Texture* texture;
         unsigned int m_vao, m_vboVertices, m_ebo;
         unsigned int shaderID;
@@ -73,6 +76,7 @@ class Sphere
         ambient = glm::vec3(0.2f);
         diffuse = glm::vec3(0.2f);
         specular = glm::vec3(0.2f);
+        position = glm::vec3(2.0f, 0.0f, 0.0f);
 
         shaderID = sId;
         hasTexture = false;
@@ -151,6 +155,29 @@ class Sphere
         // Unbind buffers and reset state
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
+
+    }
+    
+    //Teleport to specified location
+    void setPosition(glm::vec3 newPosition)
+    {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, newPosition);
+        glUseProgram(shaderID);
+        glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"), 1, GL_FALSE, &model[0][0]);
+    }
+
+    //Translate by parameter (Used to move some direction from current position)
+    void translatePosition(glm::vec3 newPosition)
+    {
+        position[0] += newPosition[0];
+        position[1] += newPosition[1];
+        position[2] += newPosition[2];
+
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, position);
+        glUseProgram(shaderID);
+        glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"), 1, GL_FALSE, &model[0][0]);
 
     }
 
