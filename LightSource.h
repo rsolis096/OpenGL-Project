@@ -13,9 +13,9 @@ class LightSource
 public:
 	LightSource();
 	LightSource(std::vector<float> inputVertices, std::vector<float> inputNormals, const char* type, Shader& lightingShader, Shader& lightCubeShader);
-	virtual void renderLight(glm::mat4 projection, glm::mat4 view) = 0;
+	virtual void renderLight(glm::vec3 cameraPos, glm::mat4 projection, glm::mat4 view) = 0;
 	~LightSource();
-	void initializeLight(glm::vec3 cameraPos);
+	virtual void initializeLight(glm::vec3 cameraPos, glm::vec3 cameraFront) = 0;
 	
 	//For Light Properties
 	void setLightPos(glm::vec3 lightPos);

@@ -24,26 +24,41 @@ class Object
         glm::vec3 m_Diffuse;
         glm::vec3 m_Specular;
 
-        //Other Attributes
+        //Object Texture Attributes
         Texture* diffuseMap;
         Texture* specularMap;
         Texture* basicTexture;
-
-        unsigned int m_vao, m_vbo, m_ebo;
-        unsigned int m_shaderID;
         bool m_hasTexture;
-        bool m_useEBO;
-        glm::vec3 m_Position;
 
-        //Generate an object with texture data but no mesh data
-        Object(unsigned int sId, const char* texturePathDiffuse, const char* texturePathSpecular);
-        //Generate an object with no texture data
-        Object(unsigned int sId);
+        //Object World Attributes
+        glm::vec3 m_Position;
+        glm::mat4 model;
+
+        //Object Render Attributes
+        unsigned int m_vao, m_vbo, m_ebo;
+        Shader m_shader;
+        bool m_useEBO;
+
+
+        //Generate an object with no mesh data, default color data, no texture data, default world attributes
+        Object();
+
+        //Methods
         void render();
+
+        //Teleport to specified location
+        void setPosition(glm::vec3 newPosition);
+        //Translate by parameter (Used to move some direction from current position)
+        void translatePosition(glm::vec3 newPosition);
+        void setAmbient(glm::vec3);
+        void setDiffuse(glm::vec3);
+        void setSpecular(glm::vec3);
+
 
     protected:
         void buildInterleavedVertices();
         void buildInterleavedVerticesWithTexCoords();
+
 
 
 };

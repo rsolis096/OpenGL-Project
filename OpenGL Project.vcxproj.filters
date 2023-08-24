@@ -89,12 +89,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="shader.frag">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="1.colors.vert">
       <Filter>Resource Files</Filter>
     </None>

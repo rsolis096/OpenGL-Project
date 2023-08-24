@@ -1,43 +1,58 @@
 #include "Object.h"
 
-Object::Object(unsigned int sId, const char* texturePathDiffuse, const char* texturePathSpecular)
+Object::Object()
 {
-    m_Ambient = glm::vec3(1.0f);
-    m_Diffuse = glm::vec3(1.0f);
-    m_Specular = glm::vec3(1.0f);
-    m_Position = glm::vec3(0.0f, 0.0f, 0.0f);
-
-    m_shaderID = sId;
-    m_hasTexture = true;
-    m_useEBO = false;
-
-    //Open and load diffuse map
-    if (std::strstr(texturePathDiffuse, ".jpg"))
-        diffuseMap = new Texture(texturePathDiffuse, false, GL_RGB);
-    else
-        diffuseMap = new Texture(texturePathDiffuse, false, GL_RGBA);
-
-    //Open and load specular map
-    if (std::strstr(texturePathSpecular, ".jpg"))
-        specularMap = new Texture(texturePathSpecular, false, GL_RGB);
-    else
-        specularMap = new Texture(texturePathSpecular, false, GL_RGBA);
-
-    //Generate VAO and VBO
-    glGenVertexArrays(1, &m_vao);
-    glGenBuffers(1, &m_vbo);
+    //Set default object properties
+    m_Ambient = glm::vec3(0.2f);
+    m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+    m_Specular = glm::vec3(0.5f);
+    m_Position = glm::vec3(1.0f, 1.0f, 1.0f);
 }
 
-Object::Object(unsigned int sId)
+void Object::render()
 {
-    m_Ambient = glm::vec3(1.0f);
-    m_Diffuse = glm::vec3(1.0f);
-    m_Specular = glm::vec3(1.0f);
-    m_Position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    m_shaderID = sId;
-    m_hasTexture = false;
-    m_useEBO = false;
+    m_shader.use();
+    m_shader.setVec3("object.ambient", m_Ambient);
+    m_shader.setVec3("object.diffuse", m_Diffuse);
+    m_shader.setVec3("object.specular", m_Specular);
+    m_shader.setMat4("model", model);
+
+    //Bind texture and send texture to fragment shader
+    if (m_hasTexture)
+    {
+        glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glBindTexture(GL_TEXTURE_2D, diffuseMap->ID);
+        glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glBindTexture(GL_TEXTURE_2D, specularMap->ID);
+
+        m_shader.use();
+        m_shader.setBool("hasTexture", true);
+    }
+    else
+    {
+        m_shader.use();
+        m_shader.setBool("hasTexture", false);
+    }
+
+    //Bind object
+    glBindVertexArray(m_vao);
+
+    //Choose render type - vertices list (VAO) or indices list(EBO)
+    if (m_useEBO)
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+        //Render the object
+        glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+    }
+    else
+    {
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+
+    // Unbind buffers and reset state
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
 }
 
@@ -82,49 +97,42 @@ void Object::buildInterleavedVerticesWithTexCoords()
     }
 }
 
-
-void Object::render()
+void Object::setAmbient(glm::vec3 newAmbient)
 {
+    m_shader.use();
+    m_Ambient = newAmbient;
+    m_shader.setVec3("object.ambient", m_Ambient);
+}
 
-    glUseProgram(m_shaderID);
-    glUniform3fv(glGetUniformLocation(m_shaderID, "object.ambient"), 1, &m_Ambient[0]);
-    glUniform3fv(glGetUniformLocation(m_shaderID, "object.diffuse"), 1, &m_Diffuse[0]);
-    glUniform3fv(glGetUniformLocation(m_shaderID, "object.specular"), 1, &m_Specular[0]);
+void Object::setDiffuse(glm::vec3 newDiffuse)
+{
+    m_shader.use();
+    m_Diffuse = newDiffuse;
+    m_shader.setVec3("object.diffuse", m_Diffuse);
+}
 
-    //Bind texture and send texture to fragment shader
-    if (m_hasTexture)
-    {
-        glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, diffuseMap->ID);
-        glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, specularMap->ID);
+void Object::setSpecular(glm::vec3 newSpecular)
+{
+    m_shader.use();
+    m_Specular = newSpecular;
+    m_shader.setVec3("object.specular", m_Specular);
+}
 
-        glUseProgram(m_shaderID);
-        glUniform1i(glGetUniformLocation(m_shaderID, "hasTexture"), true);
-    }
-    else
-    {
-        glUseProgram(m_shaderID);
-        glUniform1i(glGetUniformLocation(m_shaderID, "hasTexture"), false);
-    }
+void Object::setPosition(glm::vec3 newPosition)
+{
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, newPosition);
+    m_shader.use();
+    m_shader.setMat4("model", model);
+    //glUniformMatrix4fv(glGetUniformLocation(m_shaderID, "model"), 1, GL_FALSE, &model[0][0]);
+}
 
-    //Bind object
-    glBindVertexArray(m_vao);
+void Object::translatePosition(glm::vec3 newPosition)
+{
+    m_Position[0] += newPosition[0];
+    m_Position[1] += newPosition[1];
+    m_Position[2] += newPosition[2];
 
-    //Choose render type - vertices list (VAO) or indices list(EBO)
-    if (m_useEBO)
-    {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-        //Render the object
-        glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
-    }
-    else
-    {
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
-
-    // Unbind buffers and reset state
-    glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, m_Position);
 }

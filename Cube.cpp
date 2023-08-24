@@ -1,8 +1,30 @@
 #include "Cube.h"
 
 Cube::Cube(std::vector<float> inputVertices, std::vector<float> inputNormals, std::vector<float> inputTexCoords, const char* texturePathDiffuse, const char* texturePathSpecular
-	, unsigned int sID) : Object(sID, texturePathDiffuse, texturePathSpecular)
+	, Shader& shader) : Object()
 {
+	m_shader = shader;
+	m_hasTexture = true;
+	m_useEBO = false;
+
+	//Open and load diffuse map
+	if (std::strstr(texturePathDiffuse, ".jpg"))
+		diffuseMap = new Texture(texturePathDiffuse, false, GL_RGB);
+	else
+		diffuseMap = new Texture(texturePathDiffuse, false, GL_RGBA);
+
+	//Open and load specular map
+	if (std::strstr(texturePathSpecular, ".jpg"))
+		specularMap = new Texture(texturePathSpecular, false, GL_RGB);
+	else
+		specularMap = new Texture(texturePathSpecular, false, GL_RGBA);
+
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, m_Position);
+
+	//Generate VAO and VBO
+	glGenVertexArrays(1, &m_vao);
+	glGenBuffers(1, &m_vbo);
 
 	for (int i = 0; i < inputVertices.size(); i++)
 	{
@@ -38,8 +60,16 @@ Cube::Cube(std::vector<float> inputVertices, std::vector<float> inputNormals, st
 
 }
 
-Cube::Cube(std::vector<float> inputVertices, std::vector<float> inputNormals, unsigned int sID) : Object(sID)
+//Cube with no Textures
+Cube::Cube(std::vector<float> inputVertices, std::vector<float> inputNormals, Shader& shader) : Object()
 {
+	m_shader = shader;
+	m_hasTexture = false;
+	m_useEBO = false;
+	//Generate VAO and VBO
+	glGenVertexArrays(1, &m_vao);
+	glGenBuffers(1, &m_vbo);
+
 	for (int i = 0; i < inputVertices.size(); i++)
 	{	
 		m_Vertices.push_back(inputVertices[i]);
@@ -49,7 +79,6 @@ Cube::Cube(std::vector<float> inputVertices, std::vector<float> inputNormals, un
 	//Build interleaved Vertices
 	buildInterleavedVertices();
 
-	m_hasTexture = false;
 	//Generate VAO and VBO
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_vbo);
