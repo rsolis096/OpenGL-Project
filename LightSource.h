@@ -12,9 +12,8 @@
 class LightSource
 {
 public:
-	//LightSource();
-	LightSource(std::vector<float> inputVertices, std::vector<float> inputNormals, Shader& lightingShader, Shader& lightCubeShader, Camera& cam);
-	~LightSource();
+
+	LightSource(Camera& cam);
 
 	//virtual void renderLight() = 0;
 	//virtual void initializeLight();

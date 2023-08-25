@@ -355,9 +355,15 @@ int main()
          0.0f, 1.0f
     };
 
-    //Initialize objects
+    //Initialize Lights
     SpotLight* spotLight = new SpotLight(vertices, normals, lightingShader, lightCubeShader, myCamera);
     PointLight* pointLight = new PointLight(vertices, normals, lightingShader, lightCubeShader, myCamera);
+    PointLight* pointLight2 = new PointLight(vertices, normals, lightingShader, lightCubeShader, myCamera);
+
+    std::cout << pointLight->lightID << std::endl;
+    std::cout << pointLight2->lightID << std::endl;
+    pointLight2->setLightPos(glm::vec3(1.0f, 1.0f, -1.0f));
+    //Initialize Objects
     Cube* myCube = new Cube(vertices, normals, texCoords, "Assets/container2.png", "Assets/container2_specular.png", lightingShader);
     Cube* myCube2 = new Cube(vertices, normals, lightingShader);
     Sphere* mySphere = new Sphere(lightingShader);
@@ -380,12 +386,6 @@ int main()
 
     //Set window size of ImGUI window
     //ImGui::SetNextWindowSize(ImVec2(100, 75)); // Set the desired width and height
-
-    //Initialize Light Properties (Defaults will be used)
-    spotLight->initializeLight();
-
-
-
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -401,30 +401,27 @@ int main()
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//The back buffer currently only contains the color buffer, this clears and updates it with the colour specified by glClearColor.
 
-        //Point Light (initialize light sets light properties that may change every frame)
-        //Change the color the light emits
-        //pointLight->setDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
+        // be sure to activate shader when setting uniforms/drawing objects
+        lightingShader.use();
+        lightingShader.setVec3("viewPos", myCamera.cameraPos);
+        lightingShader.setFloat("material.shininess", 32.0f);
 
         // Update the camera
         updateCamera(lightingShader, view, projection);
 
-
-        //World Transformation (For Cube) - set the cube position to default
+        //Render Cube
         model = glm::mat4(1.0f);
         lightingShader.setMat4("model", model);
-        //Render Cube
         myCube->render();
 
         //Shift sphere and shrink (Note that this one does not have any special lighting)
         mySphere->translatePosition(glm::vec3(0.001f));
-        mySphere->setDiffuse(glm::vec3(abs(sin(currentFrame)), abs(sin(currentFrame)), abs(sin(currentFrame))));
+        //mySphere->setDiffuse(glm::vec3(abs(sin(currentFrame)), abs(sin(currentFrame)), abs(sin(currentFrame))));
         mySphere->render();
 
         //Draw Lamp Object
-        pointLight->setDiffuse(glm::vec3(abs(sin(currentFrame)), abs(cos(currentFrame)), abs(sin(currentFrame))));
         pointLight->renderLight(view, projection);
-
-
+        pointLight2->renderLight(view, projection);
         spotLight->renderLight();
 
 
