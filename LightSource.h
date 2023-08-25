@@ -7,15 +7,17 @@
 #include "Cube.h"
 #include "Sphere.h"
 #include "Shader.h"
+#include "Camera.h"
 
 class LightSource
 {
 public:
-	LightSource();
-	LightSource(std::vector<float> inputVertices, std::vector<float> inputNormals, const char* type, Shader& lightingShader, Shader& lightCubeShader);
-	virtual void renderLight(glm::vec3 cameraPos, glm::mat4 projection, glm::mat4 view) = 0;
+	//LightSource();
+	LightSource(std::vector<float> inputVertices, std::vector<float> inputNormals, Shader& lightingShader, Shader& lightCubeShader, Camera& cam);
 	~LightSource();
-	virtual void initializeLight(glm::vec3 cameraPos, glm::vec3 cameraFront) = 0;
+
+	//virtual void renderLight() = 0;
+	//virtual void initializeLight();
 	
 	//For Light Properties
 	void setLightPos(glm::vec3 lightPos);
@@ -36,6 +38,9 @@ protected:
 
 	//Light Object (light is not invisible)
 	Cube* m_LightShape;
+
+	//Reference to the camera
+	Camera& playerCamera;
 
 	//World Position
 	glm::vec3 m_LightPos;

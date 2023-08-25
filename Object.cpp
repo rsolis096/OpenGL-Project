@@ -129,10 +129,7 @@ void Object::setPosition(glm::vec3 newPosition)
 
 void Object::translatePosition(glm::vec3 newPosition)
 {
-    m_Position[0] += newPosition[0];
-    m_Position[1] += newPosition[1];
-    m_Position[2] += newPosition[2];
-
+    m_Position += newPosition;
     model = glm::mat4(1.0f);
     model = glm::translate(model, m_Position);
 }

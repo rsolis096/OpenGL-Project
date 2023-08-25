@@ -8,10 +8,11 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Vendors/stb_image.h"
-#include "Camera.h"
+//#include "Camera.h"
 
 //Objects
 #include "PointLight.h"
+#include "SpotLight.h"
 
 //Matrix Multiplication
 #include <glm/glm.hpp>
@@ -56,6 +57,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void updateCamera(Shader& lightingShader, glm::mat4& view, glm::mat4& projection)
 {
+    lightingShader.use();
     //View Matrix (Do after camera)
     view = myCamera.GetViewMatrix();
     //Projection Matrix (fov change with scroll wheel)
@@ -354,7 +356,8 @@ int main()
     };
 
     //Initialize objects
-    PointLight* pointLight = new PointLight(vertices, normals, "cube", lightingShader, lightCubeShader);
+    SpotLight* spotLight = new SpotLight(vertices, normals, lightingShader, lightCubeShader, myCamera);
+    PointLight* pointLight = new PointLight(vertices, normals, lightingShader, lightCubeShader, myCamera);
     Cube* myCube = new Cube(vertices, normals, texCoords, "Assets/container2.png", "Assets/container2_specular.png", lightingShader);
     Cube* myCube2 = new Cube(vertices, normals, lightingShader);
     Sphere* mySphere = new Sphere(lightingShader);
@@ -379,7 +382,7 @@ int main()
     //ImGui::SetNextWindowSize(ImVec2(100, 75)); // Set the desired width and height
 
     //Initialize Light Properties (Defaults will be used)
-    pointLight->initializeLight(myCamera.cameraPos, myCamera.cameraFront);
+    spotLight->initializeLight();
 
 
 
@@ -400,8 +403,7 @@ int main()
 
         //Point Light (initialize light sets light properties that may change every frame)
         //Change the color the light emits
-        //pointLight->setDiffuse(glm::vec3(abs(sin(currentFrame)), abs(cos(currentFrame)), abs(sin(currentFrame))));
-        pointLight->setDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
+        //pointLight->setDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
 
         // Update the camera
         updateCamera(lightingShader, view, projection);
@@ -419,7 +421,11 @@ int main()
         mySphere->render();
 
         //Draw Lamp Object
-        pointLight->renderLight(myCamera.cameraPos, projection, view);
+        pointLight->setDiffuse(glm::vec3(abs(sin(currentFrame)), abs(cos(currentFrame)), abs(sin(currentFrame))));
+        pointLight->renderLight(view, projection);
+
+
+        spotLight->renderLight();
 
 
         if (!isWindowHidden)

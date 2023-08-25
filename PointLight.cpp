@@ -1,18 +1,20 @@
 #include "PointLight.h"
 
-PointLight::PointLight(std::vector<float> inputVertices, std::vector<float> inputNormals, const char* type,
-	Shader& lightingShader, Shader& lightCubeShader) : LightSource(inputVertices, inputNormals, type,
-		lightingShader, lightCubeShader)
+PointLight::PointLight(std::vector<float> inputVertices, std::vector<float> inputNormals,
+	Shader& lightingShader, Shader& lightCubeShader, Camera& cam) : LightSource(inputVertices, inputNormals,
+		lightingShader, lightCubeShader, cam)
 {
-
-
+	m_Ambient = glm::vec3(0.2f, 0.2f, 0.2f); //Dark ambient
+	m_Diffuse = glm::vec3(0.5f, 0.5f, 0.5f); //Grey light color
+	m_Specular = glm::vec3(1.0f, 1.0f, 1.0f); //"Shine" color
 }
 
-void PointLight::renderLight(glm::vec3 cameraPos, glm::mat4 projection, glm::mat4 view)
+void PointLight::renderLight(glm::mat4 view, glm::mat4 projection)
 {
 	//Draw Lamp Object
+	initializeLight();
 	m_lightShapeShader.use();
-	m_lightingShader.setVec3("viewPos", cameraPos);
+	m_lightingShader.setVec3("viewPos", playerCamera.cameraPos);
 	m_lightShapeShader.setMat4("projection", projection);
 	m_lightShapeShader.setMat4("view", view);
 	m_LightShape->model = glm::mat4(1.0f);
@@ -22,7 +24,7 @@ void PointLight::renderLight(glm::vec3 cameraPos, glm::mat4 projection, glm::mat
 	m_LightShape->render();
 }
 
-void PointLight::initializeLight(glm::vec3 cameraPos, glm::vec3 cameraFront)
+void PointLight::initializeLight()
 {
 	//Default Light Properties
 	m_lightingShader.use();

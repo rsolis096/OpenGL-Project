@@ -1,13 +1,10 @@
 #include "LightSource.h"
 
-LightSource::LightSource()
-{
-}
 
-LightSource::LightSource(std::vector<float> inputVertices, std::vector<float> inputNormals, const char* type, Shader& lightingShader, Shader& lightCubeShader)
+LightSource::LightSource(std::vector<float> inputVertices, std::vector<float> inputNormals, Shader& lightingShader, Shader& lightCubeShader, Camera& cam)
+	: playerCamera(cam)
 {
 	//Builds a light source with some default values
-
 	m_lightingShader = lightingShader; //For changing the lighting properties
 	m_lightShapeShader = lightCubeShader; //For rendering the light source itself
 
@@ -18,9 +15,9 @@ LightSource::LightSource(std::vector<float> inputVertices, std::vector<float> in
 	m_LightShape->model = glm::mat4(1.0f);
 	m_LightShape->model = glm::translate(m_LightShape->model, m_LightShape->m_Position);;
 
-	m_Ambient = glm::vec3(0.2f, 0.2f, 0.2f); //Dark ambient
-	m_Diffuse = glm::vec3(0.5f, 0.5f, 0.5f); //Grey light color
-	m_Specular = glm::vec3(0.8f, 0.8f, 0.8f); //"Shine" color
+	m_Ambient = glm::vec3(0.1f, 0.1f, 0.1f); //Dark ambient
+	m_Diffuse = glm::vec3(0.8f, 0.8f, 0.8f); //Grey light color
+	m_Specular = glm::vec3(1.0f, 1.0f, 1.0f); //"Shine" color
 
 	//All lights will have the same initial drop off
 	m_Constant = 1.0f;
