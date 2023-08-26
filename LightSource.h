@@ -4,8 +4,7 @@
 #include <vector>
 #include <glad/glad.h>
 
-#include "Cube.h"
-#include "Sphere.h"
+#include "Object.h"
 #include "Shader.h"
 #include "Camera.h"
 
@@ -15,9 +14,6 @@ public:
 
 	LightSource(Camera& cam);
 
-	//virtual void renderLight() = 0;
-	//virtual void initializeLight();
-	
 	//For Light Properties
 	void setLightPos(glm::vec3 lightPos);
 	void setAmbient(glm::vec3 ambient);
@@ -36,7 +32,7 @@ protected:
 	Shader m_lightingShader;
 
 	//Light Object (light is not invisible)
-	Cube* m_LightShape;
+	Object* m_LightShape;
 
 	//Reference to the camera
 	Camera& playerCamera;

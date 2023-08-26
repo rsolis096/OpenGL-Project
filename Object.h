@@ -36,12 +36,16 @@ class Object
 
         //Object Render Attributes
         unsigned int m_vao, m_vbo, m_ebo;
-        Shader m_shader;
+        Shader m_Shader;
         bool m_useEBO;
 
 
         //Generate an object with no mesh data, default color data, no texture data, default world attributes
         Object();
+        //Build a primitive of type eg. type = "sphere", "cube", "pyramid"
+        Object(const char* type, const char* texturePathDiffuse, const char* texturePathSpecular, Shader& shader);
+        //Build a primitive object with no texture data
+        Object(const char* type, Shader& shader);
 
         //Methods
         void render();
@@ -58,6 +62,9 @@ class Object
     protected:
         void buildInterleavedVertices();
         void buildInterleavedVerticesWithTexCoords();
+
+        void buildSphere();
+        void buildCube();
 
 
 

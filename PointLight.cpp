@@ -13,7 +13,7 @@ PointLight::PointLight(std::vector<float> inputVertices, std::vector<float> inpu
 	m_lightShapeShader = lightCubeShader; //For rendering the light source itself
 
 	m_LightPos = glm::vec3(0.7f, 0.2f, 2.0f);
-	m_LightShape = new Cube(inputVertices, inputNormals, m_lightShapeShader);
+	m_LightShape = new Object("Cube", m_lightShapeShader);
 	m_LightShape->setPosition(m_LightPos);
 
 	//For the light bulb location

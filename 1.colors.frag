@@ -1,7 +1,7 @@
 #version 330 core
 out vec4 FragColor;
 
-uniform sampler2D texture_diffuse1;
+//uniform sampler2D texture_diffuse1;
 
 struct Material {
     sampler2D texture_diffuse;
@@ -75,7 +75,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main()
 {
-    /*
+    
     // properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
@@ -95,8 +95,8 @@ void main()
     result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
     
     FragColor = vec4(result, 1.0);
-    */
-   FragColor = texture(texture_diffuse1, TexCoords);
+   
+   //FragColor = texture(texture_diffuse1, TexCoords);
 }
 
 
