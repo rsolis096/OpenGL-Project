@@ -3,14 +3,19 @@
 #include "Vendors/stb_image.h"
 #include <glad/glad.h>
 #include <vector>
+#include <iostream>
+#include <string>
 
 class Texture
 {
 public:
-	static int textureCount;
 	unsigned int ID;
 	int m_Width, m_Height, m_nrChannels;
 	Texture(const char* filePath, bool flipOnY, unsigned int format);
+	Texture();
 	~Texture();
-	//void Bind() const;
+
+	//File Properties
+	std::string type; //Specifies diffuse, specular, norma, height
+	std::string path;
 };
