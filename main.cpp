@@ -8,7 +8,8 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Vendors/stb_image.h"
-//#include "Camera.h"
+#include "Model.h"
+#include "Object.h"
 
 //Objects
 #include "PointLight.h"
@@ -219,7 +220,6 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     //Compile and link shaders
-    //Shader myShader("shader.vert", "shader.frag");
     Shader lightingShader("1.colors.vert", "1.colors.frag");
     Shader lightCubeShader("1.light_cube.vert", "1.light_cube.frag");
 
@@ -359,14 +359,13 @@ int main()
     SpotLight* spotLight = new SpotLight(vertices, normals, lightingShader, lightCubeShader, myCamera);
     PointLight* pointLight = new PointLight(vertices, normals, lightingShader, lightCubeShader, myCamera);
     PointLight* pointLight2 = new PointLight(vertices, normals, lightingShader, lightCubeShader, myCamera);
-
-    std::cout << pointLight->lightID << std::endl;
-    std::cout << pointLight2->lightID << std::endl;
     pointLight2->setLightPos(glm::vec3(1.0f, 1.0f, -1.0f));
+
+    //Unique Model
+    Model ourModel("resources/objects/backpack/backpack.obj");
     //Initialize Objects
-    Cube* myCube = new Cube(vertices, normals, texCoords, "Assets/container2.png", "Assets/container2_specular.png", lightingShader);
-    Cube* myCube2 = new Cube(vertices, normals, lightingShader);
-    Sphere* mySphere = new Sphere(lightingShader);
+    Object myCube("Cube", "Assets/container2.png", "Assets/container2_specular.png", lightingShader);
+    Object mySphere("Sphere", "Assets/globe.jpg", "Assets/globe.jpg", lightingShader);
 
     // render loop 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable this line for wireframe display
@@ -386,6 +385,7 @@ int main()
 
     //Set window size of ImGUI window
     //ImGui::SetNextWindowSize(ImVec2(100, 75)); // Set the desired width and height
+    float count = 0;
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -412,12 +412,20 @@ int main()
         //Render Cube
         model = glm::mat4(1.0f);
         lightingShader.setMat4("model", model);
-        myCube->render();
+        myCube.render();
 
         //Shift sphere and shrink (Note that this one does not have any special lighting)
-        mySphere->translatePosition(glm::vec3(0.001f));
+        mySphere.translatePosition(glm::vec3(0.001f));
         //mySphere->setDiffuse(glm::vec3(abs(sin(currentFrame)), abs(sin(currentFrame)), abs(sin(currentFrame))));
-        mySphere->render();
+        mySphere.render();
+
+        // render the loaded model
+        model = glm::mat4(1.0f);
+        count += 0.001;
+        model = glm::translate(model, glm::vec3(count, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        model = glm::rotate(glm::mat4(1.0f), glm::radians(currentFrame * 50), glm::vec3(0.0, 1.0, 0.0));	// it's a bit too big for our scene, so scale it down
+        lightingShader.setMat4("model", model);
+        ourModel.Draw(lightingShader);
 
         //Draw Lamp Object
         pointLight->renderLight(view, projection);
@@ -452,10 +460,7 @@ int main()
     }
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    delete myCube;
-    myCube = nullptr;
-    delete mySphere;
-    mySphere = nullptr;
+
 
     //imgui: terminate
     ImGui_ImplOpenGL3_Shutdown();

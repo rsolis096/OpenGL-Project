@@ -1,11 +1,9 @@
 #include "Texture.h"
 #include <iostream>
 
-int Texture::textureCount = 0;
 
-Texture::Texture(const char* filePath, bool flipOnY, unsigned int format)
+Texture::Texture(const char* filePath, bool flipOnY, unsigned int format) : ID(0)
 {
-    textureCount++;
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_2D, ID);
     // set the texture wrapping parameters
@@ -31,6 +29,15 @@ Texture::Texture(const char* filePath, bool flipOnY, unsigned int format)
         std::cout << "Failed to load texture" << std::endl;
     }
     stbi_image_free(data);
+}
+
+Texture::Texture() : ID(0)
+{
+    m_Width = 0;
+    m_Height = 0;
+    m_nrChannels = 0;
+    type = "";
+    path = "";
 }
 
 Texture::~Texture()
