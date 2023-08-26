@@ -191,10 +191,12 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
     //Enable cursor and scroll wheel input
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-    //Enable mouse input
+
+    //Enable mouse input (This disables the mouse and locks it to screen)
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // glad: load all OpenGL function pointers (Initialize GLAD)
@@ -205,7 +207,7 @@ int main()
         return -1;
     }
 
-    // Setup Dear ImGui context
+    // Setup ImGUI context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -216,149 +218,17 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
     ImGui_ImplOpenGL3_Init();
 
-    //Enable Z-Buffer
+    //Enable Z-Buffer (Depth Testing)
     glEnable(GL_DEPTH_TEST);
 
     //Compile and link shaders
-    Shader lightingShader("1.colors.vert", "1.colors.frag");
-    Shader lightCubeShader("1.light_cube.vert", "1.light_cube.frag");
-
-    std::vector<float> vertices = {
-    -0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-    -0.5f,  0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
-
-    -0.5f, -0.5f,  0.5f, 
-     0.5f, -0.5f,  0.5f, 
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
-    -0.5f, -0.5f,  0.5f, 
-
-    -0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f, -0.5f, 
-    -0.5f, -0.5f, -0.5f,  
-    -0.5f, -0.5f, -0.5f, 
-    -0.5f, -0.5f,  0.5f, 
-    -0.5f,  0.5f,  0.5f,
-
-     0.5f,  0.5f,  0.5f, 
-     0.5f,  0.5f, -0.5f,  
-     0.5f, -0.5f, -0.5f,  
-     0.5f, -0.5f, -0.5f, 
-     0.5f, -0.5f,  0.5f, 
-     0.5f,  0.5f,  0.5f,  
-
-    -0.5f, -0.5f, -0.5f,  
-     0.5f, -0.5f, -0.5f,  
-     0.5f, -0.5f,  0.5f,  
-     0.5f, -0.5f,  0.5f,  
-    -0.5f, -0.5f,  0.5f,  
-    -0.5f, -0.5f, -0.5f,  
-
-    -0.5f,  0.5f, -0.5f,  
-     0.5f,  0.5f, -0.5f,  
-     0.5f,  0.5f,  0.5f,  
-     0.5f,  0.5f,  0.5f, 
-    -0.5f,  0.5f,  0.5f, 
-    -0.5f,  0.5f, -0.5f
-    };
-
-    std::vector<float> normals = {
-        0.0f,  0.0f, -1.0f,
-        0.0f,  0.0f, -1.0f,
-        0.0f,  0.0f, -1.0f,
-        0.0f,  0.0f, -1.0f,
-        0.0f,  0.0f, -1.0f,
-        0.0f,  0.0f, -1.0f,
-
-        0.0f,  0.0f,  1.0f,
-        0.0f,  0.0f,  1.0f,
-        0.0f,  0.0f,  1.0f,
-        0.0f,  0.0f,  1.0f,
-        0.0f,  0.0f,  1.0f,
-        0.0f,  0.0f,  1.0f,
-
-        -1.0f,  0.0f,  0.0f,
-        -1.0f,  0.0f,  0.0f,
-        -1.0f,  0.0f,  0.0f,
-        -1.0f,  0.0f,  0.0f,
-        -1.0f,  0.0f,  0.0f,
-        -1.0f,  0.0f,  0.0f,
-
-         1.0f,  0.0f,  0.0f,
-         1.0f,  0.0f,  0.0f,
-         1.0f,  0.0f,  0.0f,
-         1.0f,  0.0f,  0.0f,
-         1.0f,  0.0f,  0.0f,
-         1.0f,  0.0f,  0.0f,
-
-         0.0f, -1.0f,  0.0f,
-         0.0f, -1.0f,  0.0f,
-         0.0f, -1.0f,  0.0f,
-         0.0f, -1.0f,  0.0f,
-         0.0f, -1.0f,  0.0f,
-         0.0f, -1.0f,  0.0f,
-
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f
-    };
-
-    std::vector<float> texCoords = {
-       0.0f, 0.0f,
-       1.0f, 0.0f,
-       1.0f, 1.0f,
-       1.0f, 1.0f,
-       0.0f, 1.0f,
-       0.0f, 0.0f,
-
-       0.0f, 0.0f,
-       1.0f, 0.0f,
-       1.0f, 1.0f,
-       1.0f, 1.0f,
-       0.0f, 1.0f,
-       0.0f, 0.0f,
-
-        1.0f, 0.0f,
-       1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 1.0f,
-         0.0f, 0.0f,
-         1.0f, 0.0f,
-
-        1.0f, 0.0f,
-         1.0f, 1.0f,
-         0.0f, 1.0f,
-          0.0f, 1.0f,
-          0.0f, 0.0f,
-          1.0f, 0.0f,
-
-        0.0f, 1.0f,
-          1.0f, 1.0f,
-         1.0f, 0.0f,
-         1.0f, 0.0f,
-          0.0f, 0.0f,
-         0.0f, 1.0f,
-
-        0.0f, 1.0f,
-        1.0f, 1.0f,
-        1.0f, 0.0f,
-          1.0f, 0.0f,
-          0.0f, 0.0f,
-         0.0f, 1.0f
-    };
+    Shader lightingShader("lightingShader.vert", "lightingShader.frag");
+    Shader lightCubeShader("pointLightShader.vert", "pointLightShader.frag");
 
     //Initialize Lights
-    SpotLight* spotLight = new SpotLight(vertices, normals, lightingShader, lightCubeShader, myCamera);
-    PointLight* pointLight = new PointLight(vertices, normals, lightingShader, lightCubeShader, myCamera);
-    PointLight* pointLight2 = new PointLight(vertices, normals, lightingShader, lightCubeShader, myCamera);
+    SpotLight* spotLight = new SpotLight(lightingShader, myCamera);
+    PointLight* pointLight = new PointLight(lightingShader, lightCubeShader, myCamera);
+    PointLight* pointLight2 = new PointLight(lightingShader, lightCubeShader, myCamera);
     pointLight2->setLightPos(glm::vec3(1.0f, 1.0f, -1.0f));
 
     //Unique Model

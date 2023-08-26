@@ -1,13 +1,17 @@
 #pragma once
 
-#include "LightSource.h"
+#include <iostream>
+#include <vector>
+#include <glad/glad.h>
+#include "Object.h"
+#include "Shader.h"
+#include "Camera.h"
 
-class PointLight : public LightSource
+class PointLight
 {
 	public:
-		PointLight(std::vector<float> inputVertices, std::vector<float> inputNormals, Shader& lightingShader, Shader& lightCubeShader, Camera& cam);
+		PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& cam);
 		void renderLight(glm::mat4 view, glm::mat4 projection);
-		void initializeLight();
 		~PointLight();
 		static int pointLightCount;
 		int lightID;
@@ -22,5 +26,29 @@ class PointLight : public LightSource
 		void setconstant(float constant);
 		void setLinear(float linear);
 		void setQuadratic(float quadratic);
+
+	private:
+		//Shaders (for lighting and for light object itself
+		Shader m_lightShapeShader;
+		Shader m_lightingShader;
+
+		//Light Object (light is not invisible)
+		Object* m_LightShape;
+
+		//Reference to the camera
+		Camera& playerCamera;
+
+		//World Position
+		glm::vec3 m_LightPos;
+
+		//Light properties
+		glm::vec3 m_Ambient;
+		glm::vec3 m_Diffuse;
+		glm::vec3 m_Specular;
+
+		//For Attenuation
+		float m_Constant;
+		float m_Linear;
+		float m_Quadratic;
 };
 

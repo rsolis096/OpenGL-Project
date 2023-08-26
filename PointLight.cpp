@@ -2,8 +2,7 @@
 
 int PointLight::pointLightCount = 0;
 
-PointLight::PointLight(std::vector<float> inputVertices, std::vector<float> inputNormals,
-	Shader& lightingShader, Shader& lightCubeShader, Camera& cam) : LightSource(cam)
+PointLight::PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& cam) : playerCamera(cam)
 	{
 	lightID = pointLightCount;
 	pointLightCount += 1;
@@ -13,7 +12,7 @@ PointLight::PointLight(std::vector<float> inputVertices, std::vector<float> inpu
 	m_lightShapeShader = lightCubeShader; //For rendering the light source itself
 
 	m_LightPos = glm::vec3(0.7f, 0.2f, 2.0f);
-	m_LightShape = new Object("Cube", m_lightShapeShader);
+	m_LightShape = new Object("Sphere", m_lightShapeShader); //This object will be the lamp
 	m_LightShape->setPosition(m_LightPos);
 
 	//For the light bulb location
@@ -69,23 +68,11 @@ void PointLight::renderLight(glm::mat4 view, glm::mat4 projection)
 	m_lightingShader.setFloat("material.shininess", 32.0f);
 }
 
-void PointLight::initializeLight()
-{
-	/*
-	//Default Light Properties
-	m_lightingShader.setVec3("pointLights[0].position", 0.7f, 0.2f, 2.0f);
-	m_lightingShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
-	m_lightingShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
-	m_lightingShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-	m_lightingShader.setFloat("pointLights[0].constant", 1.0f);
-	m_lightingShader.setFloat("pointLights[0].linear", 0.09f);
-	m_lightingShader.setFloat("pointLights[0].quadratic", 0.032f);
-	// material properties
-	m_lightingShader.setFloat("material.shininess", 32.0f);*/
-}
 
 PointLight::~PointLight()
 {
+	delete m_LightShape;
+	m_LightShape = nullptr;
 }
 
 //For Light Properties

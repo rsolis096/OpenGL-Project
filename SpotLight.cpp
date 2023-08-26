@@ -1,12 +1,9 @@
 #include "SpotLight.h"
 
-SpotLight::SpotLight(std::vector<float> inputVertices, std::vector<float> inputNormals, Shader& lightingShader, Shader& lightCubeShader, Camera& cam)
-	: LightSource(cam)
+SpotLight::SpotLight(Shader& lightingShader, Camera& cam) : playerCamera(cam)
 {
-	m_lightShapeShader = lightCubeShader;  
 	m_lightingShader = lightingShader;
-	m_LightShape = nullptr;
-	playerCamera = cam;
+	//playerCamera = cam;
 	m_LightPos = playerCamera.cameraPos;
 
 	//Light color properties

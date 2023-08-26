@@ -1,11 +1,16 @@
 #pragma once
 
-#include "LightSource.h"
+#include <iostream>
+#include <vector>
+#include <glad/glad.h>
+#include "Object.h"
+#include "Shader.h"
+#include "Camera.h"
 
-class SpotLight : public LightSource
+class SpotLight
 {
 public:
-	SpotLight(std::vector<float> inputVertices, std::vector<float> inputNormals, Shader& lightingShader, Shader& lightCubeShader, Camera& cam);
+	SpotLight(Shader& lightingShader, Camera& cam);
 	void renderLight();
 	~SpotLight();
 
@@ -19,4 +24,19 @@ public:
 	void setconstant(float constant);
 	void setLinear(float linear);
 	void setQuadratic(float quadratic);
+
+private:
+	Shader m_lightingShader;
+	Camera& playerCamera;
+	glm::vec3 m_LightPos;
+
+	//Light properties
+	glm::vec3 m_Ambient;
+	glm::vec3 m_Diffuse;
+	glm::vec3 m_Specular;
+
+	//For Attenuation
+	float m_Constant;
+	float m_Linear;
+	float m_Quadratic;
 };
