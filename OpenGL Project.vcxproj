@@ -139,6 +139,7 @@
   <ItemGroup>
     <ClCompile Include="Dependencies\includes\glad\glad.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="Shader.cpp" />

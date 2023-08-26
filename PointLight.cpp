@@ -2,7 +2,7 @@
 
 int PointLight::pointLightCount = 0;
 
-PointLight::PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& cam) : playerCamera(cam)
+PointLight::PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& cam) : playerCamera(cam)//, m_LightModel(Model("resources/objects/lightbulb/lightbulb.obj"))
 	{
 	lightID = pointLightCount;
 	pointLightCount += 1;
@@ -13,6 +13,7 @@ PointLight::PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& 
 
 	m_LightPos = glm::vec3(0.7f, 0.2f, 2.0f);
 	m_LightShape = new Object("Sphere", m_lightShapeShader); //This object will be the lamp
+
 	m_LightShape->setPosition(m_LightPos);
 
 	//For the light bulb location

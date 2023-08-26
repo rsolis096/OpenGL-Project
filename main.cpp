@@ -229,7 +229,7 @@ int main()
     SpotLight* spotLight = new SpotLight(lightingShader, myCamera);
     PointLight* pointLight = new PointLight(lightingShader, lightCubeShader, myCamera);
     PointLight* pointLight2 = new PointLight(lightingShader, lightCubeShader, myCamera);
-    pointLight2->setLightPos(glm::vec3(1.0f, 1.0f, -1.0f));
+    pointLight2->setLightPos(glm::vec3(1.0f, 1.0f, -5.0f));
 
     //Unique Model
     Model ourModel("resources/objects/backpack/backpack.obj");

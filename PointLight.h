@@ -3,9 +3,15 @@
 #include <iostream>
 #include <vector>
 #include <glad/glad.h>
+#include "Model.h"
 #include "Object.h"
 #include "Shader.h"
 #include "Camera.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 class PointLight
 {
@@ -34,6 +40,7 @@ class PointLight
 
 		//Light Object (light is not invisible)
 		Object* m_LightShape;
+		//Model m_LightModel;
 
 		//Reference to the camera
 		Camera& playerCamera;

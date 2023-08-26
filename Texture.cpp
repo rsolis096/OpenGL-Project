@@ -1,5 +1,4 @@
 #include "Texture.h"
-#include <iostream>
 
 
 Texture::Texture(const char* filePath, bool flipOnY, unsigned int format) : ID(0)
