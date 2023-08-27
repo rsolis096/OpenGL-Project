@@ -1,13 +1,20 @@
 #include "Object.h"
 #define PI 3.141592653589793238462643383279502884197
 
-Object::Object()
+Object::Object() : diffuseMap(nullptr), specularMap(nullptr), basicTexture(nullptr), m_hasTexture(false)
 {
     //Set default object properties
-    m_Ambient = glm::vec3(0.2f);
-    m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-    m_Specular = glm::vec3(0.5f);
-    m_Position = glm::vec3(1.0f, 1.0f, 1.0f);
+    m_Ambient = glm::vec3(0.0);
+    m_Diffuse = glm::vec3(0.0f, 0.0f, 0.0f);
+    m_Specular = glm::vec3(0.0f);
+    m_Position = glm::vec3(0.0f, 0.0f, 0.0f);
+    model = glm::mat4(1.0f);
+    //Object Render Attributes
+    m_vao = 0;
+    m_vbo = 0;
+    m_ebo = 0;
+    m_useEBO = false;
+    m_type = "null";
 }
 
 Object::Object(const char* type, const char* texturePathDiffuse, const char* texturePathSpecular, Shader& shader) : m_Shader(shader)
@@ -24,6 +31,7 @@ Object::Object(const char* type, const char* texturePathDiffuse, const char* tex
     //m_Shader = shader;
     m_hasTexture = true;
     m_useEBO = false;
+    m_type = type;
 
     //Open and load diffuse map and specular map, save their objects
     if (std::strstr(texturePathDiffuse, ".jpg"))
@@ -65,6 +73,7 @@ Object::Object(const char* type, Shader& shader) : m_Shader(shader)
     //Set some rendering properties
     //m_Shader = shader;
     m_hasTexture = false;
+    m_type = type;
 
     if (type == "Cube")
     {
@@ -505,11 +514,11 @@ void Object::setSpecular(glm::vec3 newSpecular)
 
 void Object::setPosition(glm::vec3 newPosition)
 {
+    m_Position = newPosition;
     model = glm::mat4(1.0f);
     model = glm::translate(model, newPosition);
     m_Shader.use();
     m_Shader.setMat4("model", model);
-    //glUniformMatrix4fv(glGetUniformLocation(m_shaderID, "model"), 1, GL_FALSE, &model[0][0]);
 }
 
 void Object::translatePosition(glm::vec3 newPosition)

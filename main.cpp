@@ -10,6 +10,7 @@
 #include "Vendors/stb_image.h"
 #include "Model.h"
 #include "Object.h"
+#include "GUI.h"
 
 //Objects
 #include "PointLight.h"
@@ -81,7 +82,7 @@ void processInput(GLFWwindow* window)
         double currentTime = glfwGetTime();
         if (currentTime - lastKeyPressTime > debounceThreshold)
         {
-            isWindowHidden = !isWindowHidden;
+            GUI::isWindowHidden = !GUI::isWindowHidden;
             if (cursorLocked)
             {
                 //Save previous mouse location
@@ -206,20 +207,11 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-
-    // Setup ImGUI context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-    // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
-    ImGui_ImplOpenGL3_Init();
-
-    //Enable Z-Buffer (Depth Testing)
     glEnable(GL_DEPTH_TEST);
+
+
+
+
 
     //Compile and link shaders
     Shader lightingShader("lightingShader.vert", "lightingShader.frag");
@@ -234,8 +226,16 @@ int main()
     //Unique Model
     Model ourModel("resources/objects/backpack/backpack.obj");
     //Initialize Objects
-    Object myCube("Cube", "Assets/container2.png", "Assets/container2_specular.png", lightingShader);
-    Object mySphere("Sphere", "Assets/globe.jpg", "Assets/globe.jpg", lightingShader);
+
+    std::vector<Object> scenePrimitives = {
+        Object("Cube", "Assets/container2.png", "Assets/container2_specular.png", lightingShader),
+        Object("Sphere", "Assets/globe.jpg", "Assets/globe.jpg", lightingShader)
+    };
+
+    //Initialize the GUI
+    GUI myGUI(window, scenePrimitives);
+
+    
 
     // render loop 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable this line for wireframe display
@@ -279,15 +279,10 @@ int main()
         // Update the camera
         updateCamera(lightingShader, view, projection);
 
-        //Render Cube
-        model = glm::mat4(1.0f);
-        lightingShader.setMat4("model", model);
-        myCube.render();
-
-        //Shift sphere and shrink (Note that this one does not have any special lighting)
-        mySphere.translatePosition(glm::vec3(0.001f));
-        //mySphere->setDiffuse(glm::vec3(abs(sin(currentFrame)), abs(sin(currentFrame)), abs(sin(currentFrame))));
-        mySphere.render();
+        for (Object& element : scenePrimitives)
+        {
+            element.render();
+        }
 
         // render the loaded model
         model = glm::mat4(1.0f);
@@ -297,29 +292,17 @@ int main()
         lightingShader.setMat4("model", model);
         ourModel.Draw(lightingShader);
 
+
         //Draw Lamp Object
         pointLight->renderLight(view, projection);
         pointLight2->renderLight(view, projection);
         spotLight->renderLight();
 
 
-        if (!isWindowHidden)
-        {
-            // Start the Dear ImGui frame
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
+        myGUI.displayWindow();
 
-            // Rendering
-            // (Your code clears your framebuffer, renders your other stuff etc.)
-            ImGui::Begin("OpenGL Project");
-            ImGui::Text("Hello World");
-            ImGui::ColorEdit3("color", &colorSlider[0]);
-            ImGui::End();
 
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        }
+
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

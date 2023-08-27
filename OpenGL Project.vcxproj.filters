@@ -75,32 +75,21 @@
     <ClCompile Include="PointLight.cpp">
       <Filter>Source Files\Lighting</Filter>
     </ClCompile>
-    <ClCompile Include="LightSource.cpp">
-      <Filter>Source Files\Lighting</Filter>
-    </ClCompile>
-    <ClCompile Include="Cube.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Sphere.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="1.colors.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="1.colors.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="1.light_cube.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="1.light_cube.vert">
-      <Filter>Resource Files</Filter>
-    </None>
+    <None Include="lightingShader.frag" />
+    <None Include="lightingShader.vert" />
+    <None Include="pointLightShader.frag" />
+    <None Include="pointLightShader.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -148,15 +137,6 @@
     <ClInclude Include="PointLight.h">
       <Filter>Header Files\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="LightSource.h">
-      <Filter>Header Files\Lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="Cube.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Sphere.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Object.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
@@ -165,6 +145,9 @@
     </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI.h">
+      <Filter>Header Files\imgui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

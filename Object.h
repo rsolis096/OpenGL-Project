@@ -40,6 +40,8 @@ class Object
         Shader m_Shader;
         bool m_useEBO;
 
+        std::string m_type;
+
 
         //Generate an object with no mesh data, default color data, no texture data, default world attributes
         Object();
