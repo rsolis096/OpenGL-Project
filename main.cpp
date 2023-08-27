@@ -281,7 +281,13 @@ int main()
 
         for (Object& element : scenePrimitives)
         {
+            if (element.m_type == "Sphere")
+            {
+                element.translatePosition(glm::vec3(0.001f));
+            }
             element.render();
+
+
         }
 
         // render the loaded model

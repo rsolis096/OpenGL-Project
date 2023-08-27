@@ -71,6 +71,8 @@ void GUI::drawList()
 		ImGui::Text("Name: %s", selectedObject.m_type.c_str());
 		glm::vec3 pos = selectedObject.m_Position;
 		ImGui::Text("Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
+		// Show a button to set values
+
 		static float f0 = 0.001f;
 		//ImGui::InputFloat("input float", &f0, 0.01f, 1.0f, "%.3f");
 		static float vec4f[4] = { 0.00f, 0.00f, 0.00f, 0.00f };
@@ -83,9 +85,11 @@ void GUI::drawList()
 			pos[2] = vec4f[2];
 			selectedObject.setPosition(pos);
 		}
-
 	}
-
+	if (ImGui::Button("+")) {
+		m_ScenePrimitives.push_back(Object("Cube", m_ScenePrimitives[0].m_Shader));
+		//selectedObject.setPosition(pos);
+	}
 }
 
 void GUI::setScenePrimitives(std::vector<Object>& scenePrimitives)
