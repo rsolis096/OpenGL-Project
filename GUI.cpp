@@ -12,7 +12,7 @@ GUI::GUI() : window(nullptr)
 }
 */
 
-GUI::GUI(GLFWwindow* windowParam, std::vector<Object>& scenePrimitives) : window(windowParam), m_ScenePrimitives(scenePrimitives)
+GUI::GUI(GLFWwindow* windowParam, std::vector<Object*>& objects) : window(windowParam), m_scenePrimitives(objects)
 {
 	// Setup ImGUI context
 	IMGUI_CHECKVERSION();
@@ -58,18 +58,18 @@ void GUI::drawList()
 {
 	// Create an array of labels for the ListBox
 	std::vector<const char*> itemLabels;
-	for (Object& obj : m_ScenePrimitives) {
-		itemLabels.push_back(obj.m_type.c_str());
+	for (auto& obj : m_scenePrimitives) {
+		itemLabels.push_back(obj->m_type.c_str());
 	}
 
 	// Display the ListBox
 	ImGui::ListBox("Objects\n", &selectedItemIndex, itemLabels.data(), static_cast<int>(itemLabels.size()));
 
 	// Display detailed information about the selected item (if any)
-	if (selectedItemIndex >= 0 && selectedItemIndex < m_ScenePrimitives.size()) {
-		Object& selectedObject = m_ScenePrimitives[selectedItemIndex];
-		ImGui::Text("Name: %s", selectedObject.m_type.c_str());
-		glm::vec3 pos = selectedObject.m_Position;
+	if (selectedItemIndex >= 0 && selectedItemIndex < m_scenePrimitives.size()) {
+		auto& selectedObject = m_scenePrimitives[selectedItemIndex];
+		ImGui::Text("Name: %s", selectedObject->m_type.c_str());
+		glm::vec3 pos = selectedObject->m_Position;
 		ImGui::Text("Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
 		// Show a button to set values
 
@@ -83,18 +83,17 @@ void GUI::drawList()
 			pos[0] = vec4f[0];
 			pos[1] = vec4f[1];
 			pos[2] = vec4f[2];
-			selectedObject.setPosition(pos);
+			selectedObject->setPosition(pos);
 		}
 	}
 	if (ImGui::Button("+")) {
-		m_ScenePrimitives.push_back(Object("Cube", m_ScenePrimitives[0].m_Shader));
-		//selectedObject.setPosition(pos);
+		m_scenePrimitives.push_back(new Sphere(m_scenePrimitives[0]->m_Shader));
 	}
 }
 
-void GUI::setScenePrimitives(std::vector<Object>& scenePrimitives)
+void GUI::setScenePrimitives(std::vector<Object*>& objects)
 {
-	m_ScenePrimitives = scenePrimitives;
+	m_scenePrimitives = objects;
 }
 
 

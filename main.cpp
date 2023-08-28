@@ -1,20 +1,25 @@
+#include <glad/glad.h> //Opengl functions
+#include <GLFW/glfw3.h> //Window functions
+
 #include "Vendors/imgui/imgui.h"
 #include "Vendors/imgui/imgui_impl_glfw.h"
 #include "Vendors/imgui/imgui_impl_opengl3.h"
 
-#include <glad/glad.h> //Opengl functions
-#include <GLFW/glfw3.h> //Window functions
+
 #include <iostream>
 #include "Shader.h"
 #include "Texture.h"
 #include "Vendors/stb_image.h"
 #include "Model.h"
-#include "Object.h"
 #include "GUI.h"
 
 //Objects
 #include "PointLight.h"
 #include "SpotLight.h"
+//#include "Object.h"
+#include "Sphere.h"
+#include "Cube.h"
+
 
 //Matrix Multiplication
 #include <glm/glm.hpp>
@@ -224,18 +229,17 @@ int main()
     pointLight2->setLightPos(glm::vec3(1.0f, 1.0f, -5.0f));
 
     //Unique Model
-    Model ourModel("resources/objects/backpack/backpack.obj");
+    //Model ourModel("resources/objects/backpack/backpack.obj");
     //Initialize Objects
 
-    std::vector<Object> scenePrimitives = {
-        Object("Cube", "Assets/container2.png", "Assets/container2_specular.png", lightingShader),
-        Object("Sphere", "Assets/globe.jpg", "Assets/globe.jpg", lightingShader)
-    };
+    std::vector<Object*> scenePrimitives;
+    scenePrimitives.push_back(new Cube("Assets/container2.png", "Assets/container2_specular.png", lightingShader));
+    scenePrimitives.push_back(new Sphere("Assets/globe.jpg", "Assets/globe.jpg", lightingShader));
+    scenePrimitives.push_back(new Model("resources/objects/backpack/backpack.obj"));
+
 
     //Initialize the GUI
     GUI myGUI(window, scenePrimitives);
-
-    
 
     // render loop 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable this line for wireframe display
@@ -279,24 +283,26 @@ int main()
         // Update the camera
         updateCamera(lightingShader, view, projection);
 
-        for (Object& element : scenePrimitives)
+        for (auto& element : scenePrimitives)
         {
-            if (element.m_type == "Sphere")
+            if (element->m_type == "Sphere")
             {
-                element.translatePosition(glm::vec3(0.001f));
+                element->translatePosition(glm::vec3(0.001f));
             }
-            element.render();
-
-
+            if (element->m_type == "Model")
+            {
+                lightingShader.setMat4("model", model);
+            }
+            element->Draw(lightingShader);
         }
 
         // render the loaded model
-        model = glm::mat4(1.0f);
-        count += 0.001;
-        model = glm::translate(model, glm::vec3(count, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::rotate(glm::mat4(1.0f), glm::radians(currentFrame * 50), glm::vec3(0.0, 1.0, 0.0));	// it's a bit too big for our scene, so scale it down
-        lightingShader.setMat4("model", model);
-        ourModel.Draw(lightingShader);
+        //model = glm::mat4(1.0f);
+        //count += 0.001;
+        //model = glm::translate(model, glm::vec3(count, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        //model = glm::rotate(glm::mat4(1.0f), glm::radians(currentFrame * 50), glm::vec3(0.0, 1.0, 0.0));	// it's a bit too big for our scene, so scale it down
+        //lightingShader.setMat4("model", model);
+        //ourModel.Draw(lightingShader);
 
 
         //Draw Lamp Object

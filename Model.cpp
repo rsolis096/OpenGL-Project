@@ -3,11 +3,14 @@
 
 Model::Model(string const& path, bool gamma) : gammaCorrection(gamma)
 {
+    m_hasTexture = true;
+    m_type = "Model";
     loadModel(path);
 }
 
 void Model::Draw(Shader& shader)
 {
+    shader.setMat4("model", model);
     for (unsigned int i = 0; i < meshes.size(); i++)
         meshes[i].Draw(shader);
 }

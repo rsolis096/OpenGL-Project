@@ -10,6 +10,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "Object.h"
 #include "Mesh.h"
 
 #include <string>
@@ -22,7 +23,7 @@ using namespace std;
 
 unsigned int TextureFromFile(const char* path, const string& directory, bool gamma = false);
 
-class Model
+class Model : public Object
 {
 public:
     // model data 
@@ -34,7 +35,7 @@ public:
     // constructor, expects a filepath to a 3D model.
     Model(string const& path, bool gamma = false);
     // draws the model, and thus all its meshes
-    void Draw(Shader& shader);
+    void Draw(Shader& shader) override;
 
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.

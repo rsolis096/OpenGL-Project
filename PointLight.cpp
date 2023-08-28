@@ -12,7 +12,7 @@ PointLight::PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& 
 	m_lightShapeShader = lightCubeShader; //For rendering the light source itself
 
 	m_LightPos = glm::vec3(0.7f, 0.2f, 2.0f);
-	m_LightShape = new Object("Sphere", m_lightShapeShader); //This object will be the lamp
+	m_LightShape = new Sphere(m_lightShapeShader); //This object will be the lamp
 
 	m_LightShape->setPosition(m_LightPos);
 
@@ -54,7 +54,7 @@ void PointLight::renderLight(glm::mat4 view, glm::mat4 projection)
 	m_lightShapeShader.setMat4("model", m_LightShape->model);
 
 	//render lamp object
-	m_LightShape->render();
+	m_LightShape->Draw(m_lightShapeShader);
 
 	// Light color properties
 	m_lightingShader.use();
