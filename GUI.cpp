@@ -12,7 +12,7 @@ GUI::GUI() : window(nullptr)
 }
 */
 
-GUI::GUI(GLFWwindow* windowParam, std::vector<Object*>& objects) : window(windowParam), m_scenePrimitives(objects)
+GUI::GUI(GLFWwindow* windowParam, std::vector<Primitive*>& objects) : window(windowParam), m_scenePrimitives(objects)
 {
 	// Setup ImGUI context
 	IMGUI_CHECKVERSION();
@@ -87,11 +87,11 @@ void GUI::drawList()
 		}
 	}
 	if (ImGui::Button("+")) {
-		m_scenePrimitives.push_back(new Sphere(m_scenePrimitives[0]->m_Shader));
+		m_scenePrimitives.push_back(new Primitive("Sphere"));
 	}
 }
 
-void GUI::setScenePrimitives(std::vector<Object*>& objects)
+void GUI::setScenePrimitives(std::vector<Primitive*>& objects)
 {
 	m_scenePrimitives = objects;
 }

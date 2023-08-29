@@ -10,8 +10,7 @@ class Texture
 {
 public:
 	unsigned int ID;
-	int m_Width, m_Height, m_nrChannels;
-	Texture(const char* filePath, bool flipOnY, unsigned int format);
+	Texture(const char* filePath, bool flipOnY);
 	Texture();
 	~Texture();
 

@@ -137,7 +137,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Cube.cpp" />
     <ClCompile Include="Dependencies\includes\glad\glad.c" />
     <ClCompile Include="GUI.cpp" />
     <ClCompile Include="main.cpp" />
@@ -145,9 +144,9 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="Primitive.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Vendors\imgui\imgui.cpp" />
@@ -167,15 +166,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Cube.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="Primitive.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Shader.h" />
-    <ClInclude Include="Sphere.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vendors\imgui\imconfig.h" />
@@ -188,6 +186,7 @@
     <ClInclude Include="Vendors\imgui\imstb_textedit.h" />
     <ClInclude Include="Vendors\imgui\imstb_truetype.h" />
     <ClInclude Include="Vendors\stb_image.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -21,8 +21,6 @@
 #include <vector>
 using namespace std;
 
-unsigned int TextureFromFile(const char* path, const string& directory, bool gamma = false);
-
 class Model : public Object
 {
 public:
@@ -35,7 +33,7 @@ public:
     // constructor, expects a filepath to a 3D model.
     Model(string const& path, bool gamma = false);
     // draws the model, and thus all its meshes
-    void Draw(Shader& shader) override;
+    void Draw(Shader& shader);
 
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.

@@ -41,7 +41,6 @@ void Mesh::Draw(Shader& shader)
             glActiveTexture(GL_TEXTURE3); // activate the texture unit first before binding texture (2 texture in frag shader)
             glBindTexture(GL_TEXTURE_2D, textures[i].ID);
         }
-
     }
 
     // draw mesh
@@ -90,7 +89,6 @@ void Mesh::setupMesh()
     // ids
     glEnableVertexAttribArray(5);
     glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, m_BoneIDs));
-
     // weights
     glEnableVertexAttribArray(6);
     glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_Weights));

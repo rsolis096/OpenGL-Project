@@ -4,9 +4,9 @@
 #include <vector>
 #include <glad/glad.h>
 #include "Model.h"
+#include "Primitive.h"
 #include "Shader.h"
 #include "Camera.h"
-#include "Sphere.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -39,7 +39,7 @@ class PointLight
 		Shader m_lightingShader;
 
 		//Light Object (light is not invisible)
-		Object* m_LightShape;
+		Primitive m_LightShape;
 		//Model m_LightModel;
 
 		//Reference to the camera

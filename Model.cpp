@@ -3,14 +3,12 @@
 
 Model::Model(string const& path, bool gamma) : gammaCorrection(gamma)
 {
-    m_hasTexture = true;
-    m_type = "Model";
     loadModel(path);
 }
 
 void Model::Draw(Shader& shader)
 {
-    shader.setMat4("model", model);
+    //shader.setMat4("model", model);
     for (unsigned int i = 0; i < meshes.size(); i++)
         meshes[i].Draw(shader);
 }
@@ -19,6 +17,7 @@ void Model::loadModel(string const& path)
 {
     // read file via ASSIMP
     Assimp::Importer importer;
+    //Scene Object, contains all data of the model in a tree format
     const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
     // check for errors
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
@@ -26,7 +25,7 @@ void Model::loadModel(string const& path)
         cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
         return;
     }
-    // retrieve the directory path of the filepath
+    // retrieve the directory path of the filepath (where the model is stored with respect to solution
     directory = path.substr(0, path.find_last_of('/'));
 
     // process ASSIMP's root node recursively
@@ -131,6 +130,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
+
     // return a mesh object created from the extracted mesh data
     return Mesh(vertices, indices, textures);
 }
@@ -155,8 +155,10 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType type
         }
         if (!skip)
         {   // if texture hasn't been loaded already, load it
-            Texture texture;
-            texture.ID = TextureFromFile(str.C_Str(), this->directory);
+            string filename = string(str.C_Str());
+            //concantenate director and path filename specified the type of map, ie. (diffuse, specular, normal, height)
+            filename = this->directory + '/' + filename;
+            Texture texture (filename.c_str(), true);
             texture.type = typeName;
             texture.path = str.C_Str();
             textures.push_back(texture);
@@ -164,45 +166,4 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType type
         }
     }
     return textures;
-}
-
-unsigned int TextureFromFile(const char* path, const string& directory, bool gamma)
-{
-    string filename = string(path);
-    filename = directory + '/' + filename;
-
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-    stbi_set_flip_vertically_on_load(true);
-
-    int width, height, nrComponents;
-    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-    if (data)
-    {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
-    }
-
-    return textureID;
 }

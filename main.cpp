@@ -16,9 +16,8 @@
 //Objects
 #include "PointLight.h"
 #include "SpotLight.h"
-//#include "Object.h"
-#include "Sphere.h"
-#include "Cube.h"
+#include "Primitive.h"
+
 
 
 //Matrix Multiplication
@@ -229,13 +228,13 @@ int main()
     pointLight2->setLightPos(glm::vec3(1.0f, 1.0f, -5.0f));
 
     //Unique Model
-    //Model ourModel("resources/objects/backpack/backpack.obj");
+    Model ourModel("resources/objects/backpack/backpack.obj");
+    // 
     //Initialize Objects
-
-    std::vector<Object*> scenePrimitives;
-    scenePrimitives.push_back(new Cube("Assets/container2.png", "Assets/container2_specular.png", lightingShader));
-    scenePrimitives.push_back(new Sphere("Assets/globe.jpg", "Assets/globe.jpg", lightingShader));
-    scenePrimitives.push_back(new Model("resources/objects/backpack/backpack.obj"));
+    std::vector<Primitive*> scenePrimitives;
+    scenePrimitives.push_back(new Primitive("Cube", "Assets/container2.png", "Assets/container2_specular.png"));
+    scenePrimitives.push_back(new Primitive("Sphere", "Assets/globe.jpg", "Assets/globe.jpg"));
+    //scenePrimitives.push_back(new Model("resources/objects/backpack/backpack.obj"));
 
 
     //Initialize the GUI
@@ -297,12 +296,13 @@ int main()
         }
 
         // render the loaded model
-        //model = glm::mat4(1.0f);
-        //count += 0.001;
-        //model = glm::translate(model, glm::vec3(count, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        //model = glm::rotate(glm::mat4(1.0f), glm::radians(currentFrame * 50), glm::vec3(0.0, 1.0, 0.0));	// it's a bit too big for our scene, so scale it down
-        //lightingShader.setMat4("model", model);
-        //ourModel.Draw(lightingShader);
+        lightingShader.use();
+        model = glm::mat4(1.0f);
+        count += 0.01;
+        model = glm::translate(model, glm::vec3(50, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        model = glm::rotate(glm::mat4(1.0f), glm::radians(currentFrame * 50), glm::vec3(0.0, 1.0, 0.0));	// it's a bit too big for our scene, so scale it down
+        lightingShader.setMat4("model", model);
+        ourModel.Draw(lightingShader);
 
 
         //Draw Lamp Object
