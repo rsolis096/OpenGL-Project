@@ -17,4 +17,6 @@ public:
 	//File Properties
 	std::string type; //Specifies diffuse, specular, norma, height
 	std::string path;
+
+	void loadTexture(const char* filePath, bool flipOnY);
 };

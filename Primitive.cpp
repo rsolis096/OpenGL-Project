@@ -9,6 +9,10 @@ Primitive::Primitive()
     m_Specular = glm::vec3(0.5f);
     m_Position = glm::vec3(1.0f, 1.0f, 1.0f);
     m_hasTexture = false;
+
+    diffuseMap = nullptr;
+    specularMap = nullptr;
+
 }
 
 Primitive::Primitive(const char* type, const char* texturePathDiffuse, const char* texturePathSpecular)
@@ -24,7 +28,6 @@ Primitive::Primitive(const char* type, const char* texturePathDiffuse, const cha
     //Set some rendering properties
     //m_Shader = shader;
     m_hasTexture = true;
-    m_useEBO = false;
     m_type = type;
 
     //Open and load diffuse map and specular map, save their Primitives
@@ -63,6 +66,9 @@ Primitive::Primitive(const char* type)
     m_Position = glm::vec3(1.0f, 1.0f, 1.0f);
     model = glm::mat4(1.0f);
     model = glm::translate(model, m_Position);
+
+    diffuseMap = new Texture();
+    specularMap = new Texture();
 
     //Set some rendering properties
     //m_Shader = shader;
@@ -213,14 +219,13 @@ void Primitive::buildSphere()
             m_Normals.push_back(ny);
             m_Normals.push_back(nz);
 
-            if (m_hasTexture)
-            {
-                // vertex tex coord (s, t) range between [0, 1]
-                s = (float)j / sectorCount;
-                t = (float)i / stackCount;
-                m_TexCoords.push_back(s);
-                m_TexCoords.push_back(t);
-            }
+
+            // vertex tex coord (s, t) range between [0, 1]
+            s = (float)j / sectorCount;
+            t = (float)i / stackCount;
+            m_TexCoords.push_back(s);
+            m_TexCoords.push_back(t);
+
 
         }
     }
@@ -253,10 +258,8 @@ void Primitive::buildSphere()
     }
 
     // generate interleaved vertex array as well
-    if (m_hasTexture)
-        buildInterleavedVerticesWithTexCoords();
-    else
-        buildInterleavedVertices();
+    buildInterleavedVerticesWithTexCoords();
+
 
     //Setup VAO and VBO
     glGenVertexArrays(1, &m_vao);
@@ -275,29 +278,18 @@ void Primitive::buildSphere()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * m_Indices.size(), m_Indices.data(), GL_STATIC_DRAW);
 
     // Set up vertex attribute pointers (vertices, normals, texcoords)
-    if (m_hasTexture)
-    {
-        //Position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
-        //Normal Attribute
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 3));
-        //TexCoord Attribute
-        glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 6));
 
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
-    }
-    else
-    {
-        // Position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-        //Normal Attribute
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    //Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
+    //Normal Attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 3));
+    //TexCoord Attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 6));
 
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-    }
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+
 
     // unbind VAO and VBOs
     glBindVertexArray(0);

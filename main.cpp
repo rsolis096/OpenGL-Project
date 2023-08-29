@@ -221,7 +221,10 @@ int main()
     SpotLight* spotLight = new SpotLight(lightingShader, myCamera);
     PointLight* pointLight = new PointLight(lightingShader, lightCubeShader, myCamera);
     PointLight* pointLight2 = new PointLight(lightingShader, lightCubeShader, myCamera);
+    PointLight* pointLight3 = new PointLight(lightingShader, lightCubeShader, myCamera);
     pointLight2->setLightPos(glm::vec3(1.0f, 1.0f, -5.0f));
+    pointLight2->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
+
 
     //Create Scene Manager
     SceneManager myScene;
@@ -297,6 +300,8 @@ int main()
         //Draw Lamp Object
         pointLight->renderLight(view, projection);
         pointLight2->renderLight(view, projection);
+        pointLight3->renderLight(view, projection);
+
         spotLight->renderLight();
 
 

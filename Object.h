@@ -21,6 +21,12 @@ struct Object
         glm::vec3 m_Diffuse;
         glm::vec3 m_Specular;
 
+        //Texture Properties
+        Texture* diffuseMap;
+        Texture* specularMap;
+        bool m_hasTexture;
+
+
         //Object World Attributes
         glm::vec3 m_Position;
         glm::mat4 model;

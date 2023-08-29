@@ -58,11 +58,13 @@ void GUI::drawList()
 {
 	//For transformation
 	static float vec4f[4] = { 0.00f, 0.00f, 0.00f, 0.00f };
-
-
-	// Create an array of labels for the ListBox
-	ImGui::Text("Object Count: %d", myScene.objectCount);
-	//Left Side of windo
+	ImGui::Text("Object Count: %d", myScene.sceneObjects.size());
+	//Add sphere object to scene
+	if (ImGui::Button("+")) {
+		myScene.addPrimitive(new Primitive("Sphere"));
+		myScene.sceneObjects[myScene.objectCount - 1]->m_type = "Sphere" + to_string(myScene.objectCount);
+	}
+	//Left Side of window
 	static int selected = 0;
 	{
 		ImGui::BeginChild("left pane", ImVec2(150, 0), true);
@@ -71,13 +73,14 @@ void GUI::drawList()
 			// FIXME: Good candidate to use ImGuiSelectableFlags_SelectOnNav
 			char label[128];
 			sprintf_s(label, myScene.sceneObjects[i]->m_type.c_str(), i);
-			if (ImGui::Selectable(label, selected == i))
+			if (ImGui::Selectable(label, false))
 			{
 				selected = i;
 			}
 		}
 		ImGui::EndChild();
 	}
+
 	//Update the selected item (default selected item is the 0th object)
 	Object* selectedObject = myScene.sceneObjects[selected];
 	ImGui::SameLine();
@@ -113,94 +116,43 @@ void GUI::drawList()
 				}	
 				ImGui::EndTabItem();
 			}
-			if (ImGui::BeginTabItem("Details"))
+			static std::string text = " ";
+			if (ImGui::BeginTabItem("Texture"))
 			{
-				ImGui::Text("ID: 0123456789");
+				char buffer[256]; // This is where the text will be stored
+				ImGui::Text("Texture Path");
+
+				if (selectedObject != nullptr)
+				{
+					if (selectedObject->diffuseMap != nullptr)
+					{
+						if(text == " ")
+							strcpy_s(buffer, selectedObject->diffuseMap->path.c_str());
+						else
+							strcpy_s(buffer, text.c_str());
+
+						if (ImGui::InputText("Texture Path: ", buffer, sizeof(buffer)))
+							text = buffer;
+						if (ImGui::Button("Set Texture")) {
+							selectedObject->diffuseMap->path = text;
+							selectedObject->specularMap->path = text;
+							selectedObject->m_hasTexture = true;
+							selectedObject->diffuseMap->loadTexture(selectedObject->diffuseMap->path.c_str(), false);
+							selectedObject->specularMap->loadTexture(selectedObject->diffuseMap->path.c_str(), false);
+
+						}
+					}
+
+
+				}
+			
 				ImGui::EndTabItem();
 			}
 			ImGui::EndTabBar();
 		}
 		ImGui::EndChild();
-		if (ImGui::Button("Revert")) {}
-		ImGui::SameLine();
-		if (ImGui::Button("Save")) {}
 		ImGui::EndGroup();
 	}
-
-	/*
-	// Display detailed information about the selected item (if any)
-	if (selectedItemIndex >= 0 && selectedItemIndex < myScene.sceneObjects.size()) {
-		auto& selectedObject = myScene.sceneObjects[selectedItemIndex];
-		ImGui::Text("Name: %s", selectedObject->m_type.c_str());
-		glm::vec3 pos = selectedObject->m_Position;
-		ImGui::Text("Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
-		// Show a button to set values
-
-		static float f0 = 0.001f;
-		//ImGui::InputFloat("input float", &f0, 0.01f, 1.0f, "%.3f");
-		static float vec4f[4] = { 0.00f, 0.00f, 0.00f, 0.00f };
-		ImGui::InputFloat3("input float3", vec4f);
-
-		// Show a button to set values
-		if (ImGui::Button("Set")) {
-			pos[0] = vec4f[0];
-			pos[1] = vec4f[1];
-			pos[2] = vec4f[2];
-			selectedObject->setPosition(pos);
-		}
-	}*/
-
-	if (ImGui::Button("+")) {
-		myScene.addPrimitive(new Primitive("Sphere"));
-	}
-
-	/*	
-	ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
-
-
-		// Left
-		static int selected = 0;
-		{
-			ImGui::BeginChild("left pane", ImVec2(150, 0), true);
-			for (int i = 0; i < 100; i++)
-			{
-				// FIXME: Good candidate to use ImGuiSelectableFlags_SelectOnNav
-				char label[128];
-				sprintf_s(label, "MyObject %d", i);
-				if (ImGui::Selectable(label, selected == i))
-					selected = i;
-			}
-			ImGui::EndChild();
-		}
-		ImGui::SameLine();
-
-		// Right
-		{
-			ImGui::BeginGroup();
-			ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
-			ImGui::Text("MyObject: %d", selected);
-			ImGui::Separator();
-			if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
-			{
-				if (ImGui::BeginTabItem("Description"))
-				{
-					ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("Details"))
-				{
-					ImGui::Text("ID: 0123456789");
-					ImGui::EndTabItem();
-				}
-				ImGui::EndTabBar();
-			}
-			ImGui::EndChild();
-			if (ImGui::Button("Revert")) {}
-			ImGui::SameLine();
-			if (ImGui::Button("Save")) {}
-			ImGui::EndGroup();
-		}*/
-	
 }
 
 

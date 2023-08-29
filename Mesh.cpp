@@ -42,7 +42,11 @@ void Mesh::Draw(Shader& shader)
             glBindTexture(GL_TEXTURE_2D, textures[i].ID);
         }
     }
-
+    if (textures.size() == 0)
+    {
+        shader.use();
+        shader.setBool("hasTexture", false);
+    }
     // draw mesh
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);

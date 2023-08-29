@@ -20,10 +20,6 @@ public:
     std::vector<unsigned int>m_Indices;
     std::vector<float>m_InterleavedVertices;
 
-    //Primitive Texture Attributes
-    Texture* diffuseMap;
-    Texture* specularMap;
-    bool m_hasTexture;
 
     //Primitive Render Attributes
     unsigned int m_vao, m_vbo, m_ebo;
