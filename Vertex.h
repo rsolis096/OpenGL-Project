@@ -4,7 +4,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #define MAX_BONE_INFLUENCE 4
 
-
 struct Vertex {
     // position
     glm::vec3 Position;

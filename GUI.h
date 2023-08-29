@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Primitive.h"
-#include <GLFW/glfw3.h> //Window functions
+#include "SceneManager.h" //Window functions
 #include "Vendors/imgui/imgui.h"
 #include "Vendors/imgui/imgui_impl_glfw.h"
 #include "Vendors/imgui/imgui_impl_opengl3.h"
@@ -9,13 +8,13 @@
 class GUI
 {
 	public:
-		std::vector<Primitive*>& m_scenePrimitives;
+		SceneManager& myScene;
 		static bool isWindowHidden;
 		GLFWwindow* window;
 		//GUI();
-		GUI(GLFWwindow* windowParam, std::vector<Primitive*>& objects);
+		GUI(GLFWwindow* windowParam, SceneManager& scene);
 		void displayWindow();
-		void setScenePrimitives(std::vector<Primitive*>& objects);
+		//void setScenePrimitives(std::vector<Primitive*>& objects);
 private:
 	void drawList();
 };

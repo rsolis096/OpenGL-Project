@@ -28,8 +28,6 @@ public:
     //Primitive Render Attributes
     unsigned int m_vao, m_vbo, m_ebo;
     bool m_useEBO;
-    std::string m_type;
-
 
     //Generate an Primitive with no mesh data, default color data, no texture data, default world attributes
     Primitive();
@@ -39,7 +37,7 @@ public:
     Primitive(const char* type);
 
     //Methods
-    void Draw(Shader& shader);
+    void Draw(Shader& shader) override;
 
 private:
     //Used for construction of primitives

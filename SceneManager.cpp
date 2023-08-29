@@ -1,14 +1,30 @@
-#include "Model.h"
-#include "Object.h"
+#include "SceneManager.h"
 
-class SceneManager
+SceneManager::SceneManager()
 {
-public:
-	vector<Object> scenePrimitives;
-	vector<Model> sceneModels;
-	//light source vector
-private:
-	void addObject();
-	void deleteObject();
-	void getObject();
-};
+	objectCount = 0;
+}
+
+void SceneManager::addPrimitive(Primitive* obj)
+{
+	if (obj != nullptr)
+	{
+		scenePrimitives.push_back(obj);
+		sceneObjects.push_back(obj);
+		objectCount++;
+	}
+}
+
+void SceneManager::addModel(Model* obj)
+{
+	if (obj != nullptr)
+	{
+		sceneModels.push_back(obj);
+		sceneObjects.push_back(obj);
+		objectCount++;
+	}
+}
+
+void SceneManager::addLightSource()
+{
+}

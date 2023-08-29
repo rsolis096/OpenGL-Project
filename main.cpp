@@ -10,14 +10,14 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Vendors/stb_image.h"
-#include "Model.h"
 #include "GUI.h"
 
 //Objects
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "Primitive.h"
-
+#include "SceneManager.h"
+#include "Model.h"
 
 
 //Matrix Multiplication
@@ -213,10 +213,6 @@ int main()
     }
     glEnable(GL_DEPTH_TEST);
 
-
-
-
-
     //Compile and link shaders
     Shader lightingShader("lightingShader.vert", "lightingShader.frag");
     Shader lightCubeShader("pointLightShader.vert", "pointLightShader.frag");
@@ -227,18 +223,18 @@ int main()
     PointLight* pointLight2 = new PointLight(lightingShader, lightCubeShader, myCamera);
     pointLight2->setLightPos(glm::vec3(1.0f, 1.0f, -5.0f));
 
-    //Unique Model
-    Model ourModel("resources/objects/backpack/backpack.obj");
-    // 
-    //Initialize Objects
-    std::vector<Primitive*> scenePrimitives;
-    scenePrimitives.push_back(new Primitive("Cube", "Assets/container2.png", "Assets/container2_specular.png"));
-    scenePrimitives.push_back(new Primitive("Sphere", "Assets/globe.jpg", "Assets/globe.jpg"));
-    //scenePrimitives.push_back(new Model("resources/objects/backpack/backpack.obj"));
+    //Create Scene Manager
+    SceneManager myScene;
 
+    //Initialize Models
+    myScene.addModel(new Model("resources/objects/backpack/backpack.obj"));
+
+    //Initialize Objects
+    myScene.addPrimitive(new Primitive("Cube", "Assets/container2.png", "Assets/container2_specular.png"));
+    myScene.addPrimitive(new Primitive("Sphere", "Assets/globe.jpg", "Assets/globe.jpg"));
 
     //Initialize the GUI
-    GUI myGUI(window, scenePrimitives);
+    GUI myGUI(window, myScene);
 
     // render loop 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable this line for wireframe display
@@ -282,7 +278,7 @@ int main()
         // Update the camera
         updateCamera(lightingShader, view, projection);
 
-        for (auto& element : scenePrimitives)
+        for (auto& element : myScene.sceneObjects)
         {
             if (element->m_type == "Sphere")
             {
@@ -295,14 +291,7 @@ int main()
             element->Draw(lightingShader);
         }
 
-        // render the loaded model
-        lightingShader.use();
-        model = glm::mat4(1.0f);
-        count += 0.01;
-        model = glm::translate(model, glm::vec3(50, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::rotate(glm::mat4(1.0f), glm::radians(currentFrame * 50), glm::vec3(0.0, 1.0, 0.0));	// it's a bit too big for our scene, so scale it down
-        lightingShader.setMat4("model", model);
-        ourModel.Draw(lightingShader);
+
 
 
         //Draw Lamp Object

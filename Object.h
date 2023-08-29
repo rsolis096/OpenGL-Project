@@ -25,11 +25,19 @@ struct Object
         glm::vec3 m_Position;
         glm::mat4 model;
 
+        //Type
+        std::string m_type;
+
         //Teleport to specified location
         void setPosition(glm::vec3 newPosition);
         //Translate by parameter (Used to move some direction from current position)
         void translatePosition(glm::vec3 newPosition);
+
+        //Change these properties to set color of object
         void setAmbient(glm::vec3);
         void setDiffuse(glm::vec3);
         void setSpecular(glm::vec3);
+
+
+        virtual void Draw(Shader& shader) = 0;
 };
