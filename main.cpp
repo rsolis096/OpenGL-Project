@@ -15,6 +15,7 @@
 //Objects
 #include "PointLight.h"
 #include "SpotLight.h"
+#include "DirectionalLight.h"
 #include "Primitive.h"
 #include "SceneManager.h"
 #include "Model.h"
@@ -222,6 +223,7 @@ int main()
     PointLight* pointLight = new PointLight(lightingShader, lightCubeShader, myCamera);
     PointLight* pointLight2 = new PointLight(lightingShader, lightCubeShader, myCamera);
     PointLight* pointLight3 = new PointLight(lightingShader, lightCubeShader, myCamera);
+    DirectionalLight dirLight(lightingShader, myCamera);
     pointLight2->setLightPos(glm::vec3(1.0f, 1.0f, -5.0f));
     pointLight2->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
 
@@ -252,8 +254,6 @@ int main()
     // shader configuration
     // --------------------
     lightingShader.use();
-    lightingShader.setInt("material.diffuse", 0);
-    lightingShader.setInt("material.specular", 1);
 
     //Set window size of ImGUI window
     //ImGui::SetNextWindowSize(ImVec2(100, 75)); // Set the desired width and height
@@ -300,8 +300,7 @@ int main()
         //Draw Lamp Object
         pointLight->renderLight(view, projection);
         pointLight2->renderLight(view, projection);
-        pointLight3->renderLight(view, projection);
-
+        dirLight.renderLight();      
         spotLight->renderLight();
 
 

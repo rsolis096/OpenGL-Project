@@ -43,7 +43,6 @@ Texture::Texture(const char* filePath, bool flipOnY) : ID(0)
 
 Texture::Texture() : ID(0)
 {
-    std::cout << "called" << std::endl;
     type = "";
     path = "";
 }

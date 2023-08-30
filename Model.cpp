@@ -4,16 +4,32 @@
 Model::Model(string const& path, bool gamma) : gammaCorrection(gamma)
 {
     m_type = "Model";
+    m_Ambient = glm::vec3(0.2f);
+    m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+    m_Specular = glm::vec3(0.5f);
+    m_Position = glm::vec3(1.0f, 1.0f, 1.0f);
     model = glm::mat4(1.0f);
+    m_hasTexture = false;
     loadModel(path);
 }
 
 void Model::Draw(Shader& shader)
 {
     shader.use();
+    model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(0.1f));
     shader.setMat4("model", model);
+    shader.setBool("hasTexture", m_hasTexture);
+    if (!m_hasTexture)
+    {
+        shader.use();
+        shader.setVec3("object.ambient", m_Ambient);
+        shader.setVec3("object.diffuse", m_Diffuse);
+        shader.setVec3("object.specular", m_Specular);
+    }
+
     for (unsigned int i = 0; i < meshes.size(); i++)
-        meshes[i].Draw(shader);
+        meshes[i].Draw(shader, m_hasTexture);
 }
 
 void Model::loadModel(string const& path)
@@ -133,6 +149,8 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
+    if (textures.size() > 0)
+        m_hasTexture = true;
 
     // return a mesh object created from the extracted mesh data
     return Mesh(vertices, indices, textures);
