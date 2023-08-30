@@ -16,8 +16,6 @@ Model::Model(string const& path, bool gamma) : gammaCorrection(gamma)
 void Model::Draw(Shader& shader)
 {
     shader.use();
-    model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(0.1f));
     shader.setMat4("model", model);
     shader.setBool("hasTexture", m_hasTexture);
     if (!m_hasTexture)

@@ -8,7 +8,7 @@
 class DirectionalLight
 {
 public:
-	DirectionalLight(Shader& lightingShader, Camera& cam);
+	DirectionalLight(Shader& lightingShader);
 	void renderLight();
 	~DirectionalLight();
 
@@ -20,7 +20,6 @@ public:
 private:
 	Shader m_lightingShader;
 	glm::vec3 m_direction;
-	Camera& playerCamera;
 
 	//Light properties
 	glm::vec3 m_Ambient;

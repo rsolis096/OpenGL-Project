@@ -50,8 +50,7 @@ struct Object
     vec3 specular;
 };
 
-#define NR_POINT_LIGHTS 2
-
+#define NR_POINT_LIGHTS 1
 in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoords;
@@ -79,12 +78,9 @@ void main()
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
     
-    // == =====================================================
-    // Our lighting is set up in 3 phases: directional, point lights and an optional flashlight
-    // For each phase, a calculate function is defined that calculates the corresponding color
-    // per lamp. In the main() function we take all the calculated colors and sum them up for
-    // this fragment's final color.
-    // == =====================================================
+
+    //TO DO: PUT THESE RESULTS IN IF STATEMENTS DEPENDING ON WHICH LIGHT IS ON
+
     // phase 1: directional lighting
     vec3 result = CalcDirLight(dirLight, norm, viewDir);
     // phase 2: point lights
@@ -92,10 +88,8 @@ void main()
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
     //phase 3: spot light
     result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
-    
+        
     FragColor = vec4(result, 1.0);
-   
-
 }
 
 
@@ -111,16 +105,20 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         // specular shading
         vec3 reflectDir = reflect(-lightDir, normal);
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-        // attenuation
-        float distance = length(light.position - fragPos);
-        float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
-        // combine results
+                
+        //Calculate Ambient, Diffuse, Specular
         vec3 ambient = light.ambient * vec3(texture(texture_diffuse1, TexCoords));
         vec3 diffuse = light.diffuse * diff * vec3(texture(texture_diffuse1, TexCoords));
         vec3 specular = light.specular * spec * vec3(texture(texture_specular1, TexCoords));
+
+        //Apply attenuation
+        float distance = length(light.position - fragPos);
+        float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
         ambient *= attenuation;
         diffuse *= attenuation;
         specular *= attenuation;
+
+        //return contribution
         return (ambient + diffuse + specular);
     }
     else

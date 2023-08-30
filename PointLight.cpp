@@ -1,11 +1,13 @@
 #include "PointLight.h"
 
 int PointLight::pointLightCount = 0;
+bool firstFrame = true;
 
 PointLight::PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& cam) : playerCamera(cam)//, m_LightModel(Model("resources/objects/lightbulb/lightbulb.obj"))
 	{
 	lightID = pointLightCount;
 	pointLightCount += 1;
+
 
 	//Builds a light source with some default values
 	m_lightingShader = lightingShader; //For changing the lighting properties
@@ -29,16 +31,6 @@ PointLight::PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& 
 	m_Constant = 1.0f;
 	m_Linear = 0.09f;
 	m_Quadratic = 0.032f;
-
-	m_lightShapeShader.use();
-	m_lightingShader.setVec3("pointLights[0].position", m_LightPos);
-	m_lightingShader.setVec3("pointLights[0].ambient", m_Ambient);
-	m_lightingShader.setVec3("pointLights[0].diffuse", m_Diffuse);
-	m_lightingShader.setVec3("pointLights[0].specular", m_Specular);
-	m_lightingShader.setFloat("pointLights[0].constant", m_Constant);
-	m_lightingShader.setFloat("pointLights[0].linear", m_Linear);
-	m_lightingShader.setFloat("pointLights[0].quadratic", m_Quadratic);
-	m_lightingShader.setFloat("material.shininess", 32.0f);
 }
 
 void PointLight::renderLight(glm::mat4 view, glm::mat4 projection)
@@ -60,13 +52,22 @@ void PointLight::renderLight(glm::mat4 view, glm::mat4 projection)
 	m_lightingShader.use();
 	m_lightingShader.setVec3("viewPos", playerCamera.cameraPos);
 	m_lightingShader.setVec3("pointLights["+std::to_string(lightID)+"].position", m_LightPos);
-	m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].ambient", m_Ambient);
-	m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].diffuse", m_Diffuse);
-	m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].specular", m_Specular);
-	m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].constant", m_Constant);
-	m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].linear", m_Linear);
-	m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].quadratic", m_Quadratic);
-	m_lightingShader.setFloat("material.shininess", 32.0f);
+
+	//These do not need to change every frame
+	if (firstFrame)
+	{
+		m_lightingShader.setFloat("material.shininess", 32.0f);
+		m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].ambient", m_Ambient);
+		m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].diffuse", m_Diffuse);
+		m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].specular", m_Specular);
+		m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].constant", m_Constant);
+		m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].linear", m_Linear);
+		m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].quadratic", m_Quadratic);
+		firstFrame = false;
+	}
+
+
+
 }
 
 

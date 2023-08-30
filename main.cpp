@@ -223,7 +223,7 @@ int main()
     PointLight* pointLight = new PointLight(lightingShader, lightCubeShader, myCamera);
     PointLight* pointLight2 = new PointLight(lightingShader, lightCubeShader, myCamera);
     PointLight* pointLight3 = new PointLight(lightingShader, lightCubeShader, myCamera);
-    DirectionalLight dirLight(lightingShader, myCamera);
+    DirectionalLight dirLight(lightingShader);
     pointLight2->setLightPos(glm::vec3(1.0f, 1.0f, -5.0f));
     pointLight2->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
 
@@ -249,11 +249,10 @@ int main()
     glm::mat4 view;
     glm::mat4 projection;
 
-    glm::vec3 colorSlider = glm::vec3(1.0f);
-
     // shader configuration
     // --------------------
     lightingShader.use();
+    lightingShader.setFloat("material.shininess", 32.0f);
 
     //Set window size of ImGUI window
     //ImGui::SetNextWindowSize(ImVec2(100, 75)); // Set the desired width and height
@@ -276,7 +275,6 @@ int main()
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
         lightingShader.setVec3("viewPos", myCamera.cameraPos);
-        lightingShader.setFloat("material.shininess", 32.0f);
 
         // Update the camera
         updateCamera(lightingShader, view, projection);
@@ -294,10 +292,9 @@ int main()
             element->Draw(lightingShader);
         }
 
-
-
-
         //Draw Lamp Object
+
+        //TO DO: CHANGE THESE SUCH THAT LIGHTS CAN BE UPDATED IN GUI
         pointLight->renderLight(view, projection);
         pointLight2->renderLight(view, projection);
         dirLight.renderLight();      
@@ -305,10 +302,6 @@ int main()
 
 
         myGUI.displayWindow();
-
-
-
-
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

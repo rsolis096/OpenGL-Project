@@ -1,5 +1,7 @@
 #include "SpotLight.h"
 
+bool firstFrame2 = true;
+
 SpotLight::SpotLight(Shader& lightingShader, Camera& cam) : playerCamera(cam)
 {
 	m_lightingShader = lightingShader;
@@ -15,21 +17,6 @@ SpotLight::SpotLight(Shader& lightingShader, Camera& cam) : playerCamera(cam)
 	m_Constant = 1.0f;
 	m_Linear = 0.09f;
 	m_Quadratic = 0.032f;
-
-	m_lightingShader.use();
-	m_lightingShader.setVec3("spotLight.position", playerCamera.cameraPos);
-	m_lightingShader.setVec3("spotLight.direction", playerCamera.cameraFront);
-	m_lightingShader.setVec3("spotLight.ambient", m_Ambient);
-	m_lightingShader.setVec3("spotLight.diffuse", m_Diffuse);
-	m_lightingShader.setVec3("spotLight.specular", m_Specular);
-	m_lightingShader.setFloat("spotLight.constant", m_Constant);
-	m_lightingShader.setFloat("spotLight.linear", m_Linear);
-	m_lightingShader.setFloat("spotLight.quadratic", m_Quadratic);
-	m_lightingShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-	m_lightingShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
-
-	// material properties
-	m_lightingShader.setFloat("material.shininess", 32.0f);
 }
 
 void SpotLight::renderLight()
@@ -42,17 +29,25 @@ void SpotLight::renderLight()
 	m_lightingShader.setVec3("spotLight.direction", playerCamera.cameraFront);
 	m_lightingShader.setVec3("viewPos", playerCamera.cameraPos);
 	
-	m_lightingShader.setVec3("spotLight.ambient", m_Ambient);
-	m_lightingShader.setVec3("spotLight.diffuse", m_Diffuse);
-	m_lightingShader.setVec3("spotLight.specular", m_Specular);
-	m_lightingShader.setFloat("spotLight.constant", m_Constant);
-	m_lightingShader.setFloat("spotLight.linear", m_Linear);
-	m_lightingShader.setFloat("spotLight.quadratic", m_Quadratic);
-	m_lightingShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-	m_lightingShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+	//These are not changing every fram. They can be changed in their corresponding "set" method
+	//These are only initially set in the renderLight method and not the constructor as to not render light with the constructor call
+	if (firstFrame2)
+	{
+		m_lightingShader.setVec3("spotLight.ambient", m_Ambient);
+		m_lightingShader.setVec3("spotLight.diffuse", m_Diffuse);
+		m_lightingShader.setVec3("spotLight.specular", m_Specular);
+		m_lightingShader.setFloat("spotLight.constant", m_Constant);
+		m_lightingShader.setFloat("spotLight.linear", m_Linear);
+		m_lightingShader.setFloat("spotLight.quadratic", m_Quadratic);
+		m_lightingShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+		m_lightingShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
 
-	// material properties
-	m_lightingShader.setFloat("material.shininess", 32.0f);
+		// material properties
+		m_lightingShader.setFloat("material.shininess", 32.0f);
+	}
+
+
+
 }
 
 SpotLight::~SpotLight()
