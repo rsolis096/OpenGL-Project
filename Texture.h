@@ -10,13 +10,17 @@ class Texture
 {
 public:
 	unsigned int ID;
-	Texture(const char* filePath, bool flipOnY);
 	Texture();
+	Texture(const char* filePath, bool flipOnY);
 	~Texture();
+
+	//Cube Map
+	Texture(std::vector<std::string> paths);
+
 
 	//File Properties
 	std::string type; //Specifies diffuse, specular, norma, height
-	std::string path;
+	std::vector<std::string> path;
 
 	void loadTexture(const char* filePath, bool flipOnY);
 };

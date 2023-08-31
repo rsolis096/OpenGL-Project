@@ -127,18 +127,18 @@ void GUI::drawList()
 					if (selectedObject->diffuseMap != nullptr)
 					{
 						if(text == " ")
-							strcpy_s(buffer, selectedObject->diffuseMap->path.c_str());
+							strcpy_s(buffer, selectedObject->diffuseMap->path[0].c_str());
 						else
 							strcpy_s(buffer, text.c_str());
 
 						if (ImGui::InputText("Texture Path: ", buffer, sizeof(buffer)))
 							text = buffer;
 						if (ImGui::Button("Set Texture")) {
-							selectedObject->diffuseMap->path = text;
-							selectedObject->specularMap->path = text;
+							selectedObject->diffuseMap->path[0] = text;
+							selectedObject->specularMap->path[0] = text;
 							selectedObject->m_hasTexture = true;
-							selectedObject->diffuseMap->loadTexture(selectedObject->diffuseMap->path.c_str(), false);
-							selectedObject->specularMap->loadTexture(selectedObject->diffuseMap->path.c_str(), false);
+							selectedObject->diffuseMap->loadTexture(selectedObject->diffuseMap->path[0].c_str(), false);
+							selectedObject->specularMap->loadTexture(selectedObject->diffuseMap->path[0].c_str(), false);
 
 						}
 					}

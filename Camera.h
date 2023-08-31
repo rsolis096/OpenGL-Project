@@ -94,6 +94,11 @@ public:
             m_FOV = 45.0f;
     }
 
+    void setMovementSpeed(float newSpeed)
+    {
+        m_MovementSpeed = newSpeed;
+    }
+
 private:
     void updateCameraVectors()
     {

@@ -160,6 +160,8 @@
     <ClCompile Include="Vendors\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="cubeMapShader.frag" />
+    <None Include="cubeMapShader.vert" />
     <None Include="lightingShader.frag" />
     <None Include="lightingShader.vert" />
     <None Include="pointLightShader.frag" />

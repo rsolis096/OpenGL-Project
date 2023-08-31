@@ -81,6 +81,16 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    {
+        myCamera.setMovementSpeed(50.0f);
+    }
+    else
+    {
+        myCamera.setMovementSpeed(2.5);
+    }
+        
+
     //Return mouse movement when tab is pressed
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
     {
@@ -119,7 +129,7 @@ void processInput(GLFWwindow* window)
     //const float movementSpeed = 0.05f; // adjust accordingly
     if (cursorLocked)
     {
-        const float cameraSpeed = 2.5 * deltaTime;
+        const float cameraSpeed = myCamera.m_MovementSpeed * deltaTime;
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             myCamera.processKeyboard(cameraSpeed, GLFW_KEY_W);
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -185,6 +195,8 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); //OpenGL Version 3.3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //Use CORE profile of OpenGL (Modern profile with deprecated features removed)
+    // Set desired depth buffer size
+    glfwWindowHint(GLFW_DEPTH_BITS, 32);
 
     // glfw window creation
     // --------------------
@@ -220,7 +232,75 @@ int main()
     //glCullFace(GL_BACK);
     //glFrontFace(GL_CCW);
 
+    //Skybox faces
+    vector<std::string> faces
+    {
+        "Assets/skybox/right.jpg",
+        "Assets/skybox/left.jpg",
+        "Assets/skybox/top.jpg",
+        "Assets/skybox/bottom.jpg",
+        "Assets/skybox/front.jpg",
+        "Assets/skybox/back.jpg"
+    };
+
+    float skyboxVertices[] = {
+        // positions          
+        -10.0f,  10.0f, -10.0f,
+        -10.0f, -10.0f, -10.0f,
+         10.0f, -10.0f, -10.0f,
+         10.0f, -10.0f, -10.0f,
+         10.0f,  10.0f, -10.0f,
+        -10.0f,  10.0f, -10.0f,
+
+        -10.0f, -10.0f,  10.0f,
+        -10.0f, -10.0f, -10.0f,
+        -10.0f,  10.0f, -10.0f,
+        -10.0f,  10.0f, -10.0f,
+        -10.0f,  10.0f,  10.0f,
+        -10.0f, -10.0f,  10.0f,
+
+         10.0f, -10.0f, -10.0f,
+         10.0f, -10.0f,  10.0f,
+         10.0f,  10.0f,  10.0f,
+         10.0f,  10.0f,  10.0f,
+         10.0f,  10.0f, -10.0f,
+         10.0f, -10.0f, -10.0f,
+
+        -10.0f, -10.0f,  10.0f,
+        -10.0f,  10.0f,  10.0f,
+         10.0f,  10.0f,  10.0f,
+         10.0f,  10.0f,  10.0f,
+         10.0f, -10.0f,  10.0f,
+        -10.0f, -10.0f,  10.0f,
+
+        -10.0f,  10.0f, -10.0f,
+         10.0f,  10.0f, -10.0f,
+         10.0f,  10.0f,  10.0f,
+         10.0f,  10.0f,  10.0f,
+        -10.0f,  10.0f,  10.0f,
+        -10.0f,  10.0f, -10.0f,
+
+        -10.0f, -10.0f, -10.0f,
+        -10.0f, -10.0f,  10.0f,
+         10.0f, -10.0f, -10.0f,
+         10.0f, -10.0f, -10.0f,
+        -10.0f, -10.0f,  10.0f,
+         10.0f, -10.0f,  10.0f
+    };
+
+    unsigned int skyboxVAO, skyboxVBO;
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    Texture cubeMap(faces);
+
     //Compile and link shaders
+    Shader cubeMapShader("cubeMapShader.vert", "cubeMapShader.frag");
     Shader lightingShader("lightingShader.vert", "lightingShader.frag");
     Shader lightCubeShader("pointLightShader.vert", "pointLightShader.frag");
 
@@ -238,11 +318,12 @@ int main()
     SceneManager myScene;
 
     //Initialize Models
-    myScene.addModel(new Model("resources/objects/backpack/backpack.obj"));
+    myScene.addModel(new Model("resources/objects/dragon/dragon.obj"));
 
     //Initialize Objects
     myScene.addPrimitive(new Primitive("Cube", "Assets/container2.png", "Assets/container2_specular.png"));
     myScene.addPrimitive(new Primitive("Sphere", "Assets/globe.jpg", "Assets/globe.jpg"));
+    
 
     //Initialize the GUI
     GUI myGUI(window, myScene);
@@ -278,6 +359,7 @@ int main()
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//The back buffer currently only contains the color buffer, this clears and updates it with the colour specified by glClearColor.
 
+
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
         lightingShader.setVec3("viewPos", myCamera.cameraPos);
@@ -309,6 +391,21 @@ int main()
 
         myGUI.displayWindow();
 
+        // draw skybox as last
+        glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+        cubeMapShader.use();
+        view = glm::mat4(glm::mat3(myCamera.GetViewMatrix())); // remove translation from the view matrix
+        cubeMapShader.setMat4("view", view);
+        cubeMapShader.setMat4("projection", projection);
+        // skybox cube
+        glBindVertexArray(skyboxVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapShader.ID);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthFunc(GL_LESS); // set depth function back to default
+
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);//swap back frame buffer with front frame buffer.
@@ -317,6 +414,14 @@ int main()
     }
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
+    for (auto& obj : myScene.scenePrimitives)
+    {
+        glDeleteVertexArrays(1, &obj->m_vao);
+        glDeleteBuffers(1, &obj->m_vbo);
+        glDeleteBuffers(1, &obj->m_ebo);
+    }
+    glDeleteVertexArrays(1, &skyboxVAO);
+    glDeleteBuffers(1, &skyboxVBO);
 
 
     //imgui: terminate
