@@ -6,7 +6,7 @@ Primitive::Primitive()
     //Set default Primitive properties
     m_Ambient = glm::vec3(0.2f);
     m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-    m_Specular = glm::vec3(0.5f);
+    m_Specular = glm::vec3(0.1f);
     m_Position = glm::vec3(1.0f, 1.0f, 1.0f);
     m_hasTexture = false;
 
@@ -20,7 +20,7 @@ Primitive::Primitive(const char* type, const char* texturePathDiffuse, const cha
     //Set default Primitive properties
     m_Ambient = glm::vec3(0.2f);
     m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-    m_Specular = glm::vec3(0.5f);
+    m_Specular = glm::vec3(0.1f);
     m_Position = glm::vec3(1.0f, 1.0f, 1.0f);
     model = glm::mat4(1.0f);
     model = glm::translate(model, m_Position);
@@ -62,7 +62,7 @@ Primitive::Primitive(const char* type)
     //Set Default Primitive Properties
     m_Ambient = glm::vec3(0.2f);
     m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-    m_Specular = glm::vec3(0.5f);
+    m_Specular = glm::vec3(0.1f);
     m_Position = glm::vec3(1.0f, 1.0f, 1.0f);
     model = glm::mat4(1.0f);
     model = glm::translate(model, m_Position);
@@ -301,47 +301,48 @@ void Primitive::buildCube()
 {
     //Pre Defined cube vertices, normals, and TexCoords
     m_Vertices = {
-        -0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-
-        -0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
-
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-
-        -0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f, -0.5f,
-
-        -0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f
+        // Back face
+        -0.5f, -0.5f, -0.5f, // Bottom-left
+         0.5f,  0.5f, -0.5f, // top-right
+         0.5f, -0.5f, -0.5f,  // bottom-right         
+         0.5f,  0.5f, -0.5f, // top-right
+        -0.5f, -0.5f, -0.5f,   // bottom-left
+        -0.5f,  0.5f, -0.5f,  // top-left
+        // Front face
+        -0.5f, -0.5f,  0.5f, // bottom-left
+         0.5f, -0.5f,  0.5f,   // bottom-right
+         0.5f,  0.5f,  0.5f,  // top-right
+         0.5f,  0.5f,  0.5f,   // top-right
+        -0.5f,  0.5f,  0.5f,   // top-left
+        -0.5f, -0.5f,  0.5f,   // bottom-left
+        // Left face
+        -0.5f,  0.5f,  0.5f,   // top-right
+        -0.5f,  0.5f, -0.5f,   // top-left
+        -0.5f, -0.5f, -0.5f, // bottom-left
+        -0.5f, -0.5f, -0.5f,   // bottom-left
+        -0.5f, -0.5f,  0.5f, // bottom-right
+        -0.5f,  0.5f,  0.5f,  // top-right
+        // Right face
+         0.5f,  0.5f,  0.5f, // top-left
+         0.5f, -0.5f, -0.5f,   // bottom-right
+         0.5f,  0.5f, -0.5f,   // top-right         
+         0.5f, -0.5f, -0.5f,   // bottom-right
+         0.5f,  0.5f,  0.5f,   // top-left
+         0.5f, -0.5f,  0.5f, // bottom-left     
+         // Bottom face
+         -0.5f, -0.5f, -0.5f,   // top-right
+          0.5f, -0.5f, -0.5f,   // top-left
+          0.5f, -0.5f,  0.5f,  // bottom-left
+          0.5f, -0.5f,  0.5f,   // bottom-left
+         -0.5f, -0.5f,  0.5f, // bottom-right
+         -0.5f, -0.5f, -0.5f,   // top-right
+         // Top face
+         -0.5f,  0.5f, -0.5f,  // top-left
+          0.5f,  0.5f,  0.5f,  // bottom-right
+          0.5f,  0.5f, -0.5f,   // top-right     
+          0.5f,  0.5f,  0.5f,  // bottom-right
+         -0.5f,  0.5f, -0.5f,   // top-left
+         -0.5f,  0.5f,  0.5f  // bottom-left  
     };
 
     m_Normals = {
@@ -389,48 +390,50 @@ void Primitive::buildCube()
     };
 
     m_TexCoords = {
-       0.0f, 0.0f,
-       1.0f, 0.0f,
-       1.0f, 1.0f,
-       1.0f, 1.0f,
-       0.0f, 1.0f,
-       0.0f, 0.0f,
-
-       0.0f, 0.0f,
-       1.0f, 0.0f,
-       1.0f, 1.0f,
-       1.0f, 1.0f,
-       0.0f, 1.0f,
-       0.0f, 0.0f,
-
-        1.0f, 0.0f,
-       1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 1.0f,
-         0.0f, 0.0f,
-         1.0f, 0.0f,
-
-        1.0f, 0.0f,
-         1.0f, 1.0f,
-         0.0f, 1.0f,
-          0.0f, 1.0f,
-          0.0f, 0.0f,
-          1.0f, 0.0f,
-
-        0.0f, 1.0f,
-          1.0f, 1.0f,
-         1.0f, 0.0f,
-         1.0f, 0.0f,
-          0.0f, 0.0f,
-         0.0f, 1.0f,
-
-        0.0f, 1.0f,
-        1.0f, 1.0f,
-        1.0f, 0.0f,
-          1.0f, 0.0f,
-          0.0f, 0.0f,
-         0.0f, 1.0f
+        // Back face
+        0.0f, 0.0f, // Bottom-left
+        1.0f, 1.0f, // top-right
+        1.0f, 0.0f, // bottom-right         
+        1.0f, 1.0f, // top-right
+        0.0f, 0.0f, // bottom-left
+        0.0f, 1.0f, // top-left
+        // Front face
+        0.0f, 0.0f, // bottom-left
+        1.0f, 0.0f, // bottom-right
+        1.0f, 1.0f, // top-right
+        1.0f, 1.0f, // top-right
+        0.0f, 1.0f, // top-left
+        0.0f, 0.0f, // bottom-left
+        // Left face
+        1.0f, 0.0f, // top-right
+        1.0f, 1.0f, // top-left
+        0.0f, 1.0f, // bottom-left
+        0.0f, 1.0f, // bottom-left
+        0.0f, 0.0f, // bottom-right
+        1.0f, 0.0f, // top-right
+        // Right face
+        1.0f, 0.0f, // top-left
+        0.0f, 1.0f, // bottom-right
+        1.0f, 1.0f, // top-right         
+        0.0f, 1.0f, // bottom-right
+        1.0f, 0.0f, // top-left
+        0.0f, 0.0f, // bottom-left     
+         // Bottom face
+        0.0f, 1.0f, // top-right
+        1.0f, 1.0f, // top-left
+        1.0f, 0.0f, // bottom-left
+        1.0f, 0.0f, // bottom-left
+        0.0f, 0.0f, // bottom-right
+        0.0f, 1.0f, // top-right
+         // Top face
+        0.0f, 1.0f, // top-left
+        1.0f, 0.0f, // bottom-right
+        1.0f, 1.0f, // top-right     
+        1.0f, 0.0f, // bottom-right
+        0.0f, 1.0f, // top-left
+        0.0f, 0.0f  // bottom-left   
     };
+
 
     //Combine above mesh data
     if (m_hasTexture == true)

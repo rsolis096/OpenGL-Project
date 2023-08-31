@@ -15,7 +15,6 @@ PointLight::PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& 
 
 	m_LightPos = glm::vec3(0.7f, 0.2f, 2.0f);
 	m_LightShape = Primitive("Cube"); //This object will be the lamp
-
 	m_LightShape.setPosition(m_LightPos);
 
 	//For the light bulb location
@@ -41,6 +40,7 @@ void PointLight::renderLight(glm::mat4 view, glm::mat4 projection)
 	m_lightShapeShader.setMat4("projection", projection);
 	m_lightShapeShader.setMat4("view", view);
 	m_LightShape.model = glm::mat4(1.0f);
+	//m_LightShape.setPosition(m_LightPos);
 	m_LightShape.model = glm::translate(m_LightShape.model, m_LightPos); //vec is lightPos
 	m_LightShape.model = glm::scale(m_LightShape.model, glm::vec3(0.2f)); // a smaller cube
 	m_lightShapeShader.setMat4("model", m_LightShape.model);
@@ -81,6 +81,7 @@ PointLight::~PointLight()
 void PointLight::setLightPos(glm::vec3 lightPos)
 {
 	m_LightPos = lightPos;
+	m_LightShape.setPosition(lightPos);
 	m_lightingShader.use();
 	m_lightingShader.setVec3("pointlight[" + std::to_string(lightID) + "].position", m_LightPos);
 }

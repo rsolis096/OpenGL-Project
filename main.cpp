@@ -214,6 +214,12 @@ int main()
     }
     glEnable(GL_DEPTH_TEST);
 
+    //Enable this to only render front facing polygons
+    glEnable(GL_CULL_FACE);
+    //Defaults, not needed to be specified
+    //glCullFace(GL_BACK);
+    //glFrontFace(GL_CCW);
+
     //Compile and link shaders
     Shader lightingShader("lightingShader.vert", "lightingShader.frag");
     Shader lightCubeShader("pointLightShader.vert", "pointLightShader.frag");
@@ -224,7 +230,7 @@ int main()
     PointLight* pointLight2 = new PointLight(lightingShader, lightCubeShader, myCamera);
     PointLight* pointLight3 = new PointLight(lightingShader, lightCubeShader, myCamera);
     DirectionalLight dirLight(lightingShader);
-    pointLight2->setLightPos(glm::vec3(1.0f, 1.0f, -5.0f));
+    pointLight->setLightPos(glm::vec3(1.0f, 1.0f, -5.0f));
     pointLight2->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
 
 
