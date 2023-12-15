@@ -11,31 +11,35 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-//This class serves exclusively as a way to organize object colors and their transformations
 
+//Holds some attributes that all "objects" inherit
+//Does not contain rendering information as various objects render differently
 struct Object
 {
-    public: 
+        //Initializes the basic attributes for all objects
+        Object();
+
         //Object color attributes (ONLY FOR PRIMITIVES/ No texture Objects)
         glm::vec3 m_Ambient;
         glm::vec3 m_Diffuse;
         glm::vec3 m_Specular;
 
         //Texture Properties
-        Texture* diffuseMap;
-        Texture* specularMap;
+        Texture* m_DiffuseMap;
+        Texture* m_SpecularMap;
         bool m_hasTexture;
-
 
         //Object World Attributes
         glm::vec3 m_Position;
-        glm::mat4 model;
+        glm::vec3 m_Scale;
+        glm::mat4 m_Model;
 
         //Type
-        std::string m_type;
+        std::string m_Type;
 
         //Teleport to specified location
         void setPosition(glm::vec3 newPosition);
+        void setScale(glm::vec3 newScale);
         //Translate by parameter (Used to move some direction from current position)
         void translatePosition(glm::vec3 newPosition);
 
@@ -44,6 +48,8 @@ struct Object
         void setDiffuse(glm::vec3);
         void setSpecular(glm::vec3);
 
-
         virtual void Draw(Shader& shader) = 0;
+
+    private:
+        void updateModel();
 };

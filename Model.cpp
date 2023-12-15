@@ -1,14 +1,9 @@
 #pragma once
 #include "Model.h"
 
-Model::Model(string const& path, bool gamma) : gammaCorrection(gamma)
+Model::Model(string const& path, bool gamma) : Object(), gammaCorrection(gamma)
 {
-    m_type = "Model";
-    m_Ambient = glm::vec3(0.2f);
-    m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-    m_Specular = glm::vec3(0.5f);
-    m_Position = glm::vec3(1.0f, 1.0f, 1.0f);
-    model = glm::mat4(1.0f);
+    m_Type = "Model";
     m_hasTexture = false;
     loadModel(path);
 }
@@ -16,7 +11,7 @@ Model::Model(string const& path, bool gamma) : gammaCorrection(gamma)
 void Model::Draw(Shader& shader)
 {
     shader.use();
-    shader.setMat4("model", model);
+    shader.setMat4("model", m_Model);
     shader.setBool("hasTexture", m_hasTexture);
     if (!m_hasTexture)
     {
@@ -163,9 +158,10 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType type
         mat->GetTexture(type, i, &str);
         // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
         bool skip = false;
+        //Iterate through lodaed textures and make sure there are no duplicates
         for (unsigned int j = 0; j < textures_loaded.size(); j++)
         {
-            if (std::strcmp(textures_loaded[j].path[0].data(), str.C_Str()) == 0)
+            if (std::strcmp(textures[j].m_Path.data(), str.C_Str()) == 0)
             {
                 textures.push_back(textures_loaded[j]);
                 skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
@@ -177,9 +173,7 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType type
             string filename = string(str.C_Str());
             //concantenate director and path filename specified the type of map, ie. (diffuse, specular, normal, height)
             filename = this->directory + '/' + filename;
-            Texture texture (filename.c_str(), true);
-            texture.type = typeName;
-            texture.path[0] = str.C_Str();
+            Texture texture (filename.c_str(), true, typeName);
             textures.push_back(texture);
             textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
         }

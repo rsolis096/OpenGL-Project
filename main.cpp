@@ -226,7 +226,7 @@ int main()
     }
     glEnable(GL_DEPTH_TEST);
 
-    //Enable this to only render front facing polygons
+    //Enable this to only render front facing polygons (for performance)
     glEnable(GL_CULL_FACE);
     //Defaults, not needed to be specified
     //glCullFace(GL_BACK);
@@ -301,15 +301,18 @@ int main()
 
     //Compile and link shaders
     Shader cubeMapShader("cubeMapShader.vert", "cubeMapShader.frag");
+    //General directional lighting
     Shader lightingShader("lightingShader.vert", "lightingShader.frag");
-    Shader lightCubeShader("pointLightShader.vert", "pointLightShader.frag");
+    //For objects that are also light sources
+    Shader pointLightShader("pointLightShader.vert", "pointLightShader.frag");
 
     //Initialize Lights
     SpotLight* spotLight = new SpotLight(lightingShader, myCamera);
-    PointLight* pointLight = new PointLight(lightingShader, lightCubeShader, myCamera);
-    PointLight* pointLight2 = new PointLight(lightingShader, lightCubeShader, myCamera);
-    PointLight* pointLight3 = new PointLight(lightingShader, lightCubeShader, myCamera);
-    DirectionalLight dirLight(lightingShader);
+    PointLight* pointLight = new PointLight(lightingShader, pointLightShader, myCamera);
+    PointLight* pointLight2 = new PointLight(lightingShader, pointLightShader, myCamera);
+    PointLight* pointLight3 = new PointLight(lightingShader, pointLightShader, myCamera);
+    DirectionalLight* dirLight = new DirectionalLight(lightingShader);
+
     pointLight->setLightPos(glm::vec3(1.0f, 1.0f, -5.0f));
     pointLight2->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
 
@@ -328,7 +331,6 @@ int main()
     //Initialize the GUI
     GUI myGUI(window, myScene);
 
-    // render loop 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable this line for wireframe display
 
     //Initialize MVP
@@ -344,6 +346,8 @@ int main()
     //Set window size of ImGUI window
     //ImGui::SetNextWindowSize(ImVec2(100, 75)); // Set the desired width and height
     float count = 0;
+
+    //Main loop
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -367,13 +371,14 @@ int main()
         // Update the camera
         updateCamera(lightingShader, view, projection);
 
+        //Update Scene Objects
         for (auto& element : myScene.sceneObjects)
         {
-            if (element->m_type == "Sphere")
+            if (element->m_Type == "Sphere")
             {
                 element->translatePosition(glm::vec3(0.001f));
             }
-            if (element->m_type == "Model")
+            if (element->m_Type == "Model")
             {
                 lightingShader.setMat4("model", model);
             }
@@ -385,11 +390,10 @@ int main()
         //TO DO: CHANGE THESE SUCH THAT LIGHTS CAN BE UPDATED IN GUI
         pointLight->renderLight(view, projection);
         pointLight2->renderLight(view, projection);
-        dirLight.renderLight();      
+        dirLight->renderLight();      
         spotLight->renderLight();
 
 
-        myGUI.displayWindow();
 
         // draw skybox as last
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
@@ -405,7 +409,8 @@ int main()
         glBindVertexArray(0);
         glDepthFunc(GL_LESS); // set depth function back to default
 
-
+        //GUI should always be drawn last
+        myGUI.displayWindow();
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);//swap back frame buffer with front frame buffer.

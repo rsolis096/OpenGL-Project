@@ -18,8 +18,8 @@ PointLight::PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& 
 	m_LightShape.setPosition(m_LightPos);
 
 	//For the light bulb location
-	m_LightShape.model = glm::mat4(1.0f);
-	m_LightShape.model = glm::translate(m_LightShape.model, m_LightShape.m_Position);
+	m_LightShape.m_Model = glm::mat4(1.0f);
+	m_LightShape.m_Model = glm::translate(m_LightShape.m_Model, m_LightShape.m_Position);
 
 	//Light Color Properties
 	m_Ambient = glm::vec3(0.05f, 0.05f, 0.05f); //Dark ambient
@@ -39,11 +39,11 @@ void PointLight::renderLight(glm::mat4 view, glm::mat4 projection)
 	m_lightShapeShader.use();
 	m_lightShapeShader.setMat4("projection", projection);
 	m_lightShapeShader.setMat4("view", view);
-	m_LightShape.model = glm::mat4(1.0f);
+	m_LightShape.m_Model = glm::mat4(1.0f);
 	//m_LightShape.setPosition(m_LightPos);
-	m_LightShape.model = glm::translate(m_LightShape.model, m_LightPos); //vec is lightPos
-	m_LightShape.model = glm::scale(m_LightShape.model, glm::vec3(0.2f)); // a smaller cube
-	m_lightShapeShader.setMat4("model", m_LightShape.model);
+	m_LightShape.m_Model = glm::translate(m_LightShape.m_Model, m_LightPos); //vec is lightPos
+	m_LightShape.m_Model = glm::scale(m_LightShape.m_Model, glm::vec3(0.2f)); // a smaller cube
+	m_lightShapeShader.setMat4("model", m_LightShape.m_Model);
 
 	//render lamp object
 	m_LightShape.Draw(m_lightShapeShader);

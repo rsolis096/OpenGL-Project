@@ -36,6 +36,7 @@ void DirectionalLight::renderLight()
 
 DirectionalLight::~DirectionalLight()
 {
+
 }
 
 void DirectionalLight::setAmbient(glm::vec3 ambient)

@@ -10,9 +10,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
 class Primitive : public Object
 {
 public:
+
     //Mesh Data
     std::vector<float>m_Vertices;
     std::vector<float>m_TexCoords;
@@ -24,7 +26,7 @@ public:
     //Primitive Render Attributes
     unsigned int m_vao, m_vbo, m_ebo;
     bool m_useEBO;
-
+    bool changed;
     //Generate an Primitive with no mesh data, default color data, no texture data, default world attributes
     Primitive();
     //Build a primitive of type eg. type = "sphere", "cube", "pyramid"

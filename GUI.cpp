@@ -28,7 +28,6 @@ GUI::GUI(GLFWwindow* windowParam, SceneManager& scene) : window(windowParam), my
 
 	GUI::isWindowHidden = true;
 
-	
 }
 
 void GUI::displayWindow()
@@ -46,7 +45,6 @@ void GUI::displayWindow()
 		ImGui::Text("Hello World");
 		drawList();
 
-		//ImGui::ColorEdit3("color", &colorSlider[0]);
 		ImGui::End();
 
 		ImGui::Render();
@@ -58,21 +56,24 @@ void GUI::drawList()
 {
 	//For transformation
 	static float vec4f[4] = { 0.00f, 0.00f, 0.00f, 0.00f };
+	//For Scale
+	static float vec3f[4] = { 1.00f, 1.00f, 1.00f};
+
 	ImGui::Text("Object Count: %d", myScene.sceneObjects.size());
 	//Add sphere object to scene
 	if (ImGui::Button("+")) {
 		myScene.addPrimitive(new Primitive("Sphere"));
-		myScene.sceneObjects[myScene.objectCount - 1]->m_type = "Sphere" + to_string(myScene.objectCount);
+		myScene.sceneObjects[myScene.objectCount - 1]->m_Type = "Sphere" + to_string(myScene.objectCount);
 	}
 	//Left Side of window
-	static int selected = 0;
+	static int selected = 0; //Default selected object is first object in scene
 	{
 		ImGui::BeginChild("left pane", ImVec2(150, 0), true);
 		for (int i = 0; i < myScene.sceneObjects.size(); i++)
 		{
 			// FIXME: Good candidate to use ImGuiSelectableFlags_SelectOnNav
 			char label[128];
-			sprintf_s(label, myScene.sceneObjects[i]->m_type.c_str(), i);
+			sprintf_s(label, myScene.sceneObjects[i]->m_Type.c_str(), i);
 			if (ImGui::Selectable(label, false))
 			{
 				selected = i;
@@ -88,21 +89,24 @@ void GUI::drawList()
 	{
 		ImGui::BeginGroup();
 		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+		
 		if(selectedObject != nullptr)
-			ImGui::Text("Selected Item: %s", selectedObject->m_type.c_str());
+			ImGui::Text("Selected Item: %s", selectedObject->m_Type.c_str());
 		else
 			ImGui::Text("Selected Item: %s", "NULL");
 
 		ImGui::Separator();
 		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
 		{
-			if (ImGui::BeginTabItem("Position"))
+			//Properties Tab
+			if (ImGui::BeginTabItem("Properties"))
 			{
 				if (selectedObject != nullptr)
 				{
+					//Position
 					glm::vec3 pos = selectedObject->m_Position;
 					ImGui::Text("Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
-					ImGui::InputFloat3("input float3", vec4f);
+					ImGui::InputFloat3("Position", vec4f);
 					if (ImGui::Button("Set")) {
 						pos[0] = vec4f[0];
 						pos[1] = vec4f[1];
@@ -111,11 +115,25 @@ void GUI::drawList()
 						vec4f[0] = 0.00f;
 						vec4f[1] = 0.00f;
 						vec4f[2] = 0.00f;
-						vec4f[4] = 0.00f;
+					}
+					
+					//Scaling
+					glm::vec3 sc(1.0f, 1.0f, 1.0f);
+					ImGui::Text("Scale:\tx: %.2f, y: %.2f, z: %.2f", sc.x, sc.y, sc.z);
+					ImGui::InputFloat3("Scale", vec3f);
+					if (ImGui::Button("Set1")) {
+						sc[0] = vec3f[0];
+						sc[1] = vec3f[1];
+						sc[2] = vec3f[2];
+						selectedObject->setScale(sc);
+						vec3f[0] = 1.00f;
+						vec3f[1] = 1.00f;
+						vec3f[1] = 1.00f;
 					}
 				}	
 				ImGui::EndTabItem();
 			}
+			//Texture Tab
 			static std::string text = " ";
 			if (ImGui::BeginTabItem("Texture"))
 			{
@@ -124,21 +142,21 @@ void GUI::drawList()
 
 				if (selectedObject != nullptr)
 				{
-					if (selectedObject->diffuseMap != nullptr)
+					if (selectedObject->m_DiffuseMap != nullptr)
 					{
 						if(text == " ")
-							strcpy_s(buffer, selectedObject->diffuseMap->path[0].c_str());
+							strcpy_s(buffer, selectedObject->m_DiffuseMap->m_Path.c_str());
 						else
 							strcpy_s(buffer, text.c_str());
 
 						if (ImGui::InputText("Texture Path: ", buffer, sizeof(buffer)))
 							text = buffer;
 						if (ImGui::Button("Set Texture")) {
-							selectedObject->diffuseMap->path[0] = text;
-							selectedObject->specularMap->path[0] = text;
+
 							selectedObject->m_hasTexture = true;
-							selectedObject->diffuseMap->loadTexture(selectedObject->diffuseMap->path[0].c_str(), false);
-							selectedObject->specularMap->loadTexture(selectedObject->diffuseMap->path[0].c_str(), false);
+							selectedObject->m_DiffuseMap->updateTexture(text.c_str(), false);
+							//This should be changed to allow for a new specular map
+							selectedObject->m_SpecularMap->updateTexture(text.c_str(), false);
 
 						}
 					}

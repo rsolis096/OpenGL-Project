@@ -1,46 +1,21 @@
 #include "Primitive.h"
 #define PI 3.141592653589793238462643383279502884197
 
-Primitive::Primitive()
+Primitive::Primitive() : Object(), m_useEBO(false), m_ebo(0), m_vao(0), m_vbo(0)
 {
-    //Set default Primitive properties
-    m_Ambient = glm::vec3(0.2f);
-    m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-    m_Specular = glm::vec3(0.1f);
-    m_Position = glm::vec3(1.0f, 1.0f, 1.0f);
-    m_hasTexture = false;
-
-    diffuseMap = nullptr;
-    specularMap = nullptr;
-
+    //See Object default constructor
+    m_Type = "Undefined Primitive";
 }
 
-Primitive::Primitive(const char* type, const char* texturePathDiffuse, const char* texturePathSpecular)
+//Used for creating a Primtive with texture information
+Primitive::Primitive(const char* type, const char* texturePathDiffuse, const char* texturePathSpecular) : Object(), m_useEBO(false), m_ebo(0), m_vao(0), m_vbo(0)
 {
-    //Set default Primitive properties
-    m_Ambient = glm::vec3(0.2f);
-    m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-    m_Specular = glm::vec3(0.1f);
-    m_Position = glm::vec3(1.0f, 1.0f, 1.0f);
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, m_Position);
-
     //Set some rendering properties
-    //m_Shader = shader;
     m_hasTexture = true;
-    m_type = type;
-
+    m_Type = type;
     //Open and load diffuse map and specular map, save their Primitives
-    if (std::strstr(texturePathDiffuse, ".jpg"))
-        diffuseMap = new Texture(texturePathDiffuse, false);
-    else
-        diffuseMap = new Texture(texturePathDiffuse, false);
-
-    //Open and load specular map
-    if (std::strstr(texturePathSpecular, ".jpg"))
-        specularMap = new Texture(texturePathSpecular, false);
-    else
-        specularMap = new Texture(texturePathSpecular, false);
+    m_DiffuseMap = new Texture(texturePathDiffuse, false, "texture_diffuse");
+    m_SpecularMap = new Texture(texturePathSpecular, false, "texture_specular");
 
     //Build the specified Primitive type
     if (type == "Cube")
@@ -53,28 +28,19 @@ Primitive::Primitive(const char* type, const char* texturePathDiffuse, const cha
         m_useEBO = true;
         buildSphere();
     }
-    //else
-        //Throw error;
+    else
+    {
+        //Build a cube if invalid primitive is given
+        m_useEBO = false;
+        buildCube();
+    }
 }
 
-Primitive::Primitive(const char* type)
+//Used for creating a primitive with no texture
+Primitive::Primitive(const char* type) : Object(), m_useEBO(false), m_ebo(0), m_vao(0), m_vbo(0)
 {
-    //Set Default Primitive Properties
-    m_Ambient = glm::vec3(0.2f);
-    m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-    m_Specular = glm::vec3(0.1f);
-    m_Position = glm::vec3(1.0f, 1.0f, 1.0f);
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, m_Position);
-
-    diffuseMap = new Texture();
-    specularMap = new Texture();
-
-    //Set some rendering properties
-    //m_Shader = shader;
     m_hasTexture = false;
-    m_type = type;
-
+    m_Type = type;
     if (type == "Cube")
     {
         m_useEBO = false;
@@ -93,15 +59,15 @@ void Primitive::Draw(Shader& shader)
     shader.setVec3("object.ambient", m_Ambient);
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
-    shader.setMat4("model", model);
+    shader.setMat4("model", m_Model);
 
     //Bind texture and send texture to fragment shader
     if (m_hasTexture)
     {
         glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, diffuseMap->ID);
+        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
         glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, specularMap->ID);
+        glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
 
         shader.use();
         shader.setBool("hasTexture", true);
@@ -116,13 +82,12 @@ void Primitive::Draw(Shader& shader)
     glBindVertexArray(m_vao);
 
     //Choose render type - vertices list (VAO) or indices list(EBO)
-    if (m_useEBO)
+    if (m_useEBO) //Sphere
     {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-        //Render the Primitive
         glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
     }
-    else
+    else //Cube
     {
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
@@ -180,7 +145,7 @@ void Primitive::buildSphere()
     int stackCount = 30;
     int radius = 1.0f;
 
-    //Algorithm provided by site given in assignment (http://www.songho.ca/opengl/gl_sphere.html)
+    //Algorithm provided by (http://www.songho.ca/opengl/gl_sphere.html)
     std::vector<float>().swap(m_Vertices);
     std::vector<float>().swap(m_Normals);
     std::vector<float>().swap(m_TexCoords);
@@ -433,7 +398,6 @@ void Primitive::buildCube()
         0.0f, 1.0f, // top-left
         0.0f, 0.0f  // bottom-left   
     };
-
 
     //Combine above mesh data
     if (m_hasTexture == true)
