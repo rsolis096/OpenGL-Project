@@ -37,6 +37,9 @@ struct Object
         //Type
         std::string m_Type;
 
+        //Rendering info
+        unsigned int m_vao, m_vbo, m_ebo;
+
         //Teleport to specified location
         void setPosition(glm::vec3 newPosition);
         void setScale(glm::vec3 newScale);

@@ -1,8 +1,8 @@
 #pragma once
-#include "Primitive.h"
+
 #include "Model.h"
 
-class SceneManager
+class Scene
 {
 public:
 
@@ -14,13 +14,9 @@ public:
 
 	//Scene Objects (Specific)
 	std::vector<Model*> sceneModels;
-	std::vector<Primitive*> scenePrimitives;
-	//std::vector<LightSource*>& sceneLightSources;
 
 	//Constructors
-	SceneManager();
-
-	void addPrimitive(Primitive* obj);
-	void addModel(Model* obj);
+	Scene();
+	void addObject(Object* obj);
 	void addLightSource();
 };

@@ -12,7 +12,7 @@ GUI::GUI() : window(nullptr)
 }
 */
 
-GUI::GUI(GLFWwindow* windowParam, SceneManager& scene) : window(windowParam), myScene(scene)
+GUI::GUI(GLFWwindow* windowParam, Scene& scene) : window(windowParam), myScene(scene)
 {
 	// Setup ImGUI context
 	IMGUI_CHECKVERSION();
@@ -60,10 +60,10 @@ void GUI::drawList()
 	static float vec3f[4] = { 1.00f, 1.00f, 1.00f};
 
 	ImGui::Text("Object Count: %d", myScene.sceneObjects.size());
-	//Add sphere object to scene
+	//Add Cube object to scene
 	if (ImGui::Button("+")) {
-		myScene.addPrimitive(new Primitive("Sphere"));
-		myScene.sceneObjects[myScene.objectCount - 1]->m_Type = "Sphere" + to_string(myScene.objectCount);
+		myScene.addObject(new Cube());
+		myScene.sceneObjects[myScene.objectCount - 1]->m_Type = "Cube" + to_string(myScene.objectCount);
 	}
 	//Left Side of window
 	static int selected = 0; //Default selected object is first object in scene

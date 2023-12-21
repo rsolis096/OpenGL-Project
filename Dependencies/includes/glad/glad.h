@@ -1855,8 +1855,8 @@ typedef void (APIENTRYP PFNGLTEXBUFFERPROC)(GLenum target, GLenum internalformat
 GLAPI PFNGLTEXBUFFERPROC glad_glTexBuffer;
 #define glTexBuffer glad_glTexBuffer
 typedef void (APIENTRYP PFNGLPRIMITIVERESTARTINDEXPROC)(GLuint index);
-GLAPI PFNGLPRIMITIVERESTARTINDEXPROC glad_glPrimitiveRestartIndex;
-#define glPrimitiveRestartIndex glad_glPrimitiveRestartIndex
+GLAPI PFNGLPRIMITIVERESTARTINDEXPROC glad_glCubeRestartIndex;
+#define glCubeRestartIndex glad_glCubeRestartIndex
 typedef void (APIENTRYP PFNGLCOPYBUFFERSUBDATAPROC)(GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size);
 GLAPI PFNGLCOPYBUFFERSUBDATAPROC glad_glCopyBufferSubData;
 #define glCopyBufferSubData glad_glCopyBufferSubData

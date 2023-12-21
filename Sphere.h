@@ -11,7 +11,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
-class Primitive : public Object
+class Sphere : public Object
 {
 public:
 
@@ -22,17 +22,11 @@ public:
     std::vector<unsigned int>m_Indices;
     std::vector<float>m_InterleavedVertices;
 
-
-    //Primitive Render Attributes
-    unsigned int m_vao, m_vbo, m_ebo;
-    bool m_useEBO;
     bool changed;
-    //Generate an Primitive with no mesh data, default color data, no texture data, default world attributes
-    Primitive();
+    //Build a primitive Cube with no texture data
+    Sphere();
     //Build a primitive of type eg. type = "sphere", "cube", "pyramid"
-    Primitive(const char* type, const char* texturePathDiffuse, const char* texturePathSpecular);
-    //Build a primitive Primitive with no texture data
-    Primitive(const char* type);
+    Sphere(const char* texturePathDiffuse, const char* texturePathSpecular);
 
     //Methods
     void Draw(Shader& shader) override;
@@ -42,8 +36,4 @@ private:
     void buildInterleavedVertices();
     void buildInterleavedVerticesWithTexCoords();
     void buildSphere();
-    void buildCube();
-
-
-
 };

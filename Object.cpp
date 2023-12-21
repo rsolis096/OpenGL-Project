@@ -1,9 +1,9 @@
 #include "Object.h"
 #define PI 3.141592653589793238462643383279502884197
 
-Object::Object()
+Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
 {
-    //Set default Primitive properties
+    //Set default Cube properties
     m_Ambient = glm::vec3(0.2f);
     m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
     m_Specular = glm::vec3(0.1f);

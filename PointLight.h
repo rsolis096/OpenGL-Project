@@ -4,7 +4,7 @@
 #include <vector>
 #include <glad/glad.h>
 #include "Model.h"
-#include "Primitive.h"
+#include "Cube.h"
 #include "Shader.h"
 #include "Camera.h"
 
@@ -39,7 +39,7 @@ class PointLight
 		Shader m_lightingShader;
 
 		//Light Object (light is not invisible)
-		Primitive m_LightShape;
+		Cube m_LightShape;
 		//Model m_LightModel;
 
 		//Reference to the camera

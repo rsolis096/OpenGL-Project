@@ -14,7 +14,7 @@ PointLight::PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& 
 	m_lightShapeShader = lightCubeShader; //For rendering the light source itself
 
 	m_LightPos = glm::vec3(0.7f, 0.2f, 2.0f);
-	m_LightShape = Primitive("Cube"); //This object will be the lamp
+	m_LightShape = Cube(); //This object will be the lamp
 	m_LightShape.setPosition(m_LightPos);
 
 	//For the light bulb location

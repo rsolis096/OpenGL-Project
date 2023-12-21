@@ -16,9 +16,11 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "DirectionalLight.h"
-#include "Primitive.h"
-#include "SceneManager.h"
+#include "Cube.h"
+#include "Scene.h"
 #include "Model.h"
+#include "Sphere.h"
+#include "Plane.h"
 
 
 //Matrix Multiplication
@@ -318,14 +320,16 @@ int main()
 
 
     //Create Scene Manager
-    SceneManager myScene;
+    Scene myScene;
 
     //Initialize Models
-    myScene.addModel(new Model("resources/objects/dragon/dragon.obj"));
+    myScene.addObject(new Model("resources/objects/dragon/dragon.obj"));
 
     //Initialize Objects
-    myScene.addPrimitive(new Primitive("Cube", "Assets/container2.png", "Assets/container2_specular.png"));
-    myScene.addPrimitive(new Primitive("Sphere", "Assets/globe.jpg", "Assets/globe.jpg"));
+    myScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
+    myScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
+    myScene.addObject(new Plane("Assets/globe.jpg", "Assets/globe.jpg"));
+
     
 
     //Initialize the GUI
@@ -419,7 +423,7 @@ int main()
     }
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    for (auto& obj : myScene.scenePrimitives)
+    for (auto& obj : myScene.sceneObjects)
     {
         glDeleteVertexArrays(1, &obj->m_vao);
         glDeleteBuffers(1, &obj->m_vbo);
