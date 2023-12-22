@@ -1,11 +1,9 @@
 #pragma once
-
 #include <iostream>
 #include <vector>
 
 #include "Shader.h"
 #include "Texture.h"
-#include "Vertex.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -14,8 +12,9 @@
 
 //Holds some attributes that all "objects" inherit
 //Does not contain rendering information as various objects render differently
-struct Object
+class Object
 {
+public:
         //Initializes the basic attributes for all objects
         Object();
 
@@ -33,6 +32,18 @@ struct Object
         glm::vec3 m_Position;
         glm::vec3 m_Scale;
         glm::mat4 m_Model;
+
+        //Mesh Data
+        std::vector<float>m_Vertices;
+        std::vector<float>m_TexCoords;
+        std::vector<float>m_Normals;
+        std::vector<unsigned int>m_Indices;
+        std::vector<float>m_InterleavedVertices;
+
+        //Physics info (push to component later)
+        glm::vec3 m_Force;
+        glm::vec3 m_Velocity;
+        glm::vec3 m_Mass;
 
         //Type
         std::string m_Type;
@@ -53,6 +64,8 @@ struct Object
 
         virtual void Draw(Shader& shader) = 0;
 
-    private:
         void updateModel();
+
+        void buildInterleavedVerticesWithTexCoords();
+        void buildInterleavedVertices();
 };

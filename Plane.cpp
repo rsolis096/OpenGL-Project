@@ -1,7 +1,5 @@
 #include "Plane.h"
 
-
-
 //Used for creating a Primtive with texture information
 Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
@@ -26,6 +24,7 @@ Plane::Plane() : Object()
 
 void Plane::Draw(Shader& shader)
 {
+    //glDisable(GL_CULL_FACE);
     shader.use();
     shader.setVec3("object.ambient", m_Ambient);
     shader.setVec3("object.diffuse", m_Diffuse);
@@ -56,48 +55,7 @@ void Plane::Draw(Shader& shader)
     // Unbind buffers and reset state
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
-
-}
-
-void Plane::buildInterleavedVertices()
-{
-    std::vector<float>().swap(m_InterleavedVertices);
-
-    std::size_t i, j;
-    std::size_t count = m_Vertices.size();
-    for (i = 0, j = 0; i < count; i += 3)
-    {
-        m_InterleavedVertices.push_back(m_Vertices[i]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 1]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 2]);
-
-
-        m_InterleavedVertices.push_back(m_Normals[i]);
-        m_InterleavedVertices.push_back(m_Normals[i + 1]);
-        m_InterleavedVertices.push_back(m_Normals[i + 2]);
-
-    }
-}
-
-void Plane::buildInterleavedVerticesWithTexCoords()
-{
-    std::vector<float>().swap(m_InterleavedVertices);
-
-    std::size_t i, j;
-    std::size_t count = m_Vertices.size();
-    for (i = 0, j = 0; i < count; i += 3, j += 2)
-    {
-        m_InterleavedVertices.push_back(m_Vertices[i]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 1]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 2]);
-
-        m_InterleavedVertices.push_back(m_Normals[i]);
-        m_InterleavedVertices.push_back(m_Normals[i + 1]);
-        m_InterleavedVertices.push_back(m_Normals[i + 2]);
-
-        m_InterleavedVertices.push_back(m_TexCoords[j]);
-        m_InterleavedVertices.push_back(m_TexCoords[j + 1]);
-    }
+    //glEnable(GL_CULL_FACE);//Disable then re-enable to show both sides of plane
 }
 
 void Plane::buildPlane()
@@ -105,17 +63,16 @@ void Plane::buildPlane()
     //Pre Defined cube vertices, normals, and TexCoords
     m_Vertices = {
 
-         // Top face
-         -0.5f,  0.5f, -0.5f,  // top-left
-          0.5f,  0.5f,  0.5f,  // bottom-right
-          0.5f,  0.5f, -0.5f,   // top-right     
-          0.5f,  0.5f,  0.5f,  // bottom-right
-         -0.5f,  0.5f, -0.5f,   // top-left
-         -0.5f,  0.5f,  0.5f  // bottom-left  
+        // Top face
+        -0.5f,  0.0f, -0.5f,  // top-left
+        0.5f,  0.0f,  0.5f,  // bottom-right
+        0.5f,  0.0f, -0.5f,   // top-right     
+        0.5f,  0.0f,  0.5f,  // bottom-right
+        -0.5f,  0.0f, -0.5f,   // top-left
+        -0.5f,  0.0f,  0.5f  // bottom-left  
     };
 
     m_Normals = {
-
 
          0.0f,  1.0f,  0.0f,
          0.0f,  1.0f,  0.0f,
@@ -126,13 +83,14 @@ void Plane::buildPlane()
     };
 
     m_TexCoords = {
+
        // Top face
-      0.0f, 1.0f, // top-left
-      1.0f, 0.0f, // bottom-right
-      1.0f, 1.0f, // top-right     
-      1.0f, 0.0f, // bottom-right
-      0.0f, 1.0f, // top-left
-      0.0f, 0.0f  // bottom-left   
+        0.0f, 1.0f, // top-left
+        1.0f, 0.0f, // bottom-right
+        1.0f, 1.0f, // top-right     
+        1.0f, 0.0f, // bottom-right
+        0.0f, 1.0f, // top-left
+        0.0f, 0.0f  // bottom-left   
     };
 
     //Combine above mesh data

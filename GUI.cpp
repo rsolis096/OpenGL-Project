@@ -4,7 +4,7 @@ bool GUI::isWindowHidden = false;
 
 int selectedItemIndex = -1;
 static float vec3a[3] = { 0.00f, 0.00f, 0.00f };
-
+glm::vec3 cameraPos;
 /*
 GUI::GUI() : window(nullptr)
 {
@@ -30,8 +30,9 @@ GUI::GUI(GLFWwindow* windowParam, Scene& scene) : window(windowParam), myScene(s
 
 }
 
-void GUI::displayWindow()
+void GUI::displayWindow(glm::vec3 cPos)
 {
+	cameraPos = cPos;
 	if (!isWindowHidden)
 	{
 		// Start the Dear ImGui frame
@@ -59,6 +60,8 @@ void GUI::drawList()
 	//For Scale
 	static float vec3f[4] = { 1.00f, 1.00f, 1.00f};
 
+	ImGui::Text("Player Position: x: %.2f, y: %.2f, z: %.2f", 
+		cameraPos.x, cameraPos.y, cameraPos.z);
 	ImGui::Text("Object Count: %d", myScene.sceneObjects.size());
 	//Add Cube object to scene
 	if (ImGui::Button("+")) {
@@ -105,8 +108,8 @@ void GUI::drawList()
 				{
 					//Position
 					glm::vec3 pos = selectedObject->m_Position;
-					ImGui::Text("Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
-					ImGui::InputFloat3("Position", vec4f);
+					ImGui::Text("Current Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
+					ImGui::InputFloat3("##Position", vec4f);
 					if (ImGui::Button("Set")) {
 						pos[0] = vec4f[0];
 						pos[1] = vec4f[1];
@@ -118,17 +121,18 @@ void GUI::drawList()
 					}
 					
 					//Scaling
-					glm::vec3 sc(1.0f, 1.0f, 1.0f);
-					ImGui::Text("Scale:\tx: %.2f, y: %.2f, z: %.2f", sc.x, sc.y, sc.z);
-					ImGui::InputFloat3("Scale", vec3f);
+					glm::vec3 currentScale = selectedObject->m_Scale;
+					ImGui::Text("Current Scale:\tx: %.2f, y: %.2f, z: %.2f", 
+						currentScale.x, currentScale.y, currentScale.z);
+					ImGui::InputFloat3("##Scale", vec3f);
 					if (ImGui::Button("Set1")) {
-						sc[0] = vec3f[0];
-						sc[1] = vec3f[1];
-						sc[2] = vec3f[2];
-						selectedObject->setScale(sc);
+						currentScale[0] = vec3f[0];
+						currentScale[1] = vec3f[1];
+						currentScale[2] = vec3f[2];
+						selectedObject->setScale(currentScale);
 						vec3f[0] = 1.00f;
 						vec3f[1] = 1.00f;
-						vec3f[1] = 1.00f;
+						vec3f[2] = 1.00f;
 					}
 				}	
 				ImGui::EndTabItem();

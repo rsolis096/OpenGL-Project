@@ -22,6 +22,9 @@
 #include "Sphere.h"
 #include "Plane.h"
 
+//Physics
+#include "PhysicsWorld.h"
+
 
 //Matrix Multiplication
 #include <glm/glm.hpp>
@@ -69,8 +72,8 @@ void updateCamera(Shader& lightingShader, glm::mat4& view, glm::mat4& projection
     lightingShader.use();
     //View Matrix (Do after camera)
     view = myCamera.GetViewMatrix();
-    //Projection Matrix (fov change with scroll wheel)
-    projection = glm::perspective(glm::radians(myCamera.m_FOV), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 150.0f);
+    //Projection Matrix (fov change with scroll wheel) last value changes render distance
+    projection = glm::perspective(glm::radians(myCamera.m_FOV), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 1500.0f);
     //Send View and Projection matrices to shader (for camera)]]
     lightingShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.    
     lightingShader.setMat4("view", view);
@@ -89,7 +92,7 @@ void processInput(GLFWwindow* window)
     }
     else
     {
-        myCamera.setMovementSpeed(2.5);
+        myCamera.setMovementSpeed(2.5f);
     }
         
 
@@ -229,7 +232,7 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     //Enable this to only render front facing polygons (for performance)
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     //Defaults, not needed to be specified
     //glCullFace(GL_BACK);
     //glFrontFace(GL_CCW);
@@ -316,7 +319,7 @@ int main()
     DirectionalLight* dirLight = new DirectionalLight(lightingShader);
 
     pointLight->setLightPos(glm::vec3(1.0f, 1.0f, -5.0f));
-    pointLight2->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
+    //pointLight2->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
 
 
     //Create Scene Manager
@@ -330,7 +333,9 @@ int main()
     myScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
     myScene.addObject(new Plane("Assets/globe.jpg", "Assets/globe.jpg"));
 
-    
+    PhysicsWorld physicsWorld;
+    physicsWorld.addObject(myScene.sceneObjects[1]);
+    physicsWorld.addObject(myScene.sceneObjects[3]);
 
     //Initialize the GUI
     GUI myGUI(window, myScene);
@@ -378,26 +383,26 @@ int main()
         //Update Scene Objects
         for (auto& element : myScene.sceneObjects)
         {
+            physicsWorld.step(deltaTime);
             if (element->m_Type == "Sphere")
             {
-                element->translatePosition(glm::vec3(0.001f));
+                element->translatePosition(glm::vec3(0.0001f));
             }
             if (element->m_Type == "Model")
             {
                 lightingShader.setMat4("model", model);
             }
-            element->Draw(lightingShader);
+            if(element->m_Type != "Model")
+                element->Draw(lightingShader);
         }
 
         //Draw Lamp Object
 
         //TO DO: CHANGE THESE SUCH THAT LIGHTS CAN BE UPDATED IN GUI
-        pointLight->renderLight(view, projection);
-        pointLight2->renderLight(view, projection);
-        dirLight->renderLight();      
+        //pointLight->renderLight(view, projection);
+        //pointLight2->renderLight(view, projection);
+        //dirLight->renderLight();      
         spotLight->renderLight();
-
-
 
         // draw skybox as last
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
@@ -414,7 +419,7 @@ int main()
         glDepthFunc(GL_LESS); // set depth function back to default
 
         //GUI should always be drawn last
-        myGUI.displayWindow();
+        myGUI.displayWindow(myCamera.cameraPos);
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);//swap back frame buffer with front frame buffer.

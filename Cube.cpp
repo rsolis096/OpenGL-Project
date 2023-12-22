@@ -1,7 +1,5 @@
 #include "Cube.h"
 
-
-
 //Used for creating a Primtive with texture information
 Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
@@ -57,47 +55,6 @@ void Cube::Draw(Shader& shader)
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-}
-
-void Cube::buildInterleavedVertices()
-{
-    std::vector<float>().swap(m_InterleavedVertices);
-
-    std::size_t i, j;
-    std::size_t count = m_Vertices.size();
-    for (i = 0, j = 0; i < count; i += 3)
-    {
-        m_InterleavedVertices.push_back(m_Vertices[i]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 1]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 2]);
-
-
-        m_InterleavedVertices.push_back(m_Normals[i]);
-        m_InterleavedVertices.push_back(m_Normals[i + 1]);
-        m_InterleavedVertices.push_back(m_Normals[i + 2]);
-
-    }
-}
-
-void Cube::buildInterleavedVerticesWithTexCoords()
-{
-    std::vector<float>().swap(m_InterleavedVertices);
-
-    std::size_t i, j;
-    std::size_t count = m_Vertices.size();
-    for (i = 0, j = 0; i < count; i += 3, j += 2)
-    {
-        m_InterleavedVertices.push_back(m_Vertices[i]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 1]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 2]);
-
-        m_InterleavedVertices.push_back(m_Normals[i]);
-        m_InterleavedVertices.push_back(m_Normals[i + 1]);
-        m_InterleavedVertices.push_back(m_Normals[i + 2]);
-
-        m_InterleavedVertices.push_back(m_TexCoords[j]);
-        m_InterleavedVertices.push_back(m_TexCoords[j + 1]);
-    }
 }
 
 void Cube::buildCube()

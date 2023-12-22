@@ -31,6 +31,15 @@
     <Filter Include="Header Files\Objects">
       <UniqueIdentifier>{2677f4e8-914b-4740-8024-e394906497cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Environment">
+      <UniqueIdentifier>{8631d001-8659-4bd6-8c74-7e7aa5f1995a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Physics">
+      <UniqueIdentifier>{3cc2a307-e172-47c3-8709-f1af105dba78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Physics">
+      <UniqueIdentifier>{3e9b003d-378e-4bfb-94df-04f983ce80bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -104,6 +113,12 @@
     </ClCompile>
     <ClCompile Include="Sphere.cpp">
       <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsWorld.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsWorld.cpp">
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

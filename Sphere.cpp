@@ -52,11 +52,9 @@ void Sphere::Draw(Shader& shader)
     //Bind Sphere
     glBindVertexArray(m_vao);
 
-    //Choose render type - vertices list (VAO) or indices list(EBO)
+    //Choose render type - indices list(EBO)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
     glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
-
-
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
@@ -64,46 +62,6 @@ void Sphere::Draw(Shader& shader)
 
 }
 
-void Sphere::buildInterleavedVertices()
-{
-    std::vector<float>().swap(m_InterleavedVertices);
-
-    std::size_t i, j;
-    std::size_t count = m_Vertices.size();
-    for (i = 0, j = 0; i < count; i += 3)
-    {
-        m_InterleavedVertices.push_back(m_Vertices[i]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 1]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 2]);
-
-
-        m_InterleavedVertices.push_back(m_Normals[i]);
-        m_InterleavedVertices.push_back(m_Normals[i + 1]);
-        m_InterleavedVertices.push_back(m_Normals[i + 2]);
-
-    }
-}
-
-void Sphere::buildInterleavedVerticesWithTexCoords()
-{
-    std::vector<float>().swap(m_InterleavedVertices);
-
-    std::size_t i, j;
-    std::size_t count = m_Vertices.size();
-    for (i = 0, j = 0; i < count; i += 3, j += 2)
-    {
-        m_InterleavedVertices.push_back(m_Vertices[i]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 1]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 2]);
-
-        m_InterleavedVertices.push_back(m_Normals[i]);
-        m_InterleavedVertices.push_back(m_Normals[i + 1]);
-        m_InterleavedVertices.push_back(m_Normals[i + 2]);
-
-        m_InterleavedVertices.push_back(m_TexCoords[j]);
-        m_InterleavedVertices.push_back(m_TexCoords[j + 1]);
-    }
-}
 
 void Sphere::buildSphere()
 {
@@ -143,9 +101,9 @@ void Sphere::buildSphere()
             m_Vertices.push_back(z);
 
             // normalized vertex normal (nx, ny, nz)
-            nx = x * lengthInv;
-            ny = y * lengthInv;
-            nz = z * lengthInv;
+            nx = x  * lengthInv;
+            ny = y  * lengthInv;
+            nz = z  * lengthInv;
             m_Normals.push_back(nx);
             m_Normals.push_back(ny);
             m_Normals.push_back(nz);

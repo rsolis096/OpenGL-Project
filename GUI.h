@@ -16,7 +16,7 @@ class GUI
 		GLFWwindow* window;
 		//GUI();
 		GUI(GLFWwindow* windowParam, Scene& scene);
-		void displayWindow();
+		void displayWindow(glm::vec3);
 		//void setSceneCubes(std::vector<Cube*>& objects);
 private:
 	void drawList();
