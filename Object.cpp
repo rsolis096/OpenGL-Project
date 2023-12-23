@@ -18,6 +18,9 @@ Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
     m_hasTexture = false;
     m_DiffuseMap = nullptr;
     m_SpecularMap = nullptr;
+    enablePhysics = false;
+
+    startFall = 0.0f;
 
     updateModel();
 }
@@ -35,6 +38,18 @@ void Object::setDiffuse(glm::vec3 newDiffuse)
 void Object::setSpecular(glm::vec3 newSpecular)
 {
     m_Specular = newSpecular;
+}
+
+void Object::setPhysics()
+{
+    if (enablePhysics)
+        startFall = glfwGetTime();
+    setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
+}
+
+void Object::setVelocity(glm::vec3 v)
+{
+    m_Velocity = v;
 }
 
 void Object::setPosition(glm::vec3 newPosition)

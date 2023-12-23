@@ -22,15 +22,28 @@ void PhysicsWorld::removeObject(Object* obj)
 	}
 }
 
-void PhysicsWorld::step(float deltaTime)
-{;
+void PhysicsWorld::step(float totalTime, float deltaTime)
+{
 	for (Object* obj : m_Objects)
 	{
-		obj->m_Force += (obj->m_Mass) * (m_Gravity *0.001f); //Units in Newtons
-		obj->m_Velocity += (obj->m_Force / obj->m_Mass) * deltaTime; //(Newton / Kg) * frametime = velocity
-		obj->m_Position += obj->m_Velocity * deltaTime; // m/s * s = position
-		obj->m_Force = glm::vec3(0.0f, 0.0f, 0.0f);
+		if (obj->enablePhysics)
+		{
+			float airTime = totalTime - obj->startFall;
+			obj->m_Force += (obj->m_Mass) * (m_Gravity); //Units in Newtons
 
-		obj->updateModel();
+			//Calculate the current velocity given the amount of time spent in air total (acceleration)
+			obj->m_Velocity += (obj->m_Force / obj->m_Mass) * (airTime * 0.05f); //(Newton (kg * (m/s^2)) / kg) * frametime = velocity
+
+			//Terminal Velocity in y direction
+			if (obj->m_Velocity[1] > 54)
+				obj->m_Velocity[1] = 54;
+
+			//Calculate the change in position given the time between frames
+			obj->m_Position += obj->m_Velocity * (deltaTime * 0.05f); // m/s * s = position
+			obj->m_Force = glm::vec3(0.0f, 0.0f, 0.0f);
+
+			obj->updateModel();
+		}
+
 	}
 }

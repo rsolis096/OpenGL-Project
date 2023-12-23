@@ -8,7 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include <GLFW/glfw3.h> //Window functions
 
 //Holds some attributes that all "objects" inherit
 //Does not contain rendering information as various objects render differently
@@ -44,6 +44,10 @@ public:
         glm::vec3 m_Force;
         glm::vec3 m_Velocity;
         glm::vec3 m_Mass;
+        float startFall;
+        bool enablePhysics;
+        void setPhysics();
+        void setVelocity(glm::vec3);
 
         //Type
         std::string m_Type;

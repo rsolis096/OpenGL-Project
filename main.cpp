@@ -32,8 +32,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 // settings
-const unsigned int SCR_WIDTH = 1280;
-const unsigned int SCR_HEIGHT = 720;
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080;
 
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
@@ -54,7 +54,7 @@ float xpos = 0, ypos = 0;
 
 
 //Initialize Camera
-Camera myCamera;
+Camera* myCamera = new Camera();
 
 //Lighting position
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
@@ -71,9 +71,9 @@ void updateCamera(Shader& lightingShader, glm::mat4& view, glm::mat4& projection
 {
     lightingShader.use();
     //View Matrix (Do after camera)
-    view = myCamera.GetViewMatrix();
+    view = myCamera->GetViewMatrix();
     //Projection Matrix (fov change with scroll wheel) last value changes render distance
-    projection = glm::perspective(glm::radians(myCamera.m_FOV), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 1500.0f);
+    projection = glm::perspective(glm::radians(myCamera->m_FOV), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 1500.0f);
     //Send View and Projection matrices to shader (for camera)]]
     lightingShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.    
     lightingShader.setMat4("view", view);
@@ -88,11 +88,11 @@ void processInput(GLFWwindow* window)
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     {
-        myCamera.setMovementSpeed(50.0f);
+        myCamera->setMovementSpeed(50.0f);
     }
     else
     {
-        myCamera.setMovementSpeed(2.5f);
+        myCamera->setMovementSpeed(2.5f);
     }
         
 
@@ -134,15 +134,15 @@ void processInput(GLFWwindow* window)
     //const float movementSpeed = 0.05f; // adjust accordingly
     if (cursorLocked)
     {
-        const float cameraSpeed = myCamera.m_MovementSpeed * deltaTime;
+        const float cameraSpeed = myCamera->m_MovementSpeed * deltaTime;
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            myCamera.processKeyboard(cameraSpeed, GLFW_KEY_W);
+            myCamera->processKeyboard(cameraSpeed, GLFW_KEY_W);
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            myCamera.processKeyboard(-1.0f * cameraSpeed, GLFW_KEY_S);
+            myCamera->processKeyboard(-1.0f * cameraSpeed, GLFW_KEY_S);
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            myCamera.processKeyboard(-1.0f * cameraSpeed, GLFW_KEY_A);
+            myCamera->processKeyboard(-1.0f * cameraSpeed, GLFW_KEY_A);
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            myCamera.processKeyboard(cameraSpeed, GLFW_KEY_D);
+            myCamera->processKeyboard(cameraSpeed, GLFW_KEY_D);
     }
 }
 
@@ -183,13 +183,13 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
         lastX = xpos;
         lastY = ypos;
 
-        myCamera.processMouse(xoffset, yoffset);
+        myCamera->processMouse(xoffset, yoffset);
     }
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    myCamera.processScroll(xoffset, yoffset);
+    myCamera->processScroll(xoffset, yoffset);
 }
 
 int main()
@@ -236,6 +236,8 @@ int main()
     //Defaults, not needed to be specified
     //glCullFace(GL_BACK);
     //glFrontFace(GL_CCW);
+
+
 
     //Skybox faces
     vector<std::string> faces
@@ -312,10 +314,10 @@ int main()
     Shader pointLightShader("pointLightShader.vert", "pointLightShader.frag");
 
     //Initialize Lights
-    SpotLight* spotLight = new SpotLight(lightingShader, myCamera);
-    PointLight* pointLight = new PointLight(lightingShader, pointLightShader, myCamera);
-    PointLight* pointLight2 = new PointLight(lightingShader, pointLightShader, myCamera);
-    PointLight* pointLight3 = new PointLight(lightingShader, pointLightShader, myCamera);
+    SpotLight* spotLight = new SpotLight(lightingShader, *myCamera);
+    PointLight* pointLight = new PointLight(lightingShader, pointLightShader, *myCamera);
+    PointLight* pointLight2 = new PointLight(lightingShader, pointLightShader, *myCamera);
+    PointLight* pointLight3 = new PointLight(lightingShader, pointLightShader, *myCamera);
     DirectionalLight* dirLight = new DirectionalLight(lightingShader);
 
     pointLight->setLightPos(glm::vec3(1.0f, 1.0f, -5.0f));
@@ -335,6 +337,7 @@ int main()
 
     PhysicsWorld physicsWorld;
     physicsWorld.addObject(myScene.sceneObjects[1]);
+    physicsWorld.addObject(myScene.sceneObjects[2]);
     physicsWorld.addObject(myScene.sceneObjects[3]);
 
     //Initialize the GUI
@@ -356,6 +359,8 @@ int main()
     //ImGui::SetNextWindowSize(ImVec2(100, 75)); // Set the desired width and height
     float count = 0;
 
+    myScene.mainCamera = (myCamera);
+
     //Main loop
     while (!glfwWindowShouldClose(window))
     {
@@ -367,6 +372,8 @@ int main()
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+        float fps = 1 / deltaTime;
+        myScene.fps = fps;
 
         //Rendering Starts Here
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
@@ -375,7 +382,7 @@ int main()
 
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
-        lightingShader.setVec3("viewPos", myCamera.cameraPos);
+        lightingShader.setVec3("viewPos", myCamera->cameraPos);
 
         // Update the camera
         updateCamera(lightingShader, view, projection);
@@ -383,7 +390,7 @@ int main()
         //Update Scene Objects
         for (auto& element : myScene.sceneObjects)
         {
-            physicsWorld.step(deltaTime);
+            physicsWorld.step(glfwGetTime(), deltaTime);
             if (element->m_Type == "Sphere")
             {
                 element->translatePosition(glm::vec3(0.0001f));
@@ -407,7 +414,7 @@ int main()
         // draw skybox as last
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
         cubeMapShader.use();
-        view = glm::mat4(glm::mat3(myCamera.GetViewMatrix())); // remove translation from the view matrix
+        view = glm::mat4(glm::mat3(myCamera->GetViewMatrix())); // remove translation from the view matrix
         cubeMapShader.setMat4("view", view);
         cubeMapShader.setMat4("projection", projection);
         // skybox cube
@@ -418,8 +425,10 @@ int main()
         glBindVertexArray(0);
         glDepthFunc(GL_LESS); // set depth function back to default
 
+        myScene.worldTime = (float)glfwGetTime();
+
         //GUI should always be drawn last
-        myGUI.displayWindow(myCamera.cameraPos);
+        myGUI.displayWindow();
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);//swap back frame buffer with front frame buffer.

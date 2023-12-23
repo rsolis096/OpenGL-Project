@@ -4,7 +4,6 @@ bool GUI::isWindowHidden = false;
 
 int selectedItemIndex = -1;
 static float vec3a[3] = { 0.00f, 0.00f, 0.00f };
-glm::vec3 cameraPos;
 /*
 GUI::GUI() : window(nullptr)
 {
@@ -30,9 +29,8 @@ GUI::GUI(GLFWwindow* windowParam, Scene& scene) : window(windowParam), myScene(s
 
 }
 
-void GUI::displayWindow(glm::vec3 cPos)
+void GUI::displayWindow()
 {
-	cameraPos = cPos;
 	if (!isWindowHidden)
 	{
 		// Start the Dear ImGui frame
@@ -43,7 +41,7 @@ void GUI::displayWindow(glm::vec3 cPos)
 		// Rendering
 		// (Your code clears your framebuffer, renders your other stuff etc.)
 		ImGui::Begin("OpenGL Project");
-		ImGui::Text("Hello World");
+		ImGui::Text("%.3f fps", myScene.fps);
 		drawList();
 
 		ImGui::End();
@@ -61,7 +59,9 @@ void GUI::drawList()
 	static float vec3f[4] = { 1.00f, 1.00f, 1.00f};
 
 	ImGui::Text("Player Position: x: %.2f, y: %.2f, z: %.2f", 
-		cameraPos.x, cameraPos.y, cameraPos.z);
+		myScene.mainCamera->cameraPos[0],
+		myScene.mainCamera->cameraPos[1],
+		myScene.mainCamera->cameraPos[2]);
 	ImGui::Text("Object Count: %d", myScene.sceneObjects.size());
 	//Add Cube object to scene
 	if (ImGui::Button("+")) {
@@ -118,6 +118,8 @@ void GUI::drawList()
 						vec4f[0] = 0.00f;
 						vec4f[1] = 0.00f;
 						vec4f[2] = 0.00f;
+						selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
+						selectedObject->startFall = myScene.worldTime;
 					}
 					
 					//Scaling
@@ -133,6 +135,12 @@ void GUI::drawList()
 						vec3f[0] = 1.00f;
 						vec3f[1] = 1.00f;
 						vec3f[2] = 1.00f;
+					}
+
+					//Physics
+					if (ImGui::Checkbox("Enable Physics", &selectedObject->enablePhysics))
+					{
+						selectedObject->setPhysics();
 					}
 				}	
 				ImGui::EndTabItem();

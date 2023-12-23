@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Scene.h" 
 #include "Sphere.h"
 #include "Cube.h"
@@ -16,7 +15,7 @@ class GUI
 		GLFWwindow* window;
 		//GUI();
 		GUI(GLFWwindow* windowParam, Scene& scene);
-		void displayWindow(glm::vec3);
+		void displayWindow();
 		//void setSceneCubes(std::vector<Cube*>& objects);
 private:
 	void drawList();
