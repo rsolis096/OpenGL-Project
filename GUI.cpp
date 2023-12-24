@@ -166,13 +166,15 @@ void GUI::drawList()
 						"Click and hold to use drag and drop.\n"
 						"Right-click on the color square to show options.\n"
 						"CTRL+click on individual component to input value.\n");
+
+					// Physics
+					if (ImGui::Checkbox("Allow Physics", &selectedObject->enablePhysics))
+					{
+						selectedObject->setPhysics();
+					}
 				}	
 
-				// Physics
-				if (ImGui::Checkbox("Allow Physics", &selectedObject->enablePhysics))
-				{
-					selectedObject->setPhysics();
-				}
+
 
 				ImGui::EndTabItem();
 			}
