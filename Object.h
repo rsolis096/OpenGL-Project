@@ -4,6 +4,7 @@
 
 #include "Shader.h"
 #include "Texture.h"
+#include <string>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -17,8 +18,9 @@ class Object
 public:
         //Initializes the basic attributes for all objects
         Object();
+        ~Object();
 
-        //Object color attributes (ONLY FOR PRIMITIVES/ No texture Objects)
+        //Object color attributes
         glm::vec3 m_Ambient;
         glm::vec3 m_Diffuse;
         glm::vec3 m_Specular;
@@ -33,12 +35,7 @@ public:
         glm::vec3 m_Scale;
         glm::mat4 m_Model;
 
-        //Mesh Data
-        std::vector<float>m_Vertices;
-        std::vector<float>m_TexCoords;
-        std::vector<float>m_Normals;
-        std::vector<unsigned int>m_Indices;
-        std::vector<float>m_InterleavedVertices;
+
 
         //Physics info (push to component later)
         glm::vec3 m_Force;
@@ -50,26 +47,39 @@ public:
         void setVelocity(glm::vec3);
 
         //Type
-        std::string m_Type;
+        std::string m_ObjectID;
 
-        //Rendering info
-        unsigned int m_vao, m_vbo, m_ebo;
 
-        //Teleport to specified location
-        void setPosition(glm::vec3 newPosition);
-        void setScale(glm::vec3 newScale);
-        //Translate by parameter (Used to move some direction from current position)
-        void translatePosition(glm::vec3 newPosition);
+
+        //Teleport to specified location 
+        void setPosition(glm::vec3 newPosition);                // Teleport object to a different position
+        void setScale(glm::vec3 newScale);                      // Change scale of object in 3 dimensions
+        void translatePosition(glm::vec3 newPosition);          // Translate by parameter (Used to move some diistance from current position)
+        void updateObject();
 
         //Change these properties to set color of object
         void setAmbient(glm::vec3);
         void setDiffuse(glm::vec3);
         void setSpecular(glm::vec3);
 
+        //Draw the object. Each object type draws differently
         virtual void Draw(Shader& shader) = 0;
 
-        void updateModel();
+
+    protected:
+
+        //Mesh Data
+        std::vector<float>m_Vertices;
+        std::vector<float>m_TexCoords;
+        std::vector<float>m_Normals;
+        std::vector<unsigned int>m_Indices;
+        std::vector<float>m_InterleavedVertices;
+
+        //Rendering info
+        unsigned int m_vao, m_vbo, m_ebo;
 
         void buildInterleavedVerticesWithTexCoords();
         void buildInterleavedVertices();
+        
+
 };

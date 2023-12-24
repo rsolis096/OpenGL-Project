@@ -3,7 +3,7 @@
 
 Model::Model(string const& path, bool gamma) : Object(), gammaCorrection(gamma)
 {
-    m_Type = "Model";
+    m_ObjectID = "Model";
     m_hasTexture = false;
     loadModel(path);
 }

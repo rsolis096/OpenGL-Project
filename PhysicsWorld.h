@@ -2,16 +2,16 @@
 
 #include "Object.h"
 
-
 class PhysicsWorld
 {
 private:
-	std::vector<Object*> m_Objects;
 	glm::vec3 m_Gravity = glm::vec3(0.0f, -9.810f, 0.0f);
+	std::vector<Object*> m_PhysicsObjects;
 
-public:
+public:	
 	PhysicsWorld();
-	void addObject(Object* obj);
-	void removeObject(Object* obj);
+	int addObject(Object* obj);
+	int removeObject(Object* obj);
+	void removeAllObjects();
 	void step(float , float);
 };

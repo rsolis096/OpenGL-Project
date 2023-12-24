@@ -137,6 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Dependencies\includes\glad\glad.c" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="GUI.cpp" />

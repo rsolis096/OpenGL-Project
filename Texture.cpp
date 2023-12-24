@@ -16,6 +16,10 @@ Texture::Texture() : ID(0)
 
 Texture::~Texture()
 {
+    glDeleteTextures(1, &ID);
+    ID = 0;
+    m_Type = "";
+    m_Path = "";
 }
 
 //Load Cube map texture

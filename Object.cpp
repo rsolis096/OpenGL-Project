@@ -9,7 +9,7 @@ Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
     m_Position = glm::vec3(0.0f, 0.0f, 0.0f);
     m_Scale = glm::vec3(1.0f, 1.0f, 1.0f);
     m_Model = glm::mat4(1.0f);
-    m_Type = "Undefined Object";
+    m_ObjectID = "Undefined Object";
 
     m_Force = glm::vec3(0.0f, 0.0f, 0.0f);
     m_Velocity = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -22,7 +22,22 @@ Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
 
     startFall = 0.0f;
 
-    updateModel();
+    updateObject();
+}
+
+Object::~Object()
+{
+    std::cout << "Destructor called on " << m_ObjectID << std::endl;
+    glDeleteVertexArrays(1, &m_vao);
+    glDeleteBuffers(1, &m_vbo);
+    glDeleteBuffers(1, &m_ebo);
+    m_vao = 0;
+    m_vbo = 0;
+    m_ebo = 0;
+    //Texture Properties
+    delete m_DiffuseMap;
+    delete m_SpecularMap;
+
 }
 
 void Object::setAmbient(glm::vec3 newAmbient)
@@ -55,22 +70,22 @@ void Object::setVelocity(glm::vec3 v)
 void Object::setPosition(glm::vec3 newPosition)
 {
     m_Position = newPosition;
-    updateModel();
+    updateObject();
 }
 
 void Object::setScale(glm::vec3 newScale)
 {
     m_Scale = newScale;
-    updateModel();
+    updateObject();
 }
 
 void Object::translatePosition(glm::vec3 newPosition)
 {
     m_Position += newPosition;
-    updateModel();
+    updateObject();
 }
 
-void Object::updateModel()
+void Object::updateObject()
 {
     m_Model = glm::mat4(1.0f);
     // Apply translation transformation

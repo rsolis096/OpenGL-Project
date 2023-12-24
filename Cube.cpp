@@ -1,15 +1,17 @@
 #include "Cube.h"
 
+unsigned int Cube::cubeCount = 0;
+
 //Used for creating a Primtive with texture information
 Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
     //Set some rendering properties
     m_hasTexture = true;
-    m_Type = "Cube";
     //Open and load diffuse map and specular map, save their Cubes
     m_DiffuseMap = new Texture(texturePathDiffuse, false, "texture_diffuse");
     m_SpecularMap = new Texture(texturePathSpecular, false, "texture_specular");
-
+    m_ObjectID = "Cube" + std::to_string(cubeCount);
+    cubeCount++;
     //Build the specified Cube type
     buildCube();
 }
@@ -18,8 +20,9 @@ Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Ob
 Cube::Cube() : Object()
 {
     m_hasTexture = false;
-    m_Type = "Cube";
+    m_ObjectID = "Cube" + std::to_string(cubeCount);
     buildCube();
+    cubeCount++;
 }
 
 void Cube::Draw(Shader& shader)

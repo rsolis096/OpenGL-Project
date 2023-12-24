@@ -6,7 +6,7 @@ bool firstFrame = true;
 PointLight::PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& cam) : playerCamera(cam)//, m_LightModel(Model("resources/objects/lightbulb/lightbulb.obj"))
 	{
 	lightID = pointLightCount;
-	pointLightCount += 1;
+	pointLightCount++;
 
 
 	//Builds a light source with some default values
@@ -14,12 +14,13 @@ PointLight::PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& 
 	m_lightShapeShader = lightCubeShader; //For rendering the light source itself
 
 	m_LightPos = glm::vec3(0.7f, 0.2f, 2.0f);
-	m_LightShape = Cube(); //This object will be the lamp
-	m_LightShape.setPosition(m_LightPos);
+	m_LightShape = new Cube(); //This object will be the lamp
+	m_LightShape->setPosition(m_LightPos);
+	m_LightShape->m_ObjectID = "PointLight" + std::to_string(lightID) + ", Cube" + m_LightShape->m_ObjectID;
 
 	//For the light bulb location
-	m_LightShape.m_Model = glm::mat4(1.0f);
-	m_LightShape.m_Model = glm::translate(m_LightShape.m_Model, m_LightShape.m_Position);
+	m_LightShape->m_Model = glm::mat4(1.0f);
+	m_LightShape->m_Model = glm::translate(m_LightShape->m_Model, m_LightShape->m_Position);
 
 	//Light Color Properties
 	m_Ambient = glm::vec3(0.05f, 0.05f, 0.05f); //Dark ambient
@@ -39,14 +40,14 @@ void PointLight::renderLight(glm::mat4 view, glm::mat4 projection)
 	m_lightShapeShader.use();
 	m_lightShapeShader.setMat4("projection", projection);
 	m_lightShapeShader.setMat4("view", view);
-	m_LightShape.m_Model = glm::mat4(1.0f);
+	m_LightShape->m_Model = glm::mat4(1.0f);
 	//m_LightShape.setPosition(m_LightPos);
-	m_LightShape.m_Model = glm::translate(m_LightShape.m_Model, m_LightPos); //vec is lightPos
-	m_LightShape.m_Model = glm::scale(m_LightShape.m_Model, glm::vec3(0.2f)); // a smaller cube
-	m_lightShapeShader.setMat4("model", m_LightShape.m_Model);
+	m_LightShape->m_Model = glm::translate(m_LightShape->m_Model, m_LightPos); //vec is lightPos
+	m_LightShape->m_Model = glm::scale(m_LightShape->m_Model, glm::vec3(0.2f)); // a smaller cube
+	m_lightShapeShader.setMat4("model", m_LightShape->m_Model);
 
 	//render lamp object
-	m_LightShape.Draw(m_lightShapeShader);
+	m_LightShape->Draw(m_lightShapeShader);
 
 	// Light color properties
 	m_lightingShader.use();
@@ -65,23 +66,20 @@ void PointLight::renderLight(glm::mat4 view, glm::mat4 projection)
 		m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].quadratic", m_Quadratic);
 		firstFrame = false;
 	}
-
-
-
 }
 
 
 PointLight::~PointLight()
 {
-	//delete m_LightShape;
-	//m_LightShape = nullptr;
+	delete m_LightShape;
+	m_LightShape = nullptr;
 }
 
 //For Light Properties
 void PointLight::setLightPos(glm::vec3 lightPos)
 {
 	m_LightPos = lightPos;
-	m_LightShape.setPosition(lightPos);
+	m_LightShape->setPosition(lightPos);
 	m_lightingShader.use();
 	m_lightingShader.setVec3("pointlight[" + std::to_string(lightID) + "].position", m_LightPos);
 }

@@ -1,5 +1,20 @@
 #include "GUI.h"
 
+// Helper to display a little (?) mark which shows a tooltip when hovered.
+// In your own code you may want to display an actual icon if you are using a merged icon fonts (see docs/FONTS.md)
+static void HelpMarker(const char* desc)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::BeginItemTooltip())
+	{
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
+
+
 bool GUI::isWindowHidden = false;
 
 int selectedItemIndex = -1;
@@ -62,21 +77,20 @@ void GUI::drawList()
 		myScene.mainCamera->cameraPos[0],
 		myScene.mainCamera->cameraPos[1],
 		myScene.mainCamera->cameraPos[2]);
-	ImGui::Text("Object Count: %d", myScene.sceneObjects.size());
+	ImGui::Text("Object Count: %d", myScene.m_SceneObjects.size());
 	//Add Cube object to scene
 	if (ImGui::Button("+")) {
 		myScene.addObject(new Cube());
-		myScene.sceneObjects[myScene.objectCount - 1]->m_Type = "Cube" + to_string(myScene.objectCount);
 	}
 	//Left Side of window
 	static int selected = 0; //Default selected object is first object in scene
 	{
 		ImGui::BeginChild("left pane", ImVec2(150, 0), true);
-		for (int i = 0; i < myScene.sceneObjects.size(); i++)
+		for (int i = 0; i < myScene.m_SceneObjects.size(); i++)
 		{
 			// FIXME: Good candidate to use ImGuiSelectableFlags_SelectOnNav
 			char label[128];
-			sprintf_s(label, myScene.sceneObjects[i]->m_Type.c_str(), i);
+			sprintf_s(label, myScene.m_SceneObjects[i]->m_ObjectID.c_str(), i);
 			if (ImGui::Selectable(label, false))
 			{
 				selected = i;
@@ -86,7 +100,7 @@ void GUI::drawList()
 	}
 
 	//Update the selected item (default selected item is the 0th object)
-	Object* selectedObject = myScene.sceneObjects[selected];
+	Object* selectedObject = myScene.m_SceneObjects[selected];
 	ImGui::SameLine();
 	// Right side of window
 	{
@@ -94,7 +108,7 @@ void GUI::drawList()
 		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 		
 		if(selectedObject != nullptr)
-			ImGui::Text("Selected Item: %s", selectedObject->m_Type.c_str());
+			ImGui::Text("Selected Item: %s", selectedObject->m_ObjectID.c_str());
 		else
 			ImGui::Text("Selected Item: %s", "NULL");
 
@@ -106,7 +120,7 @@ void GUI::drawList()
 			{
 				if (selectedObject != nullptr)
 				{
-					//Position
+					// Position
 					glm::vec3 pos = selectedObject->m_Position;
 					ImGui::Text("Current Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
 					ImGui::InputFloat3("##Position", vec4f);
@@ -122,7 +136,7 @@ void GUI::drawList()
 						selectedObject->startFall = myScene.worldTime;
 					}
 					
-					//Scaling
+					// Scaling
 					glm::vec3 currentScale = selectedObject->m_Scale;
 					ImGui::Text("Current Scale:\tx: %.2f, y: %.2f, z: %.2f", 
 						currentScale.x, currentScale.y, currentScale.z);
@@ -137,12 +151,29 @@ void GUI::drawList()
 						vec3f[2] = 1.00f;
 					}
 
-					//Physics
-					if (ImGui::Checkbox("Enable Physics", &selectedObject->enablePhysics))
+
+
+					// Color
+					static float col1[3] = { 1.0f, 0.0f, 0.2f };
+					ImGui::Text("Object Color", "NULL");
+					if (ImGui::ColorEdit3("###color 1", col1))
 					{
-						selectedObject->setPhysics();
+						selectedObject->m_Diffuse = glm::vec3(col1[0], col1[1], col1[2]);
+
 					}
+					ImGui::SameLine(); HelpMarker(
+						"Click on the color square to open a color picker.\n"
+						"Click and hold to use drag and drop.\n"
+						"Right-click on the color square to show options.\n"
+						"CTRL+click on individual component to input value.\n");
 				}	
+
+				// Physics
+				if (ImGui::Checkbox("Allow Physics", &selectedObject->enablePhysics))
+				{
+					selectedObject->setPhysics();
+				}
+
 				ImGui::EndTabItem();
 			}
 			//Texture Tab
@@ -180,6 +211,11 @@ void GUI::drawList()
 			}
 			ImGui::EndTabBar();
 		}
+
+
+
+
+
 		ImGui::EndChild();
 		ImGui::EndGroup();
 	}

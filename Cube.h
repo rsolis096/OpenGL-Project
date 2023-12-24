@@ -18,11 +18,11 @@ public:
     //Build a primitive of type eg. type = "sphere", "cube", "pyramid"
     Cube(const char* texturePathDiffuse, const char* texturePathSpecular);
 
-
     //Methods
     void Draw(Shader& shader) override;
 
 private:
     //Used for construction of primitives
     void buildCube();
+    static unsigned int cubeCount;
 };

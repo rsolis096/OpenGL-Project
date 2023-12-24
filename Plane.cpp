@@ -5,7 +5,7 @@ Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : 
 {
     //Set some rendering properties
     m_hasTexture = true;
-    m_Type = "Plane";
+    m_ObjectID = "Plane";
     //Open and load diffuse map and specular map, save their Planes
     m_DiffuseMap = new Texture(texturePathDiffuse, false, "texture_diffuse");
     m_SpecularMap = new Texture(texturePathSpecular, false, "texture_specular");
@@ -18,7 +18,7 @@ Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : 
 Plane::Plane() : Object()
 {
     m_hasTexture = false;
-    m_Type = "Plane";
+    m_ObjectID = "Plane";
     buildPlane();
 }
 

@@ -1,26 +1,29 @@
 #include "Sphere.h"
 #define PI 3.141592653589793238462643383279502884197
+unsigned int Sphere::sphereCount = 0;
 
 //Used for creating a Primtive with texture information
 Sphere::Sphere(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
     //Set some rendering properties
     m_hasTexture = true;
-    m_Type = "Sphere";
+    m_ObjectID = "Sphere" + std::to_string(sphereCount);
     //Open and load diffuse map and specular map, save their Spheres
     m_DiffuseMap = new Texture(texturePathDiffuse, false, "texture_diffuse");
     m_SpecularMap = new Texture(texturePathSpecular, false, "texture_specular");
 
     //Build the specified Sphere type
     buildSphere();
+    sphereCount++;
 }
 
 //Used for creating a primitive with no texture
 Sphere::Sphere() : Object()
 {
     m_hasTexture = false;
-    m_Type = "Sphere";
+    m_ObjectID = "Sphere" + std::to_string(sphereCount);
     buildSphere();
+    sphereCount++;
 }
 
 
@@ -65,8 +68,8 @@ void Sphere::Draw(Shader& shader)
 
 void Sphere::buildSphere()
 {
-    int sectorCount = 30;
-    int stackCount = 30;
+    int sectorCount = 35;
+    int stackCount = 35;
     int radius = 1.0f;
 
     //Algorithm provided by (http://www.songho.ca/opengl/gl_sphere.html)
@@ -74,8 +77,8 @@ void Sphere::buildSphere()
     std::vector<float>().swap(m_Normals);
     std::vector<float>().swap(m_TexCoords);
 
-    float x, y, z, xy;                              // vertex position
-    float s, t;                                     // vertex texCoord
+    float x, y, z;                              // vertex position
+    float s, t;                                 // vertex texCoord
     float nx, ny, nz;
 
     float sectorStep = 2 * PI / sectorCount;

@@ -27,4 +27,5 @@ public:
 private:
     //Used for construction of primitives
     void buildSphere();
+    static unsigned int sphereCount;
 };

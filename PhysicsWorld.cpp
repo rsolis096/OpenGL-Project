@@ -5,26 +5,46 @@ PhysicsWorld::PhysicsWorld()
 
 }
 
-void PhysicsWorld::addObject(Object* obj)
+int PhysicsWorld::addObject(Object* obj)
 {
-	m_Objects.push_back(obj);
+	std::vector<Object*>::iterator it = std::find(m_PhysicsObjects.begin(), m_PhysicsObjects.end(), obj);
+	if (obj == nullptr)
+		return 1;
+	if (it == m_PhysicsObjects.end())
+	{
+		m_PhysicsObjects.push_back(obj);
+		return 0;
+	}
+	std::cout << "Object already in physics world!" << std::endl;
+	return 1;
 }
 
-void PhysicsWorld::removeObject(Object* obj)
+int PhysicsWorld::removeObject(Object* obj)
 {
-	std::vector<Object*>::iterator it = m_Objects.begin();
-	while (it != m_Objects.end())
+	//Remove all instances of obj
+	std::vector<Object*>::iterator removeIterator = std::remove(m_PhysicsObjects.begin(), m_PhysicsObjects.end(), obj);
+	if (removeIterator == m_PhysicsObjects.end())
 	{
-		if (*it == obj)
-			m_Objects.erase(it);
-		else
-			it++;
+		std::cout << "Physics World: " << obj->m_ObjectID << " is not part of the Physics world!" << std::endl;
+		return 1;
 	}
+	else
+	{
+		m_PhysicsObjects.erase(removeIterator, m_PhysicsObjects.end());
+		std::cout << "Physics World: Removed " << obj->m_ObjectID << std::endl;
+		return 0;
+	}
+}
+
+//Remove all objects from the scene
+void PhysicsWorld::removeAllObjects()
+{
+	m_PhysicsObjects.clear();
 }
 
 void PhysicsWorld::step(float totalTime, float deltaTime)
 {
-	for (Object* obj : m_Objects)
+	for (Object* obj : m_PhysicsObjects)
 	{
 		if (obj->enablePhysics)
 		{
@@ -42,8 +62,8 @@ void PhysicsWorld::step(float totalTime, float deltaTime)
 			obj->m_Position += obj->m_Velocity * (deltaTime * 0.05f); // m/s * s = position
 			obj->m_Force = glm::vec3(0.0f, 0.0f, 0.0f);
 
-			obj->updateModel();
+			obj->updateObject();
 		}
-
 	}
 }
+

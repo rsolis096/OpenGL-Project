@@ -39,7 +39,7 @@ class PointLight
 		Shader m_lightingShader;
 
 		//Light Object (light is not invisible)
-		Cube m_LightShape;
+		Cube* m_LightShape;
 		//Model m_LightModel;
 
 		//Reference to the camera

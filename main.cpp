@@ -73,7 +73,7 @@ void updateCamera(Shader& lightingShader, glm::mat4& view, glm::mat4& projection
     //View Matrix (Do after camera)
     view = myCamera->GetViewMatrix();
     //Projection Matrix (fov change with scroll wheel) last value changes render distance
-    projection = glm::perspective(glm::radians(myCamera->m_FOV), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 1500.0f);
+    projection = glm::perspective(glm::radians(myCamera->getFOV()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 1500.0f);
     //Send View and Projection matrices to shader (for camera)]]
     lightingShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.    
     lightingShader.setMat4("view", view);
@@ -94,7 +94,7 @@ void processInput(GLFWwindow* window)
     {
         myCamera->setMovementSpeed(2.5f);
     }
-        
+
 
     //Return mouse movement when tab is pressed
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
@@ -112,7 +112,7 @@ void processInput(GLFWwindow* window)
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
                 cursorLocked = false;
                 //Set mouse to center
-                glfwSetCursorPos(window, SCR_WIDTH/2, SCR_HEIGHT/2);
+                glfwSetCursorPos(window, SCR_WIDTH / 2, SCR_HEIGHT / 2);
             }
             else
             {
@@ -134,7 +134,7 @@ void processInput(GLFWwindow* window)
     //const float movementSpeed = 0.05f; // adjust accordingly
     if (cursorLocked)
     {
-        const float cameraSpeed = myCamera->m_MovementSpeed * deltaTime;
+        const float cameraSpeed = myCamera->getMovementSpeed() * deltaTime;
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             myCamera->processKeyboard(cameraSpeed, GLFW_KEY_W);
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -324,21 +324,18 @@ int main()
     //pointLight2->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
 
 
-    //Create Scene Manager
+    //Create Scene Manager and some default objects
     Scene myScene;
-
-    //Initialize Models
     myScene.addObject(new Model("resources/objects/dragon/dragon.obj"));
-
-    //Initialize Objects
     myScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
     myScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
     myScene.addObject(new Plane("Assets/globe.jpg", "Assets/globe.jpg"));
 
-    PhysicsWorld physicsWorld;
-    physicsWorld.addObject(myScene.sceneObjects[1]);
-    physicsWorld.addObject(myScene.sceneObjects[2]);
-    physicsWorld.addObject(myScene.sceneObjects[3]);
+    // Add objects to the PhysicsWorld allowing them to be influenced by external forces
+    PhysicsWorld physicsWorld; 
+    physicsWorld.addObject(myScene.m_SceneObjects[1]);
+    physicsWorld.addObject(myScene.m_SceneObjects[2]);
+    physicsWorld.addObject(myScene.m_SceneObjects[3]);
 
     //Initialize the GUI
     GUI myGUI(window, myScene);
@@ -388,18 +385,18 @@ int main()
         updateCamera(lightingShader, view, projection);
 
         //Update Scene Objects
-        for (auto& element : myScene.sceneObjects)
+        for (auto& element : myScene.m_SceneObjects)
         {
             physicsWorld.step(glfwGetTime(), deltaTime);
-            if (element->m_Type == "Sphere")
+            if (element->m_ObjectID[0] == 'S')
             {
-                element->translatePosition(glm::vec3(0.0001f));
+                element->translatePosition(glm::vec3(0.001f));
             }
-            if (element->m_Type == "Model")
+            if (element->m_ObjectID[0] == 'M')
             {
                 lightingShader.setMat4("model", model);
             }
-            if(element->m_Type != "Model")
+            if (element->m_ObjectID[0] != 'M')
                 element->Draw(lightingShader);
         }
 
@@ -437,12 +434,16 @@ int main()
     }
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    for (auto& obj : myScene.sceneObjects)
-    {
-        glDeleteVertexArrays(1, &obj->m_vao);
-        glDeleteBuffers(1, &obj->m_vbo);
-        glDeleteBuffers(1, &obj->m_ebo);
-    }
+
+
+    //Delete everything
+    physicsWorld.removeAllObjects();
+    myScene.removeAllObjects();
+    delete pointLight;
+    delete pointLight2;
+    delete pointLight3;
+
+    //Delete all objects
     glDeleteVertexArrays(1, &skyboxVAO);
     glDeleteBuffers(1, &skyboxVBO);
 
@@ -457,5 +458,6 @@ int main()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
+
     return 0;
 }

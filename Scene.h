@@ -14,13 +14,15 @@ public:
 	Camera* mainCamera;
 
 	// Scene Objects (All)
-	std::vector<Object*> sceneObjects;
+	std::vector<Object*> m_SceneObjects;
 
 	//Scene Objects (Specific)
 	std::vector<Model*> sceneModels;
 
 	//Constructors
 	Scene();
-	void addObject(Object* obj);
+	int addObject(Object* obj);
+	int removeObject(Object* obj);
+	void removeAllObjects();
 	void addLightSource();
 };
