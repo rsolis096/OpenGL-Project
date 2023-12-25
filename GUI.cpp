@@ -106,6 +106,14 @@ void GUI::drawList()
 	
 	//Update the selected item (default selected item is the 0th object)
 	Object* selectedObject = myScene.m_SceneObjects[selected];
+
+	//Texture info
+	static std::string diffuseText = "";
+	static std::string specularText = "";
+	static char diffuseBuffer[256]; // This is where the text will be stored
+	static char specularBuffer[256]; // This is where the text will be stored
+	static bool showSuccessText = false;
+
 	ImGui::SameLine();
 	// Right side of window
 	{
@@ -126,117 +134,135 @@ void GUI::drawList()
 				if (selectedObject != nullptr)
 				{
 					// Position
-					glm::vec3 pos = selectedObject->m_Position;
-					ImGui::Text("Current Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
-					ImGui::InputFloat3("##Position", vec4f);
-					if (ImGui::Button("Set##SetPosition")) {
-						pos[0] = vec4f[0];
-						pos[1] = vec4f[1];
-						pos[2] = vec4f[2];
-						selectedObject->setPosition(pos);
-						vec4f[0] = 0.00f;
-						vec4f[1] = 0.00f;
-						vec4f[2] = 0.00f;
-						selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
-						selectedObject->startFall = myScene.worldTime;
+					{
+						glm::vec3 pos = selectedObject->m_Position;
+						ImGui::Text("Current Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
+						ImGui::InputFloat3("##Position", vec4f);
+						if (ImGui::Button("Set##SetPosition")) {
+							pos[0] = vec4f[0];
+							pos[1] = vec4f[1];
+							pos[2] = vec4f[2];
+							selectedObject->setPosition(pos);
+							vec4f[0] = 0.00f;
+							vec4f[1] = 0.00f;
+							vec4f[2] = 0.00f;
+							selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
+							selectedObject->startFall = myScene.worldTime;
+						}
 					}
 					
 					// Scaling
-					glm::vec3 currentScale = selectedObject->m_Scale;
-					ImGui::Text("Current Scale:\tx: %.2f, y: %.2f, z: %.2f", 
-						currentScale.x, currentScale.y, currentScale.z);
-					ImGui::InputFloat3("##Scale", vec3f);
-					if (ImGui::Button("Set##SetScale")) {
-						currentScale[0] = vec3f[0];
-						currentScale[1] = vec3f[1];
-						currentScale[2] = vec3f[2];
-						selectedObject->setScale(currentScale);
-						vec3f[0] = 1.00f;
-						vec3f[1] = 1.00f;
-						vec3f[2] = 1.00f;
+					{
+						glm::vec3 currentScale = selectedObject->m_Scale;
+						ImGui::Text("Current Scale:\tx: %.2f, y: %.2f, z: %.2f",
+							currentScale.x, currentScale.y, currentScale.z);
+						ImGui::InputFloat3("##Scale", vec3f);
+						if (ImGui::Button("Set##SetScale")) {
+							currentScale[0] = vec3f[0];
+							currentScale[1] = vec3f[1];
+							currentScale[2] = vec3f[2];
+							selectedObject->setScale(currentScale);
+							vec3f[0] = 1.00f;
+							vec3f[1] = 1.00f;
+							vec3f[2] = 1.00f;
+						}
 					}
 
 					// Color
-					static float col1[3] = { 1.0f, 0.0f, 0.2f };
-					ImGui::Text("Object Color", "NULL");
-					if (ImGui::ColorEdit3("###color 1", col1))
 					{
-						selectedObject->m_Diffuse = glm::vec3(col1[0], col1[1], col1[2]);
+						static float col1[3] = { 1.0f, 0.0f, 0.2f };
+						ImGui::Text("Object Color", "NULL");
+						if (ImGui::ColorEdit3("###color 1", col1))
+						{
+							selectedObject->m_Diffuse = glm::vec3(col1[0], col1[1], col1[2]);
+
+						}
+						ImGui::SameLine(); HelpMarker(
+							"Click on the color square to open a color picker.\n"
+							"Click and hold to use drag and drop.\n"
+							"Right-click on the color square to show options.\n"
+							"CTRL+click on individual component to input value.\n");
+						ImGui::Spacing();
 
 					}
-					ImGui::SameLine(); HelpMarker(
-						"Click on the color square to open a color picker.\n"
-						"Click and hold to use drag and drop.\n"
-						"Right-click on the color square to show options.\n"
-						"CTRL+click on individual component to input value.\n");
 
-					// Physics
-					if (ImGui::Checkbox("Allow Physics", &selectedObject->enablePhysics))
+					//Texture
 					{
-						selectedObject->setPhysics();
+						ImGui::Text("Texture Paths:");
+						if (selectedObject->m_hasTexture)
+						{
+
+							//Set textbox default values
+							if (diffuseText == "")
+								strcpy_s(diffuseBuffer, selectedObject->m_DiffuseMap->m_Path.c_str());
+							else
+								strcpy_s(diffuseBuffer, diffuseText.c_str());
+
+							if (specularText == "")
+								strcpy_s(specularBuffer, selectedObject->m_SpecularMap->m_Path.c_str());
+							else
+								strcpy_s(specularBuffer, specularText.c_str());
+						}
+						else
+						{
+							//Set textbox default values
+							if (diffuseText != "")
+								strcpy_s(diffuseBuffer, diffuseText.c_str());
+							else
+								strcpy_s(diffuseBuffer, "");
+
+							if (specularText != "")
+								strcpy_s(specularBuffer, specularText.c_str());
+							else
+								strcpy_s(specularBuffer, "");
+						}
+
+						ImGui::Spacing();
+						//Get changes from textboxes
+						ImGui::Text("Diffuse Path:\n", "NULL");
+						if (ImGui::InputText("##DiffusePath", diffuseBuffer, sizeof(diffuseBuffer)))
+						{
+							diffuseText = diffuseBuffer;
+							showSuccessText = false;
+						}
+
+						ImGui::Spacing();
+						ImGui::Text("Specular Path:\n", "NULL");
+						if (ImGui::InputText("##SpecularPath", specularBuffer, sizeof(specularBuffer)))
+						{
+							specularText = specularBuffer;
+							showSuccessText = false;
+						}
+
+						if (ImGui::Button("Set Texture##hasTextureTrue")) {
+							//[0]: diffuse
+							//[1]: specular					
+							//[2]: ambient
+							std::vector<std::string> newPaths = {
+								string(diffuseBuffer, 256),
+								string(specularBuffer, 256)
+							};
+						}	
+
+						ImGui::SameLine(); HelpMarker(
+							"If only one texture is desired, insert the\n"
+							"the same file path in both input boxes.\n");
+
+					}
+
+					//Physics
+					{
+						ImGui::Spacing();
+						if (ImGui::Checkbox("Allow Physics ", &selectedObject->enablePhysics))
+						{
+							selectedObject->setPhysics();
+						}
 					}
 				}	
 				ImGui::EndTabItem();
 			}
-
-			//Texture Tab
-			static std::string text = " ";
-			if (ImGui::BeginTabItem("Texture"))
-			{
-				char buffer[256]; // This is where the text will be stored
-				ImGui::Text("Texture Path");
-
-				if (selectedObject != nullptr)
-				{
-					if (selectedObject->m_DiffuseMap != nullptr)
-					{
-						if(text == " ")
-							strcpy_s(buffer, selectedObject->m_DiffuseMap->m_Path.c_str());
-						else
-							strcpy_s(buffer, text.c_str());
-
-						if (ImGui::InputText("Texture Path: ", buffer, sizeof(buffer)))
-							text = buffer;
-						if (ImGui::Button("Set Texture")) {
-							//[0]: diffuse
-							//[1]: specular					
-							//[2]: ambient
-							std::vector<std::string> newPaths = {
-								text,
-								text
-							};
-							selectedObject->updateTexture(newPaths);
-						}
-					}
-					else
-					{
-						strcpy_s(buffer, "");
-						if (ImGui::InputText("Texture Path: ", buffer, sizeof(buffer)))
-							text = buffer;
-						if (ImGui::Button("Set Texture")) {
-							//[0]: diffuse
-							//[1]: specular					
-							//[2]: ambient
-							std::vector<std::string> newPaths = {
-								text,
-								text
-							};
-							selectedObject->updateTexture(newPaths);
-						}
-					}
-
-
-				}
-			
-				ImGui::EndTabItem();
-			}
 			ImGui::EndTabBar();
 		}
-
-
-
-
-
 		ImGui::EndChild();
 		ImGui::EndGroup();
 	}

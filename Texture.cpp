@@ -9,8 +9,8 @@ Texture::Texture(const char* filePath, bool flipOnY, std::string type) : ID(0), 
     //Ensure the texture applies
     if (updateTexture(filePath, flipOnY))
     {
-        std::cout << "Textures failed to apply, check file path and try again!" << std::endl;
-        m_Type = " ";
+        //Failed to apply texture
+        m_Type = "";
         m_Path = "";
         glDeleteTextures(1, &ID);
         ID = GL_INVALID_VALUE;
@@ -104,7 +104,7 @@ int Texture::updateTexture(const char* filePath, bool flipOnY)
         return 0;
     }
 
-    std::cout << "Failed to load texture" << std::endl;
+    std::cout << "Failed to load texture. Please verify filepath: " << filePath << std::endl;
     stbi_image_free(data);
     return 1;
 }

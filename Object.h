@@ -64,7 +64,7 @@ public:
 
         //Draw the object. Each object type draws differently
         virtual void Draw(Shader& shader) = 0;
-        virtual void updateTexture(std::vector<std::string> texturePaths) = 0;
+        virtual int updateTexture(std::vector<std::string> texturePaths) = 0;
 
 
     protected:

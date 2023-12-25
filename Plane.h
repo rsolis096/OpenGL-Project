@@ -22,7 +22,8 @@ public:
 
 
     void Draw(Shader& shader) override;
-    void updateTexture(std::vector<std::string> texturePaths) override {}
+    static unsigned int planeCount;
+    int updateTexture(std::vector<std::string> texturePaths) override;
 
 private:
     void buildPlane();

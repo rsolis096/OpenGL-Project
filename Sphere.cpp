@@ -22,8 +22,8 @@ Sphere::Sphere() : Object()
 {
     m_hasTexture = false;
     m_ObjectID = "Sphere" + std::to_string(sphereCount);
-    buildSphere();
     sphereCount++;
+    buildSphere();
 }
 
 
@@ -64,7 +64,6 @@ void Sphere::Draw(Shader& shader)
     glBindTexture(GL_TEXTURE_2D, 0);
 
 }
-
 
 void Sphere::buildSphere()
 {
@@ -188,3 +187,62 @@ void Sphere::buildSphere()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
+
+int Sphere::updateTexture(std::vector<std::string> texturePaths)
+{
+    // Three Scenarios
+    // 1. Updating a texture of an Object that already has textures
+    // 2. Updating a texture of an Object with no initial texture
+    // 3. Updating the texture of a model object
+
+    //Secenario 1
+    if (m_hasTexture == true)
+    {
+        //Success flags
+        int dSuccess = 1;
+        int sSuccess = 1;
+
+        if (texturePaths.size() == 2)
+        {
+            dSuccess = m_DiffuseMap->updateTexture(texturePaths[0].c_str(), false);
+            sSuccess = m_SpecularMap->updateTexture(texturePaths[1].c_str(), false);
+        }
+
+        if (dSuccess == 1 || sSuccess == 1)
+        {
+            //Texture failed to apply
+            //As of right now, all textures are deleted
+            delete m_DiffuseMap;
+            delete m_SpecularMap;
+            m_DiffuseMap = nullptr;
+            m_SpecularMap = nullptr;
+            m_hasTexture = false;
+            return 0;
+        }
+        else
+            std::cout << "Updated Texture successfully!" << std::endl;
+        return 1;
+    }
+    //Scenario 2
+    else if (m_hasTexture == false)
+    {
+        m_DiffuseMap = new Texture(texturePaths[0].c_str(), false, "texture_diffuse");
+        m_SpecularMap = new Texture(texturePaths[1].c_str(), false, "texture_specular");
+        if (m_DiffuseMap->ID == GL_INVALID_VALUE || m_SpecularMap->ID == GL_INVALID_VALUE)
+        {
+            //Texture failed to apply
+            delete m_DiffuseMap;
+            delete m_SpecularMap;
+            m_DiffuseMap = nullptr;
+            m_SpecularMap = nullptr;
+            m_hasTexture = false;
+            return 0;
+        }
+        else
+            m_hasTexture = true;
+        return 1;
+    }
+    return 0;
+}
+
+

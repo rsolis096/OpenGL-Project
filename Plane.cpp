@@ -1,5 +1,8 @@
 #include "Plane.h"
 
+unsigned int Plane::planeCount = 0;
+
+
 //Used for creating a Primtive with texture information
 Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
@@ -9,7 +12,8 @@ Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : 
     //Open and load diffuse map and specular map, save their Planes
     m_DiffuseMap = new Texture(texturePathDiffuse, false, "texture_diffuse");
     m_SpecularMap = new Texture(texturePathSpecular, false, "texture_specular");
-
+    m_ObjectID = "Plane" + std::to_string(planeCount);
+    planeCount++;
     //Build the specified Plane type
     buildPlane();
 }
@@ -18,7 +22,8 @@ Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : 
 Plane::Plane() : Object()
 {
     m_hasTexture = false;
-    m_ObjectID = "Plane";
+    m_ObjectID = "Plane" + std::to_string(planeCount);
+    planeCount++;
     buildPlane();
 }
 
@@ -94,10 +99,8 @@ void Plane::buildPlane()
     };
 
     //Combine above mesh data
-    if (m_hasTexture == true)
-        buildInterleavedVerticesWithTexCoords();
-    else
-        buildInterleavedVertices();
+    buildInterleavedVerticesWithTexCoords();
+
 
     //Generate VAO and VBO
     glGenVertexArrays(1, &m_vao);
@@ -109,32 +112,77 @@ void Plane::buildPlane()
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_InterleavedVertices.size(), m_InterleavedVertices.data(), GL_STATIC_DRAW);
 
     // Set up vertex attribute pointers (vertices, normals, texcoords)
-    if (m_hasTexture)
-    {
-        //Position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
-        //Normal Attribute
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 3));
-        //TexCoord Attribute
-        glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 6));
+    
+    //Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
+    //Normal Attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 3));
+    //TexCoord Attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 6));
 
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
-    }
-    else
-    {
-        // Position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-        //Normal Attribute
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
 
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-    }
 
     // unbind VAO and VBOs
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+int Plane::updateTexture(std::vector<std::string> texturePaths)
+{
+    // Three Scenarios
+    // 1. Updating a texture of an Object that already has textures
+    // 2. Updating a texture of an Object with no initial texture
+    // 3. Updating the texture of a model object
+
+    //Secenario 1
+    if (m_hasTexture == true)
+    {
+        //Success flags
+        int dSuccess = 1;
+        int sSuccess = 1;
+
+        if (texturePaths.size() == 2)
+        {
+            dSuccess = m_DiffuseMap->updateTexture(texturePaths[0].c_str(), false);
+            sSuccess = m_SpecularMap->updateTexture(texturePaths[1].c_str(), false);
+        }
+
+        if (dSuccess == 1 || sSuccess == 1)
+        {
+            //Textures failed to apply
+            //As of right now, remove all textures if an invalid texture is applied
+            delete m_DiffuseMap;
+            delete m_SpecularMap;
+            m_hasTexture = false;
+            return 0;
+        }
+        else
+            std::cout << "Updated Texture successfully!" << std::endl;
+        return 1;
+    }
+    //Scenario 2
+    else if (m_hasTexture == false)
+    {
+        m_DiffuseMap = new Texture(texturePaths[0].c_str(), false, "texture_diffuse");
+        m_SpecularMap = new Texture(texturePaths[1].c_str(), false, "texture_specular");
+        if (m_DiffuseMap->ID == GL_INVALID_VALUE || m_SpecularMap->ID == GL_INVALID_VALUE)
+        {
+            //Textures failed to apply
+            delete m_DiffuseMap;
+            delete m_SpecularMap;
+            m_DiffuseMap = nullptr;
+            m_SpecularMap = nullptr;
+            m_hasTexture = false;
+            return 0;
+        }
+        else
+            m_hasTexture = true;
+        return 1;
+    }
+    return 0;
+}
+
 

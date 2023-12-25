@@ -25,6 +25,6 @@ private:
     //Used for construction of primitives
     void buildCube();
     static unsigned int cubeCount;
-    void updateTexture(std::vector<std::string> texturePaths) override;
+    int updateTexture(std::vector<std::string> texturePaths) override;
 
 };

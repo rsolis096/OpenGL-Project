@@ -131,7 +131,6 @@ void processInput(GLFWwindow* window)
     }
 
     //Mouse Input
-    //const float movementSpeed = 0.05f; // adjust accordingly
     if (cursorLocked)
     {
         const float cameraSpeed = myCamera->getMovementSpeed() * deltaTime;
@@ -232,8 +231,9 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     //Enable this to only render front facing polygons (for performance)
-    //glEnable(GL_CULL_FACE);
-    //Defaults, not needed to be specified
+    glEnable(GL_CULL_FACE);
+
+    //Defaults, not needed to be specified (just for reference)
     //glCullFace(GL_BACK);
     //glFrontFace(GL_CCW);
 

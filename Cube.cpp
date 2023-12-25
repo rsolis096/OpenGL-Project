@@ -228,7 +228,7 @@ void Cube::buildCube()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Cube::updateTexture(std::vector<std::string> texturePaths)
+int Cube::updateTexture(std::vector<std::string> texturePaths)
 {
     // Three Scenarios
     // 1. Updating a texture of an Object that already has textures
@@ -250,14 +250,17 @@ void Cube::updateTexture(std::vector<std::string> texturePaths)
 
         if (dSuccess == 1 || sSuccess == 1)
         {
-            std::cout << "Textures failed to apply, check file path and try again!" << std::endl;
             //As of right now, all textures are deleted
             delete m_DiffuseMap;
             delete m_SpecularMap;
+            m_DiffuseMap = nullptr;
+            m_SpecularMap = nullptr;
             m_hasTexture = false;
+            return 0;
         }
         else
             std::cout << "Updated Texture successfully!" << std::endl;
+        return 1;
     }
     //Scenario 2
     else if (m_hasTexture == false)
@@ -266,19 +269,18 @@ void Cube::updateTexture(std::vector<std::string> texturePaths)
         m_SpecularMap = new Texture(texturePaths[1].c_str(), false, "texture_specular");
         if (m_DiffuseMap->ID == GL_INVALID_VALUE || m_SpecularMap->ID == GL_INVALID_VALUE)
         {
-            std::cout << "Textures were unable to update, check filepaths and try again!" << std::endl;
+            delete m_DiffuseMap;
+            delete m_SpecularMap;
+            m_DiffuseMap = nullptr;
+            m_SpecularMap = nullptr;
             m_hasTexture = false;
+            return 0;
         }
         else
             m_hasTexture = true;
+        return 1;
     }
-
-
-
-
-
-
-
+    return 0;
 }
 
 
