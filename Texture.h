@@ -26,5 +26,5 @@ public:
 	//Cube Map
 	Texture(std::vector<std::string> paths);
 
-	void updateTexture(const char* filePath, bool flipOnY);
+	int updateTexture(const char* filePath, bool flipOnY);
 };

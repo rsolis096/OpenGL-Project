@@ -198,10 +198,7 @@ void Cube::buildCube()
     };
 
     //Combine above mesh data
-    if (m_hasTexture == true)
-        buildInterleavedVerticesWithTexCoords();
-    else
-        buildInterleavedVertices();
+    buildInterleavedVerticesWithTexCoords();
 
     //Generate VAO and VBO
     glGenVertexArrays(1, &m_vao);
@@ -213,32 +210,75 @@ void Cube::buildCube()
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_InterleavedVertices.size(), m_InterleavedVertices.data(), GL_STATIC_DRAW);
 
     // Set up vertex attribute pointers (vertices, normals, texcoords)
-    if (m_hasTexture)
-    {
-        //Position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
-        //Normal Attribute
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 3));
-        //TexCoord Attribute
-        glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 6));
 
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
-    }
-    else
-    {
-        // Position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-        //Normal Attribute
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    //Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
+    //Normal Attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 3));
+    //TexCoord Attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 6));
 
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-    }
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+
 
     // unbind VAO and VBOs
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+void Cube::updateTexture(std::vector<std::string> texturePaths)
+{
+    // Three Scenarios
+    // 1. Updating a texture of an Object that already has textures
+    // 2. Updating a texture of an Object with no initial texture
+    // 3. Updating the texture of a model object
+
+    //Secenario 1
+    if (m_hasTexture == true)
+    {
+        //Success flags
+        int dSuccess = 1;
+        int sSuccess = 1;
+
+        if (texturePaths.size() == 2)
+        {
+            dSuccess = m_DiffuseMap->updateTexture(texturePaths[0].c_str(), false);
+            sSuccess = m_SpecularMap->updateTexture(texturePaths[1].c_str(), false);
+        }
+
+        if (dSuccess == 1 || sSuccess == 1)
+        {
+            std::cout << "Textures failed to apply, check file path and try again!" << std::endl;
+            //As of right now, all textures are deleted
+            delete m_DiffuseMap;
+            delete m_SpecularMap;
+            m_hasTexture = false;
+        }
+        else
+            std::cout << "Updated Texture successfully!" << std::endl;
+    }
+    //Scenario 2
+    else if (m_hasTexture == false)
+    {
+        m_DiffuseMap = new Texture(texturePaths[0].c_str(), false, "texture_diffuse");
+        m_SpecularMap = new Texture(texturePaths[1].c_str(), false, "texture_specular");
+        if (m_DiffuseMap->ID == GL_INVALID_VALUE || m_SpecularMap->ID == GL_INVALID_VALUE)
+        {
+            std::cout << "Textures were unable to update, check filepaths and try again!" << std::endl;
+            m_hasTexture = false;
+        }
+        else
+            m_hasTexture = true;
+    }
+
+
+
+
+
+
+
+}
+
 

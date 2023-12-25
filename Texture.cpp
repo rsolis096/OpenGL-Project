@@ -5,19 +5,30 @@ Texture::Texture(const char* filePath, bool flipOnY, std::string type) : ID(0), 
 {
     //Creates a Texture
     glGenTextures(1, &ID);
-    updateTexture(filePath, flipOnY);
+
+    //Ensure the texture applies
+    if (updateTexture(filePath, flipOnY))
+    {
+        std::cout << "Textures failed to apply, check file path and try again!" << std::endl;
+        m_Type = " ";
+        m_Path = "";
+        glDeleteTextures(1, &ID);
+        ID = GL_INVALID_VALUE;
+        //Failure essentially does the same as the default constructor
+    }
 }
 
 Texture::Texture() : ID(0)
 {
     m_Type = "";
     m_Path = "";
+    ID = GL_INVALID_VALUE;
 }
 
 Texture::~Texture()
 {
     glDeleteTextures(1, &ID);
-    ID = 0;
+    ID = GL_INVALID_VALUE;
     m_Type = "";
     m_Path = "";
 }
@@ -56,7 +67,7 @@ Texture::Texture(std::vector<std::string> paths) : ID(0)
 }
 
 //Allows for texture updates at runtime, also used by constructor
-void Texture::updateTexture(const char* filePath, bool flipOnY)
+int Texture::updateTexture(const char* filePath, bool flipOnY)
 {
     if (flipOnY)
         stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
@@ -89,10 +100,11 @@ void Texture::updateTexture(const char* filePath, bool flipOnY)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         std::cout << "Successfully Loaded: " << filePath << std::endl;
+        stbi_image_free(data);
+        return 0;
     }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
+
+    std::cout << "Failed to load texture" << std::endl;
     stbi_image_free(data);
+    return 1;
 }

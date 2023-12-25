@@ -113,7 +113,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
                 
         //Calculate Ambient, Diffuse, Specular
         vec3 ambientColor = light.ambient * vec3(texture(texture_diffuse1, TexCoords)); 
-        vec3 diffuseColor = light.diffuse * lambertian * vec3(texture(texture_diffuse1, TexCoords));
+        vec3 diffuseColor = light.diffuse * lambertian * vec3(texture(texture_diffuse1, TexCoords)) * object.diffuse;
         vec3 specularColor = light.specular * specular * vec3(texture(texture_specular1, TexCoords));
 
         //Apply attenuation
@@ -186,7 +186,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
         // Calculate the diffuse component
         float diff = max(dot(Normal, lightDir), 0.0);
-        vec3 diffuseColor = light.diffuse * vec3(texture(texture_diffuse1, TexCoords)) * (lambertian * spotFactor);
+        vec3 diffuseColor = light.diffuse * vec3(texture(texture_diffuse1, TexCoords)) * (lambertian * spotFactor) * object.diffuse;
 
         // Calculate the specular component
         vec3 specularColor = light.specular * vec3(texture(texture_specular1, TexCoords)) * (specular * spotFactor);
@@ -255,7 +255,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
                 
         //Calculate Ambient, Diffuse, Specular
         vec3 ambientColor = light.ambient * vec3(texture(texture_diffuse1, TexCoords)); 
-        vec3 diffuseColor = light.diffuse * lambertian * vec3(texture(texture_diffuse1, TexCoords));
+        vec3 diffuseColor = light.diffuse * lambertian * vec3(texture(texture_diffuse1, TexCoords)) * object.diffuse;
         vec3 specularColor = light.specular * specular * vec3(texture(texture_specular1, TexCoords));
 
         //return contribution

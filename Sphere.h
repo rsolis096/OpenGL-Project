@@ -23,6 +23,7 @@ public:
 
     //Methods
     void Draw(Shader& shader) override;
+    void updateTexture(std::vector<std::string> texturePaths) override {}
 
 private:
     //Used for construction of primitives

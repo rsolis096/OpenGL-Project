@@ -99,6 +99,11 @@ void GUI::drawList()
 		ImGui::EndChild();
 	}
 
+
+	//******************************************
+	// EDIT OBJECT PROPERTIES
+	// *****************************************
+	
 	//Update the selected item (default selected item is the 0th object)
 	Object* selectedObject = myScene.m_SceneObjects[selected];
 	ImGui::SameLine();
@@ -124,7 +129,7 @@ void GUI::drawList()
 					glm::vec3 pos = selectedObject->m_Position;
 					ImGui::Text("Current Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
 					ImGui::InputFloat3("##Position", vec4f);
-					if (ImGui::Button("Set")) {
+					if (ImGui::Button("Set##SetPosition")) {
 						pos[0] = vec4f[0];
 						pos[1] = vec4f[1];
 						pos[2] = vec4f[2];
@@ -141,7 +146,7 @@ void GUI::drawList()
 					ImGui::Text("Current Scale:\tx: %.2f, y: %.2f, z: %.2f", 
 						currentScale.x, currentScale.y, currentScale.z);
 					ImGui::InputFloat3("##Scale", vec3f);
-					if (ImGui::Button("Set1")) {
+					if (ImGui::Button("Set##SetScale")) {
 						currentScale[0] = vec3f[0];
 						currentScale[1] = vec3f[1];
 						currentScale[2] = vec3f[2];
@@ -150,8 +155,6 @@ void GUI::drawList()
 						vec3f[1] = 1.00f;
 						vec3f[2] = 1.00f;
 					}
-
-
 
 					// Color
 					static float col1[3] = { 1.0f, 0.0f, 0.2f };
@@ -173,11 +176,9 @@ void GUI::drawList()
 						selectedObject->setPhysics();
 					}
 				}	
-
-
-
 				ImGui::EndTabItem();
 			}
+
 			//Texture Tab
 			static std::string text = " ";
 			if (ImGui::BeginTabItem("Texture"))
@@ -197,12 +198,30 @@ void GUI::drawList()
 						if (ImGui::InputText("Texture Path: ", buffer, sizeof(buffer)))
 							text = buffer;
 						if (ImGui::Button("Set Texture")) {
-
-							selectedObject->m_hasTexture = true;
-							selectedObject->m_DiffuseMap->updateTexture(text.c_str(), false);
-							//This should be changed to allow for a new specular map
-							selectedObject->m_SpecularMap->updateTexture(text.c_str(), false);
-
+							//[0]: diffuse
+							//[1]: specular					
+							//[2]: ambient
+							std::vector<std::string> newPaths = {
+								text,
+								text
+							};
+							selectedObject->updateTexture(newPaths);
+						}
+					}
+					else
+					{
+						strcpy_s(buffer, "");
+						if (ImGui::InputText("Texture Path: ", buffer, sizeof(buffer)))
+							text = buffer;
+						if (ImGui::Button("Set Texture")) {
+							//[0]: diffuse
+							//[1]: specular					
+							//[2]: ambient
+							std::vector<std::string> newPaths = {
+								text,
+								text
+							};
+							selectedObject->updateTexture(newPaths);
 						}
 					}
 
