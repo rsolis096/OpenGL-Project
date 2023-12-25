@@ -4,16 +4,16 @@ Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
 {
     //Set default Cube properties
     m_Ambient = glm::vec3(0.2f);
-    m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+    m_Diffuse = glm::vec3(1.0f);
     m_Specular = glm::vec3(0.1f);
-    m_Position = glm::vec3(0.0f, 0.0f, 0.0f);
-    m_Scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    m_Position = glm::vec3(0.0f);
+    m_Scale = glm::vec3(1.0f);
     m_Model = glm::mat4(1.0f);
     m_ObjectID = "Undefined Object";
 
-    m_Force = glm::vec3(0.0f, 0.0f, 0.0f);
-    m_Velocity = glm::vec3(0.0f, 0.0f, 0.0f);
-    m_Mass = glm::vec3(1, 1, 1);
+    m_Force = glm::vec3(0.0f);
+    m_Velocity = glm::vec3(0.0f);
+    m_Mass = glm::vec3(1.0f);
 
     m_hasTexture = false;
     m_DiffuseMap = nullptr;

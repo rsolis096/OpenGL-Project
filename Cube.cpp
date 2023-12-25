@@ -52,6 +52,7 @@ void Cube::Draw(Shader& shader)
 
     //Bind Cube
     glBindVertexArray(m_vao);
+    //Render
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // Unbind buffers and reset state

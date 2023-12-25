@@ -308,20 +308,21 @@ int main()
 
     //Compile and link shaders
     Shader cubeMapShader("cubeMapShader.vert", "cubeMapShader.frag");
-    //General directional lighting
+    //General Rasterized lighting
     Shader lightingShader("lightingShader.vert", "lightingShader.frag");
     //For objects that are also light sources
     Shader pointLightShader("pointLightShader.vert", "pointLightShader.frag");
 
     //Initialize Lights
     SpotLight* spotLight = new SpotLight(lightingShader, *myCamera);
+
+    //First instance of pointlight is the only one rendered for some reason
     PointLight* pointLight = new PointLight(lightingShader, pointLightShader, *myCamera);
     PointLight* pointLight2 = new PointLight(lightingShader, pointLightShader, *myCamera);
-    PointLight* pointLight3 = new PointLight(lightingShader, pointLightShader, *myCamera);
     DirectionalLight* dirLight = new DirectionalLight(lightingShader);
 
-    pointLight->setLightPos(glm::vec3(1.0f, 1.0f, -5.0f));
-    //pointLight2->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
+    pointLight->setLightPos(glm::vec3(-51.0f, -51.0f, -5.0f));
+    pointLight2->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
 
 
     //Create Scene Manager and some default objects
@@ -354,7 +355,6 @@ int main()
 
     //Set window size of ImGUI window
     //ImGui::SetNextWindowSize(ImVec2(100, 75)); // Set the desired width and height
-    float count = 0;
 
     myScene.mainCamera = (myCamera);
 
@@ -403,9 +403,9 @@ int main()
         //Draw Lamp Object
 
         //TO DO: CHANGE THESE SUCH THAT LIGHTS CAN BE UPDATED IN GUI
-        //pointLight->renderLight(view, projection);
-        //pointLight2->renderLight(view, projection);
-        //dirLight->renderLight();      
+        pointLight->renderLight(view, projection);
+        pointLight2->renderLight(view, projection);
+        dirLight->renderLight();      
         spotLight->renderLight();
 
         // draw skybox as last
@@ -441,7 +441,6 @@ int main()
     myScene.removeAllObjects();
     delete pointLight;
     delete pointLight2;
-    delete pointLight3;
 
     //Delete all objects
     glDeleteVertexArrays(1, &skyboxVAO);

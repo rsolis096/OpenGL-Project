@@ -3,69 +3,66 @@
 int PointLight::pointLightCount = 0;
 bool firstFrame = true;
 
-PointLight::PointLight(Shader& lightingShader, Shader& lightCubeShader, Camera& cam) : playerCamera(cam)//, m_LightModel(Model("resources/objects/lightbulb/lightbulb.obj"))
-	{
+PointLight::PointLight(Shader& lightingShader, Shader& objectShader, Camera& cam) : playerCamera(cam)
+{
+	m_LightShape = new Cube(); //Create the physical light
 	lightID = pointLightCount;
+	m_LightShape->m_ObjectID = "PointLight" + std::to_string(lightID);
 	pointLightCount++;
 
 
+	//Light and its corresponding object starts at center of world
+	setLightPos(glm::vec3(0.0f, 0.0f, 0.0f));
+	m_LightShape->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
+
 	//Builds a light source with some default values
 	m_lightingShader = lightingShader; //For changing the lighting properties
-	m_lightShapeShader = lightCubeShader; //For rendering the light source itself
+	m_ObjectShader = objectShader; //For rendering the light object itself (a cube)
 
-	m_LightPos = glm::vec3(0.7f, 0.2f, 2.0f);
-	m_LightShape = new Cube(); //This object will be the lamp
-	m_LightShape->setPosition(m_LightPos);
-	m_LightShape->m_ObjectID = "PointLight" + std::to_string(lightID) + ", Cube" + m_LightShape->m_ObjectID;
-
-	//For the light bulb location
-	m_LightShape->m_Model = glm::mat4(1.0f);
-	m_LightShape->m_Model = glm::translate(m_LightShape->m_Model, m_LightShape->m_Position);
-
-	//Light Color Properties
+	//Light Color Properties (How it casts light on objects)
 	m_Ambient = glm::vec3(0.05f, 0.05f, 0.05f); //Dark ambient
-	m_Diffuse = glm::vec3(0.8f, 0.8f, 0.8f); //Grey light color
+	m_Diffuse = glm::vec3(1.0f, 0.0f, 0.0f); //Grey light color
 	m_Specular = glm::vec3(1.0f, 1.0f, 1.0f); //"Shine" color
+
+	//Set the color for the light object
+	m_LightShape->m_Diffuse = m_Diffuse;
+	m_LightShape->m_Ambient = m_Ambient;
+	m_LightShape->m_Ambient = m_Ambient;
+
 
 	//For attenuation
 	m_Constant = 1.0f;
 	m_Linear = 0.09f;
 	m_Quadratic = 0.032f;
+
+	//Set these properties in the lightingShader.frag, this is used when rendering all objects
+	//These do not need to change every draw call
+	m_lightingShader.use();
+	m_lightingShader.setFloat("material.shininess", 32.0f);
+
+	//These can be changed in a change color function to change the way the light color itself
+	m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].ambient", m_Ambient);
+	m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].diffuse", m_Diffuse);
+	m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].specular", m_Specular);
+
+	m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].constant", m_Constant);
+	m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].linear", m_Linear);
+	m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].quadratic", m_Quadratic);
+	m_lightingShader.setInt("numberOfPointLights", pointLightCount);
 }
 
 void PointLight::renderLight(glm::mat4 view, glm::mat4 projection)
 {
 
-	//MVP
-	m_lightShapeShader.use();
-	m_lightShapeShader.setMat4("projection", projection);
-	m_lightShapeShader.setMat4("view", view);
-	m_LightShape->m_Model = glm::mat4(1.0f);
-	//m_LightShape.setPosition(m_LightPos);
-	m_LightShape->m_Model = glm::translate(m_LightShape->m_Model, m_LightPos); //vec is lightPos
-	m_LightShape->m_Model = glm::scale(m_LightShape->m_Model, glm::vec3(0.2f)); // a smaller cube
-	m_lightShapeShader.setMat4("model", m_LightShape->m_Model);
+	//Render the light Object
+	m_ObjectShader.use();
+	m_ObjectShader.setMat4("projection", projection);
+	m_ObjectShader.setMat4("view", view);
+	m_LightShape->Draw(m_ObjectShader);
 
-	//render lamp object
-	m_LightShape->Draw(m_lightShapeShader);
-
-	// Light color properties
+	// Set the light properties to be 
 	m_lightingShader.use();
 	m_lightingShader.setVec3("viewPos", playerCamera.cameraPos);
-	m_lightingShader.setVec3("pointLights["+std::to_string(lightID)+"].position", m_LightPos);
-
-	//These do not need to change every frame
-	if (firstFrame)
-	{
-		m_lightingShader.setFloat("material.shininess", 32.0f);
-		m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].ambient", m_Ambient);
-		m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].diffuse", m_Diffuse);
-		m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].specular", m_Specular);
-		m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].constant", m_Constant);
-		m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].linear", m_Linear);
-		m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].quadratic", m_Quadratic);
-		firstFrame = false;
-	}
 }
 
 
@@ -75,13 +72,12 @@ PointLight::~PointLight()
 	m_LightShape = nullptr;
 }
 
-//For Light Properties
 void PointLight::setLightPos(glm::vec3 lightPos)
 {
 	m_LightPos = lightPos;
 	m_LightShape->setPosition(lightPos);
 	m_lightingShader.use();
-	m_lightingShader.setVec3("pointlight[" + std::to_string(lightID) + "].position", m_LightPos);
+	m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].position", m_LightPos);
 }
 
 void PointLight::setAmbient(glm::vec3 ambient)
@@ -89,7 +85,6 @@ void PointLight::setAmbient(glm::vec3 ambient)
 	m_Ambient = ambient;
 	m_lightingShader.use();
 	m_lightingShader.setVec3("pointlight[" + std::to_string(lightID) + "].ambient", m_Ambient);
-
 }
 
 void PointLight::setDiffuse(glm::vec3 diffuse)
@@ -106,7 +101,6 @@ void PointLight::setSpecular(glm::vec3 specular)
 	m_lightingShader.setVec3("pointlight[" + std::to_string(lightID) + "].specular", m_Specular);
 }
 
-//For Attenuation
 void PointLight::setconstant(float constant)
 {
 	m_Constant = constant;

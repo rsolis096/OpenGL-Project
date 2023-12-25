@@ -35,7 +35,7 @@ class PointLight
 
 	private:
 		//Shaders (for lighting and for light object itself
-		Shader m_lightShapeShader;
+		Shader m_ObjectShader;
 		Shader m_lightingShader;
 
 		//Light Object (light is not invisible)

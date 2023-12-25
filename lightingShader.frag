@@ -1,5 +1,6 @@
 #version 330 core
 out vec4 FragColor;
+const int NR_POINT_LIGHTS = 8;
 
 //uniform sampler2D texture_diffuse1;
 
@@ -42,7 +43,7 @@ struct SpotLight {
     vec3 specular;       
 };
 
-//Only used for no texture primitives/models
+//Object color properties
 struct Object
 {
     vec3 ambient;
@@ -50,7 +51,6 @@ struct Object
     vec3 specular;
 };
 
-#define NR_POINT_LIGHTS 1
 in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoords;
@@ -59,6 +59,7 @@ uniform vec3 viewPos;
 
 uniform DirLight dirLight;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
+uniform int numberOfPointLights;
 uniform SpotLight spotLight;
 
 uniform Material material;
@@ -82,12 +83,17 @@ void main()
     //TO DO: PUT THESE RESULTS IN IF STATEMENTS DEPENDING ON WHICH LIGHT IS ON
 
     // phase 1: directional lighting
-    //vec3 result = CalcDirLight(dirLight, norm, viewDir);
+    vec3 result = CalcDirLight(dirLight, norm, viewDir);
     // phase 2: point lights
-    //for(int i = 0; i < NR_POINT_LIGHTS; i++)
-        //result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
+    for(int i = 0; i < numberOfPointLights; i++)
+    {
+        //if(i == 0)
+        result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
+
+            
+    }
     //phase 3: spot light
-    vec3 result = CalcSpotLight(spotLight, norm, FragPos, viewDir);    
+    result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
         
     FragColor = vec4(result, 1.0);
 }
@@ -100,7 +106,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     if(hasTexture)
     {
         //Diffuse (Blinn Phong)
-        vec3 lightDir = normalize(light.position - fragPos);
+        vec3 lightDir = normalize(light.position-fragPos);
         float lambertian = max(dot(normal, lightDir), 0.0);
         float specular = 0.0;
 
@@ -117,7 +123,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         vec3 specularColor = light.specular * specular * vec3(texture(texture_specular1, TexCoords));
 
         //Apply attenuation
-        float distance = length(light.position - fragPos);
+        float distance = length(light.position -fragPos );
         float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
         ambientColor *= attenuation;
         diffuseColor *= attenuation;
