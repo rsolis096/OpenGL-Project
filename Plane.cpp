@@ -3,7 +3,6 @@
 unsigned int Plane::planeCount = 0;
 
 
-//Used for creating a Primtive with texture information
 Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
     //Set some rendering properties

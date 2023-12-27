@@ -16,21 +16,23 @@ public:
 
 	//For Light Properties
 	void setLightPos(glm::vec3 lightPos);
-	void setAmbient(glm::vec3 ambient);
-	void setDiffuse(glm::vec3 diffuse);
-	void setSpecular(glm::vec3 specular);
 
 	//For Attenuation
 	void setconstant(float constant);
 	void setLinear(float linear);
 	void setQuadratic(float quadratic);
 
+	//For Light Properties
+	void setAmbient(glm::vec3 ambient);
+	void setDiffuse(glm::vec3 diffuse);
+	void setSpecular(glm::vec3 specular);
+
+
 private:
 	Shader m_lightingShader;
 	Camera& playerCamera;
 	glm::vec3 m_LightPos;
 
-	//Light properties
 	glm::vec3 m_Ambient;
 	glm::vec3 m_Diffuse;
 	glm::vec3 m_Specular;

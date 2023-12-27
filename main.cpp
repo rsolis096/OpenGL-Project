@@ -1,6 +1,7 @@
 #include <glad/glad.h> //Opengl functions
 #include <GLFW/glfw3.h> //Window functions
 
+
 #include "Vendors/imgui/imgui.h"
 #include "Vendors/imgui/imgui_impl_glfw.h"
 #include "Vendors/imgui/imgui_impl_opengl3.h"
@@ -13,14 +14,15 @@
 #include "GUI.h"
 
 //Objects
+
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "DirectionalLight.h"
-#include "Cube.h"
+
 #include "Scene.h"
 #include "Model.h"
-#include "Sphere.h"
-#include "Plane.h"
+
+#include "LightController.h"
 
 //Physics
 #include "PhysicsWorld.h"
@@ -313,16 +315,13 @@ int main()
     //For objects that are also light sources
     Shader pointLightShader("pointLightShader.vert", "pointLightShader.frag");
 
-    //Initialize Lights
-    SpotLight* spotLight = new SpotLight(lightingShader, *myCamera);
-
-    //First instance of pointlight is the only one rendered for some reason
-    PointLight* pointLight = new PointLight(lightingShader, pointLightShader, *myCamera);
-    PointLight* pointLight2 = new PointLight(lightingShader, pointLightShader, *myCamera);
-    DirectionalLight* dirLight = new DirectionalLight(lightingShader);
-
-    pointLight->setLightPos(glm::vec3(-51.0f, -51.0f, -5.0f));
-    pointLight2->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
+    //This objects controls all light sources, allows for their addition and removal
+    LightController lightController(lightingShader, pointLightShader, myCamera);
+    lightController.addPointLight();
+    lightController.addPointLight();
+    lightController.addSpotLight();
+    lightController.m_PointLights[0]->setLightPos(glm::vec3(-51.0f, -51.0f, -5.0f));
+    lightController.m_PointLights[1]->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
 
 
     //Create Scene Manager and some default objects
@@ -400,13 +399,8 @@ int main()
                 element->Draw(lightingShader);
         }
 
-        //Draw Lamp Object
-
-        //TO DO: CHANGE THESE SUCH THAT LIGHTS CAN BE UPDATED IN GUI
-        pointLight->renderLight(view, projection);
-        pointLight2->renderLight(view, projection);
-        dirLight->renderLight();      
-        spotLight->renderLight();
+        //Draw Lights
+        lightController.drawLighting(view, projection);
 
         // draw skybox as last
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
@@ -439,8 +433,8 @@ int main()
     //Delete everything
     physicsWorld.removeAllObjects();
     myScene.removeAllObjects();
-    delete pointLight;
-    delete pointLight2;
+    //delete pointLight;
+    //delete pointLight2;
 
     //Delete all objects
     glDeleteVertexArrays(1, &skyboxVAO);

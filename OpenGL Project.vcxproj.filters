@@ -138,6 +138,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\World</Filter>
     </ClCompile>
+    <ClCompile Include="LightController.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="lightingShader.frag" />
@@ -219,6 +222,9 @@
     </ClInclude>
     <ClInclude Include="Vendors\imgui\imconfig.h">
       <Filter>Header Files\Vendors</Filter>
+    </ClInclude>
+    <ClInclude Include="LightController.h">
+      <Filter>Header Files\Lighting</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

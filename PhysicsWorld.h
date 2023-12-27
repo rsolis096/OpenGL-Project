@@ -13,5 +13,5 @@ public:
 	int addObject(Object* obj);
 	int removeObject(Object* obj);
 	void removeAllObjects();
-	void step(float , float);
+	void step(float totalTime, float deltaTime);
 };
