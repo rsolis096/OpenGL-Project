@@ -1,7 +1,6 @@
 #include <glad/glad.h> //Opengl functions
 #include <GLFW/glfw3.h> //Window functions
 
-
 #include "Vendors/imgui/imgui.h"
 #include "Vendors/imgui/imgui_impl_glfw.h"
 #include "Vendors/imgui/imgui_impl_opengl3.h"
@@ -10,7 +9,6 @@
 #include <iostream>
 #include "Shader.h"
 #include "Texture.h"
-#include "Vendors/stb_image.h"
 #include "GUI.h"
 
 //Objects
@@ -18,7 +16,7 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "DirectionalLight.h"
-
+#include "SkyBox.h"
 #include "Scene.h"
 #include "Model.h"
 
@@ -239,81 +237,16 @@ int main()
     //glCullFace(GL_BACK);
     //glFrontFace(GL_CCW);
 
-
-
-    //Skybox faces
-    vector<std::string> faces
-    {
-        "Assets/skybox/right.jpg",
-        "Assets/skybox/left.jpg",
-        "Assets/skybox/top.jpg",
-        "Assets/skybox/bottom.jpg",
-        "Assets/skybox/front.jpg",
-        "Assets/skybox/back.jpg"
-    };
-
-    float skyboxVertices[] = {
-        // positions          
-        -10.0f,  10.0f, -10.0f,
-        -10.0f, -10.0f, -10.0f,
-         10.0f, -10.0f, -10.0f,
-         10.0f, -10.0f, -10.0f,
-         10.0f,  10.0f, -10.0f,
-        -10.0f,  10.0f, -10.0f,
-
-        -10.0f, -10.0f,  10.0f,
-        -10.0f, -10.0f, -10.0f,
-        -10.0f,  10.0f, -10.0f,
-        -10.0f,  10.0f, -10.0f,
-        -10.0f,  10.0f,  10.0f,
-        -10.0f, -10.0f,  10.0f,
-
-         10.0f, -10.0f, -10.0f,
-         10.0f, -10.0f,  10.0f,
-         10.0f,  10.0f,  10.0f,
-         10.0f,  10.0f,  10.0f,
-         10.0f,  10.0f, -10.0f,
-         10.0f, -10.0f, -10.0f,
-
-        -10.0f, -10.0f,  10.0f,
-        -10.0f,  10.0f,  10.0f,
-         10.0f,  10.0f,  10.0f,
-         10.0f,  10.0f,  10.0f,
-         10.0f, -10.0f,  10.0f,
-        -10.0f, -10.0f,  10.0f,
-
-        -10.0f,  10.0f, -10.0f,
-         10.0f,  10.0f, -10.0f,
-         10.0f,  10.0f,  10.0f,
-         10.0f,  10.0f,  10.0f,
-        -10.0f,  10.0f,  10.0f,
-        -10.0f,  10.0f, -10.0f,
-
-        -10.0f, -10.0f, -10.0f,
-        -10.0f, -10.0f,  10.0f,
-         10.0f, -10.0f, -10.0f,
-         10.0f, -10.0f, -10.0f,
-        -10.0f, -10.0f,  10.0f,
-         10.0f, -10.0f,  10.0f
-    };
-
-    unsigned int skyboxVAO, skyboxVBO;
-    glGenVertexArrays(1, &skyboxVAO);
-    glGenBuffers(1, &skyboxVBO);
-    glBindVertexArray(skyboxVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-    Texture cubeMap(faces);
-
     //Compile and link shaders
     Shader cubeMapShader("cubeMapShader.vert", "cubeMapShader.frag");
     //General Rasterized lighting
     Shader lightingShader("lightingShader.vert", "lightingShader.frag");
     //For objects that are also light sources
     Shader pointLightShader("pointLightShader.vert", "pointLightShader.frag");
+
+    //Create the SkyBox
+    SkyBox* mySkyBox = new SkyBox(cubeMapShader, myCamera);
+    mySkyBox->setCubeMapTexture("Assets/skybox/skybox1.png");
 
     //This objects controls all light sources, allows for their addition and removal
     LightController lightController(lightingShader, pointLightShader, myCamera);
@@ -401,20 +334,8 @@ int main()
 
         //Draw Lights
         lightController.drawLighting(view, projection);
-
-        // draw skybox as last
-        glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-        cubeMapShader.use();
-        view = glm::mat4(glm::mat3(myCamera->GetViewMatrix())); // remove translation from the view matrix
-        cubeMapShader.setMat4("view", view);
-        cubeMapShader.setMat4("projection", projection);
-        // skybox cube
-        glBindVertexArray(skyboxVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapShader.ID);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
-        glDepthFunc(GL_LESS); // set depth function back to default
+        //Draw SkyBox
+        mySkyBox->draw(projection);
 
         myScene.worldTime = (float)glfwGetTime();
 
@@ -424,7 +345,6 @@ int main()
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);//swap back frame buffer with front frame buffer.
         glfwPollEvents();
-
     }
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
@@ -433,12 +353,6 @@ int main()
     //Delete everything
     physicsWorld.removeAllObjects();
     myScene.removeAllObjects();
-    //delete pointLight;
-    //delete pointLight2;
-
-    //Delete all objects
-    glDeleteVertexArrays(1, &skyboxVAO);
-    glDeleteBuffers(1, &skyboxVBO);
 
 
     //imgui: terminate

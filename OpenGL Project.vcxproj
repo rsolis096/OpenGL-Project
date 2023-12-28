@@ -156,12 +156,15 @@
     <ClCompile Include="PhysicsWorld.h" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Plane.h" />
     <ClCompile Include="SpotLight.cpp" />
+    <ClCompile Include="stb_image.cpp" />
+    <ClCompile Include="stb_image_write.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Vendors\imgui\imgui.cpp" />
     <ClCompile Include="Vendors\imgui\imgui_demo.cpp" />
@@ -170,7 +173,6 @@
     <ClCompile Include="Vendors\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="Vendors\imgui\imgui_tables.cpp" />
     <ClCompile Include="Vendors\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Vendors\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cubeMapShader.frag" />
@@ -192,6 +194,7 @@
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SkyBox.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="Texture.h" />

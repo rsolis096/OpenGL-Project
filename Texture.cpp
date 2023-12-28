@@ -1,6 +1,5 @@
 #include "Texture.h"
 
-
 Texture::Texture(const char* filePath, bool flipOnY, std::string type) : ID(0), m_Type(type), m_Path(filePath)
 {
     //Creates a Texture
@@ -31,6 +30,91 @@ Texture::~Texture()
     ID = GL_INVALID_VALUE;
     m_Type = "";
     m_Path = "";
+}
+
+//Load Cube map texture
+Texture::Texture(std::string path) : ID(0)
+{
+    glGenTextures(1, &ID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
+
+    int width, height, nrChannels;
+
+    unsigned char* data;
+    data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+    //Dimensions for each face
+    int faceWidth = width / 4;
+    int faceHeight = height / 3;
+    std::cout << width << ", " << height << std::endl;
+    GLenum format = GL_RED;
+    if (nrChannels == 1)
+        format = GL_RED;
+    else if (nrChannels == 3)
+        format = GL_RGB;
+    else if (nrChannels == 4)
+        format = GL_RGBA;
+
+    std::pair<int, int> positions[] = {
+        {0, faceHeight},                //Left
+        {2 * faceWidth, faceHeight},    //Right
+        {faceWidth, 0},                 //Top
+        {faceWidth, 2 * faceHeight},    //Bottom
+        {3 * faceWidth, faceHeight},    //Back
+        {faceWidth, faceHeight}         //Front
+    };
+
+    //Swapping right and left fixing alignment issuuse along the horizontal
+    unsigned int targets[] = {
+        GL_TEXTURE_CUBE_MAP_POSITIVE_X, //Right
+        GL_TEXTURE_CUBE_MAP_NEGATIVE_X, //Left
+        GL_TEXTURE_CUBE_MAP_POSITIVE_Y,	//Top
+        GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, //Bottom
+        GL_TEXTURE_CUBE_MAP_POSITIVE_Z, //Back
+        GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, //Front
+    };
+
+    if (data)
+    {
+        for (int i = 0; i < 6; ++i)
+        {
+            int offsetX = positions[i].first;
+            int offsetY = positions[i].second;
+
+
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, width);
+            glPixelStorei(GL_UNPACK_SKIP_PIXELS, offsetX);
+            glPixelStorei(GL_UNPACK_SKIP_ROWS, offsetY);
+
+            glTexImage2D(
+                targets[i],
+                0,
+                format,
+                faceWidth,
+                faceHeight,
+                0,
+                format,
+                GL_UNSIGNED_BYTE,
+                data
+            );
+
+            // Reset pixel store parameters to their default values
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+            glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+            glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+        }
+    }
+    else
+    {
+        std::cout << "Failed to load texture: " << path << std::endl;
+    }
+    stbi_image_free(data);
+
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
 //Load Cube map texture
@@ -108,3 +192,55 @@ int Texture::updateTexture(const char* filePath, bool flipOnY)
     stbi_image_free(data);
     return 1;
 }
+
+
+//Could be useful for fixing top and bottom of cubemap loaded as t-shaped cube map
+//TO CORRECTLY FLIP (IN PHOTOSHOP) FLIP VERTICALLY THEN HORIZONTALLY FOR BOTH THE TOP AND BOTTOM FACES
+/*
+const char* flipTexture(std::string path)
+{
+    const char* inputPath = path.c_str();
+    const char* outputPath = "output.png";
+
+    int width, height, channels;
+    unsigned char* data = stbi_load(inputPath, &width, &height, &channels, 0);
+    //4096 x 3072
+    //faceHeight = 1365
+    //faceWidth = 1024
+    if (data) 
+    {
+        // Define the region to flip (e.g., from (0,0) to (256,256))
+        int startX = 1024;
+        int startY = 0;
+        int endX = 1024*2;
+        int endY = 1365;
+
+        // Ensure the region is within bounds
+        endX = std::min(endX, width);
+        endY = std::min(endY, height);
+        // Flip the specified portion vertically
+        for (int y = startY; y < endY; ++y) {
+            for (int x = startX; x < endX; ++x) {
+                int topPixelIndex = (y * width + x) * channels;
+                int bottomPixelIndex = ((endY - 1) * width + x) * channels;
+
+                for (int c = 0; c < channels; ++c) {
+                    // Swap the pixel values vertically
+                    std::swap(data[topPixelIndex + c], data[bottomPixelIndex + c]);
+                }
+            }
+        }
+
+        // Save the modified image
+        stbi_write_png(outputPath, width, height, channels, data, width * channels);
+
+        // Free the image data
+        stbi_image_free(data);
+
+        return outputPath;
+    }
+
+    return "" ;
+
+}
+*/

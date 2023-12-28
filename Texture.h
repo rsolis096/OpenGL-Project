@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Vendors/stb_image.h"
+#include "Vendors/stb_image_write.h"
+
 #include <glad/glad.h>
 #include <vector>
 #include <iostream>
@@ -25,6 +27,7 @@ public:
 
 	//Cube Map
 	Texture(std::vector<std::string> paths);
+	Texture(std::string path);
 
 	int updateTexture(const char* filePath, bool flipOnY);
 };
