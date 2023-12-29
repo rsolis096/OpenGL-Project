@@ -73,6 +73,7 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
     char infoLog[512];
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success); //Check compilation success
     glGetShaderInfoLog(shader, 512, NULL, infoLog); //If error message exists, write it to infoLog
+
     if (type != "PROGRAM")
     {
         if (!success)

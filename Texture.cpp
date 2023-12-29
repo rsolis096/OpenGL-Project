@@ -53,6 +53,8 @@ Texture::Texture(std::string path) : ID(0)
         format = GL_RGB;
     else if (nrChannels == 4)
         format = GL_RGBA;
+    else
+        std::cout << "Invalid Format" << std::endl;
 
     std::pair<int, int> positions[] = {
         {0, faceHeight},                //Left
@@ -80,7 +82,6 @@ Texture::Texture(std::string path) : ID(0)
             int offsetX = positions[i].first;
             int offsetY = positions[i].second;
 
-
             glPixelStorei(GL_UNPACK_ROW_LENGTH, width);
             glPixelStorei(GL_UNPACK_SKIP_PIXELS, offsetX);
             glPixelStorei(GL_UNPACK_SKIP_ROWS, offsetY);
@@ -97,11 +98,12 @@ Texture::Texture(std::string path) : ID(0)
                 data
             );
 
-            // Reset pixel store parameters to their default values
-            glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-            glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
-            glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+
         }
+        // Reset pixel store parameters to their default values
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+        glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
     }
     else
     {

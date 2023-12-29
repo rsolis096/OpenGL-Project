@@ -7,7 +7,7 @@ PointLight::PointLight(Shader& lightingShader, Shader& objectShader, Camera& cam
 {
 	m_LightShape = new Cube(); //Create the physical light
 	lightID = pointLightCount;
-	m_LightShape->m_ObjectID = "PointLight" + std::to_string(lightID);
+	m_LightShape->m_DisplayName = "PointLight" + std::to_string(lightID);
 	pointLightCount++;
 
 

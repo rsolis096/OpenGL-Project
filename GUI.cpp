@@ -90,7 +90,7 @@ void GUI::drawList()
 		{
 			// FIXME: Good candidate to use ImGuiSelectableFlags_SelectOnNav
 			char label[128];
-			sprintf_s(label, myScene.m_SceneObjects[i]->m_ObjectID.c_str(), i);
+			sprintf_s(label, myScene.m_SceneObjects[i]->m_DisplayName.c_str(), i);
 			if (ImGui::Selectable(label, false))
 			{
 				selected = i;
@@ -121,7 +121,7 @@ void GUI::drawList()
 		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 		
 		if(selectedObject != nullptr)
-			ImGui::Text("Selected Item: %s", selectedObject->m_ObjectID.c_str());
+			ImGui::Text("Selected Item: %s", selectedObject->m_DisplayName.c_str());
 		else
 			ImGui::Text("Selected Item: %s", "NULL");
 
@@ -147,7 +147,7 @@ void GUI::drawList()
 							vec4f[1] = 0.00f;
 							vec4f[2] = 0.00f;
 							selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
-							selectedObject->startFall = myScene.worldTime;
+							selectedObject->startFall = glfwGetTime();
 						}
 					}
 					
@@ -255,6 +255,8 @@ void GUI::drawList()
 						ImGui::Spacing();
 						if (ImGui::Checkbox("Allow Physics ", &selectedObject->enablePhysics))
 						{
+							if(selectedObject->isPhysicsObject == false)
+								myScene.m_PhysicsWorld->addObject(selectedObject);
 							selectedObject->setPhysics();
 						}
 					}

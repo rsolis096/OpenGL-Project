@@ -7,11 +7,11 @@ Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : 
 {
     //Set some rendering properties
     m_hasTexture = true;
-    m_ObjectID = "Plane";
     //Open and load diffuse map and specular map, save their Planes
     m_DiffuseMap = new Texture(texturePathDiffuse, false, "texture_diffuse");
     m_SpecularMap = new Texture(texturePathSpecular, false, "texture_specular");
-    m_ObjectID = "Plane" + std::to_string(planeCount);
+    m_DisplayName = "Plane" + std::to_string(planeCount);
+    m_ObjectID = planeCount;
     planeCount++;
     //Build the specified Plane type
     buildPlane();
@@ -21,14 +21,15 @@ Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : 
 Plane::Plane() : Object()
 {
     m_hasTexture = false;
-    m_ObjectID = "Plane" + std::to_string(planeCount);
+    m_DisplayName = "Plane" + std::to_string(planeCount);
+    m_ObjectID = planeCount;
     planeCount++;
     buildPlane();
 }
 
 void Plane::Draw(Shader& shader)
 {
-    //glDisable(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
     shader.use();
     shader.setVec3("object.ambient", m_Ambient);
     shader.setVec3("object.diffuse", m_Diffuse);
@@ -59,7 +60,7 @@ void Plane::Draw(Shader& shader)
     // Unbind buffers and reset state
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
-    //glEnable(GL_CULL_FACE);//Disable then re-enable to show both sides of plane
+    glEnable(GL_CULL_FACE);//Disable then re-enable to show both sides of plane
 }
 
 void Plane::buildPlane()

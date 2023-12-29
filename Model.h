@@ -1,5 +1,4 @@
-#ifndef MODEL_H
-#define MODEL_H
+#pragma once
 
 #include <glad/glad.h> 
 
@@ -45,6 +44,5 @@ private:
     // the required info is returned as a Texture struct.
     vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
     int updateTexture(std::vector<std::string> texturePaths) override { return 1; }
+    static unsigned int modelCount;
 };
-
-#endif

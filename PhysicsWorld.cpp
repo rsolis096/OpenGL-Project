@@ -13,6 +13,8 @@ int PhysicsWorld::addObject(Object* obj)
 	if (it == m_PhysicsObjects.end())
 	{
 		m_PhysicsObjects.push_back(obj);
+		obj->isPhysicsObject = true;
+		std::cout << "Added " << obj->m_ObjectID << " to physics world." << std::endl;
 		return 0;
 	}
 	std::cout << "Object already in physics world!" << std::endl;
@@ -31,6 +33,7 @@ int PhysicsWorld::removeObject(Object* obj)
 	else
 	{
 		m_PhysicsObjects.erase(removeIterator, m_PhysicsObjects.end());
+		obj->isPhysicsObject = false;
 		std::cout << "Physics World: Removed " << obj->m_ObjectID << std::endl;
 		return 0;
 	}

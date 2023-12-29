@@ -44,11 +44,13 @@ public:
         glm::vec3 m_Mass;
         float startFall;
         bool enablePhysics;
+        bool isPhysicsObject;
         void setPhysics();
         void setVelocity(glm::vec3);
 
         //Type
-        std::string m_ObjectID;
+        unsigned int m_ObjectID;
+        std::string m_DisplayName;
 
 
 

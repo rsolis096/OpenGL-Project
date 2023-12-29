@@ -229,7 +229,8 @@ int main()
         return -1;
     }
     glEnable(GL_DEPTH_TEST);
-
+    //Gamma Correction
+    glEnable(GL_FRAMEBUFFER_SRGB);
     //Enable this to only render front facing polygons (for performance)
     glEnable(GL_CULL_FACE);
 
@@ -237,53 +238,35 @@ int main()
     //glCullFace(GL_BACK);
     //glFrontFace(GL_CCW);
 
-    //Compile and link shaders
-    Shader cubeMapShader("cubeMapShader.vert", "cubeMapShader.frag");
-    //General Rasterized lighting
-    Shader lightingShader("lightingShader.vert", "lightingShader.frag");
-    //For objects that are also light sources
-    Shader pointLightShader("pointLightShader.vert", "pointLightShader.frag");
-
-    //Create the SkyBox
-    SkyBox* mySkyBox = new SkyBox(cubeMapShader, myCamera);
-    mySkyBox->setCubeMapTexture("Assets/skybox/skybox1.png");
-
-    //This objects controls all light sources, allows for their addition and removal
-    LightController lightController(lightingShader, pointLightShader, myCamera);
-    lightController.addPointLight();
-    lightController.addPointLight();
-    lightController.addSpotLight();
-    lightController.m_PointLights[0]->setLightPos(glm::vec3(-51.0f, -51.0f, -5.0f));
-    lightController.m_PointLights[1]->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
-
-
+    Scene myScene(myCamera);
     //Create Scene Manager and some default objects
-    Scene myScene;
     myScene.addObject(new Model("resources/objects/dragon/dragon.obj"));
     myScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
     myScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
-    myScene.addObject(new Plane("Assets/globe.jpg", "Assets/globe.jpg"));
+    myScene.addObject(new Plane("Assets/woodparquet_93_basecolor-2K.png", "Assets/woodparquet_93_basecolor-2K.png"));
+    myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[1]);
+    myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[2]);
+    myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[3]);
+    myScene.createLightController();
+    myScene.m_LightController->addPointLight();
+    myScene.m_LightController->addPointLight();
+    myScene.m_LightController->addSpotLight();
+    myScene.m_LightController->m_PointLights[0]->setLightPos(glm::vec3(-51.0f, -51.0f, -5.0f));
+    myScene.m_LightController->m_PointLights[1]->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
 
-    // Add objects to the PhysicsWorld allowing them to be influenced by external forces
-    PhysicsWorld physicsWorld; 
-    physicsWorld.addObject(myScene.m_SceneObjects[1]);
-    physicsWorld.addObject(myScene.m_SceneObjects[2]);
-    physicsWorld.addObject(myScene.m_SceneObjects[3]);
+    //Create the SkyBox
+    SkyBox* mySkyBox = new SkyBox(myScene.cubeMapShader, myCamera);
+    mySkyBox->setCubeMapTexture("Assets/skybox/rocky_ridge_puresky2.png");
 
     //Initialize the GUI
     GUI myGUI(window, myScene);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable this line for wireframe display
 
-    //Initialize MVP
-    glm::mat4 model;
+    //Initialize View and Projection (These are changed in updateCamera() )
     glm::mat4 view;
     glm::mat4 projection;
 
-    // shader configuration
-    // --------------------
-    lightingShader.use();
-    lightingShader.setFloat("material.shininess", 32.0f);
 
     //Set window size of ImGUI window
     //ImGui::SetNextWindowSize(ImVec2(100, 75)); // Set the desired width and height
@@ -301,43 +284,21 @@ int main()
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        float fps = 1 / deltaTime;
-        myScene.fps = fps;
+        myScene.fps = 1 / deltaTime;
 
         //Rendering Starts Here
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//The back buffer currently only contains the color buffer, this clears and updates it with the colour specified by glClearColor.
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-        // be sure to activate shader when setting uniforms/drawing objects
-        lightingShader.use();
-        lightingShader.setVec3("viewPos", myCamera->cameraPos);
-
+        myScene.lightingShader.use();
+        myScene.lightingShader.setVec3("viewPos", myCamera->cameraPos);
         // Update the camera
-        updateCamera(lightingShader, view, projection);
-
-        //Update Scene Objects
-        for (auto& element : myScene.m_SceneObjects)
-        {
-            physicsWorld.step(glfwGetTime(), deltaTime);
-            if (element->m_ObjectID[0] == 'S')
-            {
-                element->translatePosition(glm::vec3(0.001f));
-            }
-            if (element->m_ObjectID[0] == 'M')
-            {
-                lightingShader.setMat4("model", model);
-            }
-            if (element->m_ObjectID[0] != 'M')
-                element->Draw(lightingShader);
-        }
-
-        //Draw Lights
-        lightController.drawLighting(view, projection);
+        updateCamera(myScene.lightingShader, view, projection);
+        //Draw Scene
+        myScene.drawScene(projection, deltaTime);
         //Draw SkyBox
         mySkyBox->draw(projection);
-
-        myScene.worldTime = (float)glfwGetTime();
 
         //GUI should always be drawn last
         myGUI.displayWindow();
@@ -351,7 +312,7 @@ int main()
 
 
     //Delete everything
-    physicsWorld.removeAllObjects();
+    myScene.m_PhysicsWorld->removeAllObjects();
     myScene.removeAllObjects();
 
 

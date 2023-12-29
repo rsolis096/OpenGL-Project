@@ -7,7 +7,8 @@ Sphere::Sphere(const char* texturePathDiffuse, const char* texturePathSpecular) 
 {
     //Set some rendering properties
     m_hasTexture = true;
-    m_ObjectID = "Sphere" + std::to_string(sphereCount);
+    m_DisplayName = "Sphere" + std::to_string(sphereCount);
+    m_ObjectID = sphereCount;
     //Open and load diffuse map and specular map, save their Spheres
     m_DiffuseMap = new Texture(texturePathDiffuse, false, "texture_diffuse");
     m_SpecularMap = new Texture(texturePathSpecular, false, "texture_specular");
@@ -21,7 +22,8 @@ Sphere::Sphere(const char* texturePathDiffuse, const char* texturePathSpecular) 
 Sphere::Sphere() : Object()
 {
     m_hasTexture = false;
-    m_ObjectID = "Sphere" + std::to_string(sphereCount);
+    m_DisplayName = "Sphere" + std::to_string(sphereCount);
+    m_ObjectID = sphereCount;
     sphereCount++;
     buildSphere();
 }

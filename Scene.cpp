@@ -3,10 +3,35 @@
 Scene::Scene()
 {
 	objectCount = 0;
-	worldTime = 0;
 	fps = 0;
 	mainCamera = nullptr;
+	m_LightController = nullptr;
+
+	//Compile and link shaders
+	cubeMapShader = Shader("cubeMapShader.vert", "cubeMapShader.frag");
+	//General Rasterized lighting
+	lightingShader = Shader("lightingShader.vert", "lightingShader.frag");
+	//For objects that are also light sources
+	pointLightShader = Shader("pointLightShader.vert", "pointLightShader.frag");
 }
+
+Scene::Scene(Camera* mC)
+{
+	objectCount = 0;
+	fps = 0;
+	mainCamera = mC;
+	m_LightController = nullptr;
+
+	//Compile and link shaders
+	cubeMapShader = Shader("cubeMapShader.vert", "cubeMapShader.frag");
+	//General Rasterized lighting
+	lightingShader = Shader("lightingShader.vert", "lightingShader.frag");
+	//For objects that are also light sources
+	pointLightShader = Shader("pointLightShader.vert", "pointLightShader.frag");
+
+	m_PhysicsWorld = new PhysicsWorld();
+}
+
 
 //Add an object to the scene (only objects part of a scene are rendered)
 int Scene::addObject(Object* obj)
@@ -49,7 +74,45 @@ void Scene::removeAllObjects()
 	m_SceneObjects.clear();
 }
 
-//Add a light to the scene
-void Scene::addLightSource()
+//Create a LightController within the scene
+void Scene::createLightController()
 {
+	if (m_LightController != nullptr)
+		removeLightController();
+	m_LightController = new LightController(lightingShader, pointLightShader, mainCamera);;
+}
+
+//Add a LightController to the scene
+void Scene::addLightController(LightController* lc)
+{
+	if (m_LightController != nullptr)
+		removeLightController();
+	m_LightController = lc;
+}
+
+void Scene::removeLightController()
+{
+
+}
+
+void Scene::drawScene(glm::mat4 projection, float deltaTime)
+{
+	//Update Scene Objects
+	for (auto& element : m_SceneObjects)
+	{
+		m_PhysicsWorld->step(glfwGetTime(), deltaTime);
+		if (typeid(element).name()[0] == 'S')
+		{
+			element->translatePosition(glm::vec3(0.001f));
+		}
+		if (typeid(element).name()[0] == 'M')
+		{
+			element->Draw(lightingShader);
+		}
+		if (typeid(element).name()[0] != 'M')
+			element->Draw(lightingShader);
+	}
+
+	//Draw Lights
+	m_LightController->drawLighting(mainCamera->GetViewMatrix(), projection);
 }

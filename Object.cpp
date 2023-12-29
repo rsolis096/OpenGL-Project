@@ -9,7 +9,7 @@ Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
     m_Position = glm::vec3(0.0f);
     m_Scale = glm::vec3(1.0f);
     m_Model = glm::mat4(1.0f);
-    m_ObjectID = "Undefined Object";
+    m_ObjectID = 0;
 
     m_Force = glm::vec3(0.0f);
     m_Velocity = glm::vec3(0.0f);
@@ -19,6 +19,7 @@ Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
     m_DiffuseMap = nullptr;
     m_SpecularMap = nullptr;
     enablePhysics = false;
+    isPhysicsObject = false;
 
     startFall = 0.0f;
 

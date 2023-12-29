@@ -1,9 +1,14 @@
 #pragma once
 #include "Model.h"
 
+unsigned int Model::modelCount = 0;
+
+
 Model::Model(string const& path, bool gamma) : Object(), gammaCorrection(gamma)
 {
-    m_ObjectID = "Model";
+    m_DisplayName= "Model";
+    m_ObjectID = modelCount;
+    modelCount++;
     m_hasTexture = false;
     loadModel(path);
 }

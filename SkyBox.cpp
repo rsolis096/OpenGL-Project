@@ -85,12 +85,11 @@ void SkyBox::draw(glm::mat4 projection)
     m_CubeMapShader.setMat4("view", view);
     m_CubeMapShader.setMat4("projection", projection);
     // skybox cube
+    glBindVertexArray(m_SkyBoxVAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapShader.ID);
-    glBindVertexArray(m_SkyBoxVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glDepthFunc(GL_LESS); // set depth function back to default
-
 }
 
 int SkyBox::setCubeMapTexture(std::vector<std::string> v)
@@ -212,8 +211,6 @@ int SkyBox::setCubeMapTexture(std::string s)
         };
 
         glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(m_Vertices), &m_Vertices[0], GL_STATIC_DRAW);
-
-
     }
     return 0;
 }

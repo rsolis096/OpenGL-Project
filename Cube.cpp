@@ -10,7 +10,8 @@ Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Ob
     //Open and load diffuse map and specular map, save their Cubes
     m_DiffuseMap = new Texture(texturePathDiffuse, false, "texture_diffuse");
     m_SpecularMap = new Texture(texturePathSpecular, false, "texture_specular");
-    m_ObjectID = "Cube" + std::to_string(cubeCount);
+    m_DisplayName = "Cube" + std::to_string(cubeCount);
+    m_ObjectID = cubeCount;
     cubeCount++;
     //Build the specified Cube type
     buildCube();
@@ -20,7 +21,8 @@ Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Ob
 Cube::Cube() : Object()
 {
     m_hasTexture = false;
-    m_ObjectID = "Cube" + std::to_string(cubeCount);
+    m_DisplayName = "Cube" + std::to_string(cubeCount);
+    m_ObjectID = cubeCount;
     buildCube();
     cubeCount++;
 }
