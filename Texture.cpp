@@ -189,7 +189,7 @@ int Texture::updateTexture(const char* filePath, bool flipOnY)
         stbi_image_free(data);
         return 0;
     }
-
+    glCheckError();
     std::cout << "Failed to load texture. Please verify filepath: " << filePath << std::endl;
     stbi_image_free(data);
     return 1;

@@ -19,7 +19,8 @@ struct DirLight {
 };
 
 struct PointLight {
-    vec3 position;   
+    vec3 position;  
+    float padding;
     float constant;
     float linear;
     float quadratic;	
@@ -70,12 +71,15 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
+uniform float textureScale;  // Scaling factor for texture coordinates
+vec2 scaledTexCoords;
 void main()
 {
     
     // properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
+    scaledTexCoords = TexCoords * textureScale;
     
 
     //TO DO: PUT THESE RESULTS IN IF STATEMENTS DEPENDING ON WHICH LIGHT IS ON
@@ -119,9 +123,9 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     if(hasTexture)
     {              
         //Calculate Ambient, Diffuse, Specular
-        ambientColor = light.ambient * vec3(texture(texture_diffuse1, TexCoords)); 
-        diffuseColor = light.diffuse * lambertian * vec3(texture(texture_diffuse1, TexCoords)) * object.diffuse;
-        specularColor = light.specular * specular * vec3(texture(texture_specular1, TexCoords));
+        ambientColor = light.ambient * vec3(texture(texture_diffuse1, scaledTexCoords)); 
+        diffuseColor = light.diffuse * lambertian * vec3(texture(texture_diffuse1, scaledTexCoords)) * object.diffuse;
+        specularColor = light.specular * specular * vec3(texture(texture_specular1, scaledTexCoords));
     }
 
     //Apply attenuation
@@ -171,14 +175,14 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     if(hasTexture)
     {
         //Calculate Ambient
-        ambientColor = light.ambient * vec3(texture(texture_diffuse1, TexCoords));
+        ambientColor = light.ambient * vec3(texture(texture_diffuse1, scaledTexCoords));
 
         // Calculate the diffuse component
         float diff = max(dot(Normal, lightDir), 0.0);
-        diffuseColor = light.diffuse * vec3(texture(texture_diffuse1, TexCoords)) * (lambertian * spotFactor) * object.diffuse;
+        diffuseColor = light.diffuse * vec3(texture(texture_diffuse1, scaledTexCoords)) * (lambertian * spotFactor) * object.diffuse;
 
         // Calculate the specular component
-        specularColor = light.specular * vec3(texture(texture_specular1, TexCoords)) * (specular * spotFactor);
+        specularColor = light.specular * vec3(texture(texture_specular1, scaledTexCoords)) * (specular * spotFactor);
 
     }
 
@@ -213,9 +217,9 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     if(hasTexture)
     {          
         //Calculate Ambient, Diffuse, Specular
-        ambientColor = light.ambient * vec3(texture(texture_diffuse1, TexCoords)); 
-        diffuseColor = light.diffuse * lambertian * vec3(texture(texture_diffuse1, TexCoords)) * object.diffuse;
-        specularColor = light.specular * specular * vec3(texture(texture_specular1, TexCoords));
+        ambientColor = light.ambient * vec3(texture(texture_diffuse1, scaledTexCoords)); 
+        diffuseColor = light.diffuse * lambertian * vec3(texture(texture_diffuse1, scaledTexCoords)) * object.diffuse;
+        specularColor = light.specular * specular * vec3(texture(texture_specular1, scaledTexCoords));
     }
 
     //return contribution

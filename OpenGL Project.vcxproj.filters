@@ -235,5 +235,8 @@
     <ClInclude Include="SkyBox.h">
       <Filter>Header Files\World</Filter>
     </ClInclude>
+    <ClInclude Include="DebugUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

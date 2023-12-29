@@ -35,6 +35,7 @@ void Plane::Draw(Shader& shader)
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
     shader.setMat4("model", m_Model);
+    shader.setFloat("textureScale", (float)(50.0f));
 
     //Bind texture and send texture to fragment shader
     if (m_hasTexture)
@@ -61,6 +62,10 @@ void Plane::Draw(Shader& shader)
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glEnable(GL_CULL_FACE);//Disable then re-enable to show both sides of plane
+    shader.use();
+    shader.setFloat("textureScale", 1.0f);
+    glCheckError();
+
 }
 
 void Plane::buildPlane()

@@ -20,11 +20,11 @@ public:
 	PhysicsWorld* m_PhysicsWorld;
 
 	//Compile and link shaders
-	Shader cubeMapShader;
+	Shader* cubeMapShader;
 	//General Rasterized lighting
-	Shader lightingShader;
+	Shader* lightingShader;
 	//For objects that are also light sources
-	Shader pointLightShader;
+	Shader* pointLightShader;
 
 	// Scene Objects (All)
 	std::vector<Object*> m_SceneObjects;

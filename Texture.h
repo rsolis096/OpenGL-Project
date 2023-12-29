@@ -3,7 +3,7 @@
 #include "Vendors/stb_image.h"
 #include "Vendors/stb_image_write.h"
 
-#include <glad/glad.h>
+#include "Camera.h" //glad
 #include <vector>
 #include <iostream>
 #include <string>

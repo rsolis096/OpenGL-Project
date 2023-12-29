@@ -1,7 +1,6 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include <glad/glad.h> // holds all OpenGL type declarations
 #include "Shader.h"
 #include "Texture.h"
 #include "Vertex.h"

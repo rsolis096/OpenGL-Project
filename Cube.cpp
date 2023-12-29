@@ -43,6 +43,15 @@ void Cube::Draw(Shader& shader)
         glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
 
+        GLint diffuseLocation = glGetUniformLocation(shader.ID, "texture_diffuse1");
+        GLint specularLocation = glGetUniformLocation(shader.ID, "texture_specular1");
+
+        if (diffuseLocation != -1)
+            glUniform1i(diffuseLocation, 0); // 0 corresponds to GL_TEXTURE0
+
+        if (specularLocation != -1)
+            glUniform1i(specularLocation, 1); // 1 corresponds to GL_TEXTURE1
+
         shader.use();
         shader.setBool("hasTexture", true);
     }
@@ -60,7 +69,7 @@ void Cube::Draw(Shader& shader)
     // Unbind buffers and reset state
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
-
+    glCheckError();
 }
 
 void Cube::buildCube()

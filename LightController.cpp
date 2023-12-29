@@ -7,11 +7,13 @@ LightController::LightController
 	m_LightingShader = lightingShader;
 	m_ObjectShader = objectShader;
 	m_PlayerCamera = cam;
+	glCheckError();
 }
 
 void LightController::addPointLight()
 {
 	m_PointLights.push_back(new PointLight(m_LightingShader, m_ObjectShader, *m_PlayerCamera));
+	glCheckError();
 }
 
 void LightController::removePointLight()
@@ -35,5 +37,4 @@ void LightController::drawLighting(glm::mat4 view, glm::mat4 projection)
 		spotLights->renderLight();
 
 	m_WordLight->renderLight();
-
 }

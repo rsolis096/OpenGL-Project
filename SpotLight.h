@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <vector>
-#include <glad/glad.h>
 #include "Object.h"
 #include "Shader.h"
 #include "Camera.h"

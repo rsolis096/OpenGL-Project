@@ -64,6 +64,7 @@ void Sphere::Draw(Shader& shader)
     // Unbind buffers and reset state
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+    glCheckError();
 
 }
 

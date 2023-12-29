@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <vector>
-#include <glad/glad.h>
 #include "Model.h"
 #include "Cube.h"
 #include "Shader.h"
@@ -35,8 +34,8 @@ class PointLight
 
 	private:
 		//Shaders (for lighting and for light object itself
-		Shader m_ObjectShader;
-		Shader m_lightingShader;
+		Shader& m_ObjectShader;
+		Shader& m_lightingShader;
 
 		//Light Object (light is not invisible)
 		Cube* m_LightShape;

@@ -14,58 +14,57 @@ SkyBox::SkyBox(Shader& s, Camera* c) : m_CubeMapShader(s), m_PlayerCamera(c)
 
     m_Vertices = {
         // positions          
-        -10.0f,  10.0f, -10.0f,
-        -10.0f, -10.0f, -10.0f,
-         10.0f, -10.0f, -10.0f,
-         10.0f, -10.0f, -10.0f,
-         10.0f,  10.0f, -10.0f,
-        -10.0f,  10.0f, -10.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
 
-        -10.0f, -10.0f,  10.0f,
-        -10.0f, -10.0f, -10.0f,
-        -10.0f,  10.0f, -10.0f,
-        -10.0f,  10.0f, -10.0f,
-        -10.0f,  10.0f,  10.0f,
-        -10.0f, -10.0f,  10.0f,
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
 
-         10.0f, -10.0f, -10.0f,
-         10.0f, -10.0f,  10.0f,
-         10.0f,  10.0f,  10.0f,
-         10.0f,  10.0f,  10.0f,
-         10.0f,  10.0f, -10.0f,
-         10.0f, -10.0f, -10.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
 
-        -10.0f, -10.0f,  10.0f,
-        -10.0f,  10.0f,  10.0f,
-         10.0f,  10.0f,  10.0f,
-         10.0f,  10.0f,  10.0f,
-         10.0f, -10.0f,  10.0f,
-        -10.0f, -10.0f,  10.0f,
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
 
-        -10.0f,  10.0f, -10.0f,
-         10.0f,  10.0f, -10.0f,
-         10.0f,  10.0f,  10.0f,
-         10.0f,  10.0f,  10.0f,
-        -10.0f,  10.0f,  10.0f,
-        -10.0f,  10.0f, -10.0f,
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
 
-        -10.0f, -10.0f, -10.0f,
-        -10.0f, -10.0f,  10.0f,
-         10.0f, -10.0f, -10.0f,
-         10.0f, -10.0f, -10.0f,
-        -10.0f, -10.0f,  10.0f,
-         10.0f, -10.0f,  10.0f
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
     };
 
     glGenVertexArrays(1, &m_SkyBoxVAO);
     glGenBuffers(1, &m_SkyBoxVBO);
     glBindVertexArray(m_SkyBoxVAO);
     glBindBuffer(GL_ARRAY_BUFFER, m_SkyBoxVBO);
-    glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(m_Vertices), &m_Vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(float), m_Vertices.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-    //Texture map(m_Faces);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+    glCheckError();
     m_CubeMap = new Texture(m_Faces);
 }
 
@@ -76,7 +75,7 @@ SkyBox::~SkyBox()
     glDeleteBuffers(1, &m_SkyBoxVBO);
 }
 
-void SkyBox::draw(glm::mat4 projection)
+void SkyBox::draw(glm::mat4& projection)
 {
     // draw skybox as last
     glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
@@ -87,9 +86,11 @@ void SkyBox::draw(glm::mat4 projection)
     // skybox cube
     glBindVertexArray(m_SkyBoxVAO);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapShader.ID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMap->ID);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
     glDepthFunc(GL_LESS); // set depth function back to default
+    glCheckError();
 }
 
 int SkyBox::setCubeMapTexture(std::vector<std::string> v)
@@ -157,60 +158,6 @@ int SkyBox::setCubeMapTexture(std::string s)
         delete m_CubeMap;
         m_CubeMap = nullptr;
         m_CubeMap = new Texture(s);
-
-        m_Vertices = {
-            // positions  
-       
-            //Front
-            -10.0f,  10.0f, -10.0f,
-            -10.0f, -10.0f, -10.0f,
-             10.0f, -10.0f, -10.0f,
-             10.0f, -10.0f, -10.0f,
-             10.0f,  10.0f, -10.0f,
-            -10.0f,  10.0f, -10.0f,
-
-            //Right
-            -10.0f, -10.0f,  10.0f,
-            -10.0f, -10.0f, -10.0f,
-            -10.0f,  10.0f, -10.0f,
-            -10.0f,  10.0f, -10.0f,
-            -10.0f,  10.0f,  10.0f,
-            -10.0f, -10.0f,  10.0f,
-
-             //Left
-             10.0f, -10.0f, -10.0f,
-             10.0f, -10.0f,  10.0f,
-             10.0f,  10.0f,  10.0f,
-             10.0f,  10.0f,  10.0f,
-             10.0f,  10.0f, -10.0f,
-             10.0f, -10.0f, -10.0f,
-
-             //Back
-            -10.0f, -10.0f,  10.0f,
-            -10.0f,  10.0f,  10.0f,
-             10.0f,  10.0f,  10.0f,
-             10.0f,  10.0f,  10.0f,
-             10.0f, -10.0f,  10.0f,
-            -10.0f, -10.0f,  10.0f,
-
-            //Top
-            -10.0f,  10.0f, -10.0f,
-             10.0f,  10.0f, -10.0f,
-             10.0f,  10.0f,  10.0f,
-             10.0f,  10.0f,  10.0f,
-            -10.0f,  10.0f,  10.0f,
-            -10.0f,  10.0f, -10.0f,
-
-            //Bottom
-            -10.0f, -10.0f, -10.0f,
-            -10.0f, -10.0f,  10.0f,
-             10.0f, -10.0f, -10.0f,
-             10.0f, -10.0f, -10.0f,
-            -10.0f, -10.0f,  10.0f,
-             10.0f, -10.0f,  10.0f
-        };
-
-        glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(m_Vertices), &m_Vertices[0], GL_STATIC_DRAW);
     }
     return 0;
 }

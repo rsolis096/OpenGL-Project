@@ -6,7 +6,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     std::string fragmentCode;
     std::ifstream vShaderFile(vertexPath);
     std::ifstream fShaderFile(fragmentPath);
-
+    glCheckError();
     vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try
@@ -29,33 +29,40 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 
     const char* vShaderCode = vertexCode.c_str();
     const char* fShaderCode = fragmentCode.c_str();
-
+    glCheckError();
     //Create vertex shader object
     unsigned int vertexShader; //initialize vertex shader reference id
     vertexShader = glCreateShader(GL_VERTEX_SHADER); //Create shader of type GL_VERTEX_SHADER
     glShaderSource(vertexShader, 1, &vShaderCode, NULL); //Attach shader to shader source code
     glCompileShader(vertexShader); //Compile vertexShader
-
+    glCheckError();
     //Create fragmentShader object
     unsigned int fragmentShader; //initialize fragment shader reference id
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER); //Create shader of type GL_FRAGMENT_SHADER
     glShaderSource(fragmentShader, 1, &fShaderCode, NULL); //Attach shader to shader source code
     glCompileShader(fragmentShader); //compile fragmentShader
-
+    glCheckError();
     //To use the recently compiled shaders we have to link them to a shader program object and then activate this shader program
     //Links output of vertex shader to input of fragment shader
     ID = glCreateProgram();
     glAttachShader(ID, vertexShader); //Attach compiled shader object (vertexShader) to a shader program (shaderProgram)
+    glCheckError();
+
     glAttachShader(ID, fragmentShader); //Attach compiled shader object (fragmentShader) to a shader program (shaderProgram)
+    glCheckError();
+
     glLinkProgram(ID); //Link the two shaders, order matters. Always attach vertex shader before fragment shader to match rendering pipeline
-
+    glCheckError();
     checkCompileErrors(vertexShader, "VERTEX");
+    glCheckError();
     checkCompileErrors(fragmentShader, "FRAGMENT");
+    glCheckError();
     checkCompileErrors(ID, "PROGRAM");
-
+    glCheckError();
     //The vertexShader and fragmentShader shader objects are already linked to the program object. Its ok to delete them.
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+    glCheckError();
 }
 
 Shader::Shader()
@@ -71,24 +78,33 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
 {
     int  success;
     char infoLog[512];
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success); //Check compilation success
-    glGetShaderInfoLog(shader, 512, NULL, infoLog); //If error message exists, write it to infoLog
 
+    //CHeck the compilation of the shaders
+    //This essentially checks for syntax errors like missing semi-colons in the fragment and vertex shaders
     if (type != "PROGRAM")
     {
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &success); //Check compilation success
+        glGetShaderInfoLog(shader, 512, NULL, infoLog); //If error message exists, write it to infoLog
+
         if (!success)
         {
-            std::cout << "SHADER::"<<type<<"::COMPILATION_FAILED\n" << infoLog << std::endl;
-        }
-    }
-    //Check for linking success
-    else if(type == "PROGRAM")
-    {
-        if (!success) {
-            std::cout << "Shader Linking Failed: " << infoLog << std::endl;
+            std::cout << "SHADER::" << type << "::COMPILATION_FAILED\n" << infoLog << std::endl;
         }
     }
 
+    //Check for linking success
+    //Linking is the process of combining the two shaders into the rendering pipeline
+    //Linking ensures the output of one shader stages matches the input of the next
+    //Just because compilation succeeded does not imply Linking will also succeed
+    else if (type == "PROGRAM")
+    {
+        glGetProgramiv(shader, GL_LINK_STATUS, &success);
+        glGetProgramInfoLog(shader, 512, NULL, infoLog);
+
+        if (!success) {
+            std::cout << "Program Linking Failed: " << infoLog << std::endl;
+        }
+    }
 }
 
 

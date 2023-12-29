@@ -8,11 +8,22 @@ Scene::Scene()
 	m_LightController = nullptr;
 
 	//Compile and link shaders
-	cubeMapShader = Shader("cubeMapShader.vert", "cubeMapShader.frag");
+	cubeMapShader = new Shader("cubeMapShader.vert", "cubeMapShader.frag");
+	glCheckError();
+
 	//General Rasterized lighting
-	lightingShader = Shader("lightingShader.vert", "lightingShader.frag");
+	lightingShader = new Shader("lightingShader.vert", "lightingShader.frag");
+	glCheckError();
+
 	//For objects that are also light sources
-	pointLightShader = Shader("pointLightShader.vert", "pointLightShader.frag");
+	pointLightShader = new Shader("pointLightShader.vert", "pointLightShader.frag");
+	glCheckError();
+
+
+	m_PhysicsWorld = new PhysicsWorld();
+
+	glCheckError();
+
 }
 
 Scene::Scene(Camera* mC)
@@ -23,13 +34,16 @@ Scene::Scene(Camera* mC)
 	m_LightController = nullptr;
 
 	//Compile and link shaders
-	cubeMapShader = Shader("cubeMapShader.vert", "cubeMapShader.frag");
+	cubeMapShader = new Shader("cubeMapShader.vert", "cubeMapShader.frag");
 	//General Rasterized lighting
-	lightingShader = Shader("lightingShader.vert", "lightingShader.frag");
+	glCheckError();
+	lightingShader = new Shader("lightingShader.vert", "lightingShader.frag");
 	//For objects that are also light sources
-	pointLightShader = Shader("pointLightShader.vert", "pointLightShader.frag");
-
+	glCheckError();
+	pointLightShader = new Shader("pointLightShader.vert", "pointLightShader.frag");
+	glCheckError();
 	m_PhysicsWorld = new PhysicsWorld();
+	glCheckError();
 }
 
 
@@ -79,7 +93,7 @@ void Scene::createLightController()
 {
 	if (m_LightController != nullptr)
 		removeLightController();
-	m_LightController = new LightController(lightingShader, pointLightShader, mainCamera);;
+	m_LightController = new LightController(*lightingShader, *pointLightShader, mainCamera);;
 }
 
 //Add a LightController to the scene
@@ -107,10 +121,10 @@ void Scene::drawScene(glm::mat4 projection, float deltaTime)
 		}
 		if (typeid(element).name()[0] == 'M')
 		{
-			element->Draw(lightingShader);
+			element->Draw(*lightingShader);
 		}
 		if (typeid(element).name()[0] != 'M')
-			element->Draw(lightingShader);
+			element->Draw(*lightingShader);
 	}
 
 	//Draw Lights

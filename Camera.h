@@ -1,12 +1,11 @@
-//Matrix Multiplication
 #pragma once
 
-#include <glad/glad.h>
+//#include <glad/glad.h>
+#include "DebugUtils.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 #include <vector>
-
 
 
 class Camera

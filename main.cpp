@@ -1,10 +1,10 @@
-#include <glad/glad.h> //Opengl functions
+//#include <glad/glad.h> //Opengl functions
+#include "DebugUtils.h"
 #include <GLFW/glfw3.h> //Window functions
 
 #include "Vendors/imgui/imgui.h"
 #include "Vendors/imgui/imgui_impl_glfw.h"
 #include "Vendors/imgui/imgui_impl_opengl3.h"
-
 
 #include <iostream>
 #include "Shader.h"
@@ -230,33 +230,58 @@ int main()
     }
     glEnable(GL_DEPTH_TEST);
     //Gamma Correction
-    glEnable(GL_FRAMEBUFFER_SRGB);
+    //glEnable(GL_FRAMEBUFFER_SRGB);
     //Enable this to only render front facing polygons (for performance)
     glEnable(GL_CULL_FACE);
 
     //Defaults, not needed to be specified (just for reference)
     //glCullFace(GL_BACK);
     //glFrontFace(GL_CCW);
+    glCheckError();
 
     Scene myScene(myCamera);
+    glCheckError();
     //Create Scene Manager and some default objects
-    myScene.addObject(new Model("resources/objects/dragon/dragon.obj"));
+    //myScene.addObject(new Model("resources/objects/dragon/dragon.obj"));
     myScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
+    glCheckError();
+
     myScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
+    glCheckError();
+
     myScene.addObject(new Plane("Assets/woodparquet_93_basecolor-2K.png", "Assets/woodparquet_93_basecolor-2K.png"));
+    glCheckError();
+
+    myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[0]);
+    glCheckError();
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[1]);
+    glCheckError();
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[2]);
-    myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[3]);
+    glCheckError();
     myScene.createLightController();
+    glCheckError();
+
     myScene.m_LightController->addPointLight();
-    myScene.m_LightController->addPointLight();
+    glCheckError();
+
     myScene.m_LightController->addSpotLight();
-    myScene.m_LightController->m_PointLights[0]->setLightPos(glm::vec3(-51.0f, -51.0f, -5.0f));
-    myScene.m_LightController->m_PointLights[1]->setLightPos(glm::vec3(1.0f, 5.0f, 0.0f));
+    glCheckError();
+
+    myScene.m_LightController->m_PointLights[0]->setLightPos(glm::vec3(-4.0f, 7.0f, 2.0f));
+    glCheckError();
+
+    myScene.m_SceneObjects[0]->setPosition(glm::vec3(1.0f));
+    glCheckError();
+
+    myScene.m_SceneObjects[1]->setPosition(glm::vec3(1.0f, 4.0f, -3.0f));
+    glCheckError();
+
+    myScene.m_SceneObjects[2]->setScale(glm::vec3(100.0f));
+    glCheckError();
 
     //Create the SkyBox
-    SkyBox* mySkyBox = new SkyBox(myScene.cubeMapShader, myCamera);
-    mySkyBox->setCubeMapTexture("Assets/skybox/rocky_ridge_puresky2.png");
+    SkyBox* mySkyBox = new SkyBox(*myScene.cubeMapShader, myCamera);
+    //mySkyBox->setCubeMapTexture("Assets/skybox/rocky_ridge_puresky2.png");
 
     //Initialize the GUI
     GUI myGUI(window, myScene);
@@ -291,14 +316,19 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-        myScene.lightingShader.use();
-        myScene.lightingShader.setVec3("viewPos", myCamera->cameraPos);
+        myScene.lightingShader->use();
+        myScene.lightingShader->setVec3("viewPos", myCamera->cameraPos);
         // Update the camera
-        updateCamera(myScene.lightingShader, view, projection);
+        updateCamera(*myScene.lightingShader, view, projection);
         //Draw Scene
+        glCheckError();
+
         myScene.drawScene(projection, deltaTime);
+        glCheckError();
+
         //Draw SkyBox
         mySkyBox->draw(projection);
+        glCheckError();
 
         //GUI should always be drawn last
         myGUI.displayWindow();

@@ -12,6 +12,7 @@ DirectionalLight::DirectionalLight(Shader& lightingShader)
 	m_Diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	m_Specular = glm::vec3(0.5f, 0.5f, 0.5f);
 
+	glCheckError();
 
 }
 

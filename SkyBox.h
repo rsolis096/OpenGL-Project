@@ -14,7 +14,7 @@ public:
 	Shader m_CubeMapShader;
 	SkyBox(Shader&, Camera*);
 	~SkyBox();
-	void draw(glm::mat4);
+	void draw(glm::mat4&);
 	Texture* m_CubeMap;
 	int setCubeMapTexture(std::vector<std::string>);
 	int setCubeMapTexture(std::string);

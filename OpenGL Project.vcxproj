@@ -184,6 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="DebugUtils.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="LightController.h" />
