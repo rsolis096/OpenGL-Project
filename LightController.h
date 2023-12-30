@@ -24,6 +24,7 @@ public:
 
 	//Spot Light methods
 	void addSpotLight();
+	void addSpotLight(glm::vec3&, glm::vec3&);
 	void removeSpotLight();
 
 	void drawLighting(glm::mat4, glm::mat4);

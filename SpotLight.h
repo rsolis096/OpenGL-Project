@@ -6,10 +6,12 @@
 #include "Shader.h"
 #include "Camera.h"
 
+
 class SpotLight
 {
 public:
 	SpotLight(Shader& lightingShader, Camera& cam);
+	SpotLight(Shader& lightingShader, glm::vec3& pos, glm::vec3& dir);
 	void renderLight();
 	~SpotLight();
 
@@ -28,9 +30,12 @@ public:
 
 
 private:
-	Shader m_lightingShader;
-	Camera& playerCamera;
-	glm::vec3 m_LightPos;
+	Shader& m_lightingShader;
+	bool playerCamera;
+	static int spotLightCount;
+	int spotLightID;
+	glm::vec3& m_lightDirection;
+	glm::vec3& m_LightPos;
 
 	glm::vec3 m_Ambient;
 	glm::vec3 m_Diffuse;

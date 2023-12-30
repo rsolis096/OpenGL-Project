@@ -155,6 +155,12 @@
     <None Include="pointLightShader.vert" />
     <None Include="cubeMapShader.frag" />
     <None Include="cubeMapShader.vert" />
+    <None Include="debug_quad.vert" />
+    <None Include="debug_quad_depth.frag" />
+    <None Include="shadow_mapping.vert" />
+    <None Include="shadow_mapping.frag" />
+    <None Include="shadow_mapping_depth.vert" />
+    <None Include="shadow_mapping_depth.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">

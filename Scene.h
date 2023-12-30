@@ -46,4 +46,5 @@ public:
 	//void addShader(Shader&);
 
 	void drawScene(glm::mat4 projection, float deltaTime);
+	void drawScene(glm::mat4 projection, float deltaTime, Shader& shader);
 };

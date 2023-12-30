@@ -72,6 +72,23 @@ void Cube::Draw(Shader& shader)
     glCheckError();
 }
 
+void Cube::ShadowMapDraw(Shader& shader)
+{
+    shader.use();
+    shader.setMat4("model", m_Model);
+    shader.setBool("hasTexture", false);
+
+    //Bind Cube
+    glBindVertexArray(m_vao);
+    //Render
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    // Unbind buffers and reset state
+    glBindVertexArray(0);
+    glCheckError();
+}
+
+
 void Cube::buildCube()
 {
     //Pre Defined cube vertices, normals, and TexCoords
@@ -217,12 +234,11 @@ void Cube::buildCube()
     glGenBuffers(1, &m_vbo);
 
     //Assign vertices to Cube
-    glBindVertexArray(m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_InterleavedVertices.size(), m_InterleavedVertices.data(), GL_STATIC_DRAW);
 
     // Set up vertex attribute pointers (vertices, normals, texcoords)
-
+    glBindVertexArray(m_vao);
     //Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
     //Normal Attribute
@@ -236,8 +252,8 @@ void Cube::buildCube()
 
 
     // unbind VAO and VBOs
-    glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 int Cube::updateTexture(std::vector<std::string> texturePaths)

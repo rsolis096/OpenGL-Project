@@ -65,11 +65,30 @@ void Plane::Draw(Shader& shader)
     shader.use();
     shader.setFloat("textureScale", 1.0f);
     glCheckError();
+}
 
+void Plane::ShadowMapDraw(Shader& shader)
+{
+    //glDisable(GL_CULL_FACE);
+    shader.use();
+    shader.setMat4("model", m_Model);
+    shader.setFloat("textureScale", (float)(50.0f));
+    shader.setBool("hasTexture", false);
+    //Bind Plane
+    glBindVertexArray(m_vao);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    // Unbind buffers and reset state
+    glBindVertexArray(0);
+    //glEnable(GL_CULL_FACE);//Disable then re-enable to show both sides of plane
+    shader.use();
+    shader.setFloat("textureScale", 1.0f);
+    glCheckError();
 }
 
 void Plane::buildPlane()
 {
+    /*
     //Pre Defined cube vertices, normals, and TexCoords
     m_Vertices = {
 
@@ -103,8 +122,20 @@ void Plane::buildPlane()
         0.0f, 0.0f  // bottom-left   
     };
 
+    
     //Combine above mesh data
     buildInterleavedVerticesWithTexCoords();
+        */
+    m_InterleavedVertices = {
+        // positions            // normals         // texcoords
+         25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
+        -25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+        -25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+
+         25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
+        -25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+         25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,  25.0f, 25.0f
+    };
 
 
     //Generate VAO and VBO
@@ -132,7 +163,7 @@ void Plane::buildPlane()
 
     // unbind VAO and VBOs
     glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 int Plane::updateTexture(std::vector<std::string> texturePaths)

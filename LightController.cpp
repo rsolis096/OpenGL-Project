@@ -25,6 +25,11 @@ void LightController::addSpotLight()
 	m_SpotLights.push_back(new SpotLight(m_LightingShader, *m_PlayerCamera));
 }
 
+void LightController::addSpotLight(glm::vec3& pos, glm::vec3& dir)
+{
+	m_SpotLights.push_back(new SpotLight(m_LightingShader, pos, dir));
+}
+
 void LightController::removeSpotLight()
 {
 }

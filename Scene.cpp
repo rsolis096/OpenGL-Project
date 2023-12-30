@@ -37,7 +37,8 @@ Scene::Scene(Camera* mC)
 	cubeMapShader = new Shader("cubeMapShader.vert", "cubeMapShader.frag");
 	//General Rasterized lighting
 	glCheckError();
-	lightingShader = new Shader("lightingShader.vert", "lightingShader.frag");
+	//lightingShader = new Shader("lightingShader.vert", "lightingShader.frag");
+	lightingShader = new Shader("shadow_mapping.vert", "shadow_mapping.frag");
 	//For objects that are also light sources
 	glCheckError();
 	pointLightShader = new Shader("pointLightShader.vert", "pointLightShader.frag");
@@ -130,3 +131,26 @@ void Scene::drawScene(glm::mat4 projection, float deltaTime)
 	//Draw Lights
 	m_LightController->drawLighting(mainCamera->GetViewMatrix(), projection);
 }
+
+void Scene::drawScene(glm::mat4 projection, float deltaTime, Shader& shader)
+{
+	//Update Scene Objects
+	for (auto& element : m_SceneObjects)
+	{
+		//m_PhysicsWorld->step(glfwGetTime(), deltaTime);
+		if (typeid(element).name()[0] == 'S')
+		{
+			element->translatePosition(glm::vec3(0.001f));
+		}
+		if (typeid(element).name()[0] == 'M')
+		{
+			element->Draw(shader);
+		}
+		if (typeid(element).name()[0] != 'M')
+			element->Draw(shader);
+	}
+
+	//Draw Lights
+	m_LightController->drawLighting(mainCamera->GetViewMatrix(), projection);
+}
+

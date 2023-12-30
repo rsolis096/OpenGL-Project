@@ -50,37 +50,17 @@ m_lightingShader(lightingShader), m_ObjectShader(objectShader)
 
 	//Set these properties in the lightingShader.frag, this is used when rendering all objects
 	//These do not need to change every draw call
-	glCheckError();
 
 	m_lightingShader.use();
-	glCheckError();
-
 	m_lightingShader.setFloat("material.shininess", 128.0f);
-	glCheckError();
-
 	//These can be changed in a change color function to change the way the light color itself
 	m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].ambient", m_Ambient);
-	glCheckError();
-
 	m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].diffuse", m_Diffuse);
-	glCheckError();
-
 	m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].specular", m_Specular);
-	glCheckError();
-
-
 	m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].constant", m_Constant);
-	glCheckError();
-
 	m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].linear", m_Linear);
-	glCheckError();
-
 	m_lightingShader.setFloat("pointLights[" + std::to_string(lightID) + "].quadratic", m_Quadratic);
-	glCheckError();
-
 	m_lightingShader.setInt("numberOfPointLights", pointLightCount);
-	glCheckError();
-
 	m_lightingShader.setVec3("pointLights[" + std::to_string(lightID) + "].position", m_LightPos);
 	GLint positionLocation = glGetUniformLocation(m_lightingShader.ID, ("pointLights[" + std::to_string(lightID) + "].position").c_str());
 	if (positionLocation == -1) {

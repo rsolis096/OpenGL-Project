@@ -31,5 +31,5 @@ public:
     void setVec3(const std::string& name, float x, float y, float z) const;
 
 private:
-    void checkCompileErrors(unsigned int, std::string);
+    void checkCompileErrors(unsigned int, std::string, std::string);
 };
