@@ -69,64 +69,30 @@ void Plane::Draw(Shader& shader)
 
 void Plane::ShadowMapDraw(Shader& shader)
 {
+    std::cout << "Draw Plane" << std::endl;
     //glDisable(GL_CULL_FACE);
     shader.use();
+    m_Model = glm::mat4(1.0f);
     shader.setMat4("model", m_Model);
     shader.setFloat("textureScale", (float)(50.0f));
     shader.setBool("hasTexture", false);
     //Bind Plane
     glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
     //glEnable(GL_CULL_FACE);//Disable then re-enable to show both sides of plane
-    shader.use();
-    shader.setFloat("textureScale", 1.0f);
+    //shader.use();
+    //shader.setFloat("textureScale", 1.0f);
     glCheckError();
 }
 
 void Plane::buildPlane()
 {
-    /*
-    //Pre Defined cube vertices, normals, and TexCoords
-    m_Vertices = {
-
-        // Top face
-        -0.5f,  0.0f, -0.5f,  // top-left
-        0.5f,  0.0f,  0.5f,  // bottom-right
-        0.5f,  0.0f, -0.5f,   // top-right     
-        0.5f,  0.0f,  0.5f,  // bottom-right
-        -0.5f,  0.0f, -0.5f,   // top-left
-        -0.5f,  0.0f,  0.5f  // bottom-left  
-    };
-
-    m_Normals = {
-
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f
-    };
-
-    m_TexCoords = {
-
-       // Top face
-        0.0f, 1.0f, // top-left
-        1.0f, 0.0f, // bottom-right
-        1.0f, 1.0f, // top-right     
-        1.0f, 0.0f, // bottom-right
-        0.0f, 1.0f, // top-left
-        0.0f, 0.0f  // bottom-left   
-    };
-
     
-    //Combine above mesh data
-    buildInterleavedVerticesWithTexCoords();
-        */
-    m_InterleavedVertices = {
+    //Pre Defined cube vertices, normals, and TexCoords
+    float planeVertices[] = {
         // positions            // normals         // texcoords
          25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
         -25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
@@ -138,27 +104,18 @@ void Plane::buildPlane()
     };
 
 
-    //Generate VAO and VBO
     glGenVertexArrays(1, &m_vao);
     glGenBuffers(1, &m_vbo);
-
-    //Assign vertices to Plane
     glBindVertexArray(m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_InterleavedVertices.size(), m_InterleavedVertices.data(), GL_STATIC_DRAW);
-
-    // Set up vertex attribute pointers (vertices, normals, texcoords)
-    
-    //Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
-    //Normal Attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 3));
-    //TexCoord Attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 6));
-
+    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glBindVertexArray(0);
 
 
     // unbind VAO and VBOs

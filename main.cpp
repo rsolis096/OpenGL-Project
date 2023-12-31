@@ -287,9 +287,6 @@ void RenderScene(Shader& shader)
 {
     // floor
     glm::mat4 model = glm::mat4(1.0f);
-    shader.setMat4("model", model);
-    glBindVertexArray(planeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
     // cubes
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0));
@@ -389,7 +386,7 @@ int main()
     //myScene.addObject(new Model("resources/objects/dragon/dragon.obj"));
     myScene.addObject(new Cube());
     myScene.addObject(new Sphere());
-    myScene.addObject(new Plane("Assets/woodparquet_93_basecolor-2K.png", "Assets/woodparquet_93_basecolor-2K.png"));
+    myScene.addObject(new Plane());
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[0]);
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[1]);
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[2]);    
@@ -400,9 +397,9 @@ int main()
     glm::vec3 spotLightDir = glm::vec3(0.0f, 0.0f, 0.0f);
     myScene.m_LightController->addSpotLight(spotLightPos, spotLightDir);
     //myScene.m_LightController->m_PointLights[0]->setLightPos(glm::vec3(-31.0f, 9.0f, 26.0f));
-    myScene.m_SceneObjects[0]->setPosition(glm::vec3(0.0f, 1.5f, 0.0));
+    myScene.m_SceneObjects[0]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
     myScene.m_SceneObjects[0]->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
-    myScene.m_SceneObjects[1]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
+    myScene.m_SceneObjects[1]->setPosition(glm::vec3(0.0f, 1.5f, 0.0));
     //myScene.m_SceneObjects[2]->setScale(glm::vec3(1000.0f));
     //myScene.m_SceneObjects[2]->setPosition(glm::vec3(0.0f,-0.5,0.0f));
 
@@ -427,7 +424,7 @@ int main()
     // configure depth map FBO
     // -----------------------
     Texture woodTexture("Assets/woodparquet_93_basecolor-2K.png", false, "shadow");
-    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    const unsigned int SHADOW_WIDTH = 1024*2, SHADOW_HEIGHT = 1024*2;
     unsigned int depthMapFBO;
     glGenFramebuffers(1, &depthMapFBO);
     // create depth texture
@@ -437,28 +434,16 @@ int main()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     // attach depth texture as FBO's depth buffer
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    //Make the floor
-    glGenVertexArrays(1, &planeVAO);
-    glGenBuffers(1, &planeVBO);
-    glBindVertexArray(planeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glBindVertexArray(0);
 
     // shader configuration
     // --------------------
@@ -501,11 +486,11 @@ int main()
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, woodTexture.ID);
-        for (Object* obj : myScene.m_SceneObjects)
-            obj->ShadowMapDraw(simpleDepthShader);
-        RenderScene(simpleDepthShader);
+        glCullFace(GL_FRONT);
+        myScene.m_SceneObjects[2]->ShadowMapDraw(simpleDepthShader);
+        myScene.m_SceneObjects[0]->ShadowMapDraw(simpleDepthShader);
+        myScene.m_SceneObjects[1]->ShadowMapDraw(simpleDepthShader);
+        glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glCheckError();
    
@@ -525,18 +510,21 @@ int main()
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, woodTexture.ID);
-        //GLint diffuseLocation = glGetUniformLocation(shader.ID, "diffuseTexture");
-        //glUniform1i(diffuseLocation, 0); // 0 corresponds to GL_TEXTURE0
+        GLint diffuseLocation = glGetUniformLocation(shader.ID, "diffuseTexture");
+        glUniform1i(diffuseLocation, 0); // 0 corresponds to GL_TEXTURE0
 
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, depthMap);
-        //GLint specularLocation = glGetUniformLocation(shader.ID, "shadowMap");
-        //glUniform1i(specularLocation, 1); // 1 corresponds to GL_TEXTURE1
+        GLint specularLocation = glGetUniformLocation(shader.ID, "shadowMap");
+        glUniform1i(specularLocation, 1); // 1 corresponds to GL_TEXTURE1
 
         glCheckError();
-        RenderScene(shader);
-        for (Object* obj : myScene.m_SceneObjects)
-            obj->ShadowMapDraw(shader);
+
+        //PLANE MUST BE RENDERED FIRST
+        myScene.m_SceneObjects[2]->ShadowMapDraw(shader);
+        myScene.m_SceneObjects[0]->ShadowMapDraw(shader);
+        myScene.m_SceneObjects[1]->ShadowMapDraw(shader);
+
         //myScene.drawScene(projection, deltaTime, shader);
         
 
@@ -549,8 +537,10 @@ int main()
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, depthMap);
         updateCamera(debugDepthQuad, view, projection);
-        renderQuad();
+        RenderQuad();
         */
+
+        mySkyBox->draw(projection);
 
         //GUI should always be drawn last
         myGUI.displayWindow();
