@@ -36,6 +36,7 @@ void Sphere::Draw(Shader& shader)
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
     shader.setMat4("model", m_Model);
+    m_hasTexture = false;
 
     //Bind texture and send texture to fragment shader
     if (m_hasTexture)

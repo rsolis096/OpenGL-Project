@@ -80,8 +80,8 @@ uniform bool hasTexture;
 
 
 // function prototypes
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+//vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
+//vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 uniform float textureScale;  // Scaling factor for texture coordinates
@@ -127,7 +127,7 @@ void main()
     // properties
     vec3 norm = normalize(fs_in.Normal);
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
-    scaledTexCoords = fs_in.TexCoords * textureScale;
+    scaledTexCoords = fs_in.TexCoords * 1;
     
 
     //TO DO: PUT THESE RESULTS IN IF STATEMENTS DEPENDING ON WHICH LIGHT IS ON
@@ -140,9 +140,9 @@ void main()
         //result += CalcPointLight(pointLights[i], norm, fs_in.FragPos, viewDir);           
     }
     //phase 3: spot light
-    for(int i = 0; i < numberOfSpotLights; i++)
+    //for(int i = 0; i < numberOfSpotLights; i++)
     {
-        result += CalcSpotLight(spotLights[i], norm, fs_in.FragPos, viewDir);           
+        result += CalcSpotLight(spotLights[0], norm, fs_in.FragPos, viewDir);           
     }
         
     FragColor = vec4(result, 1.0);
@@ -150,13 +150,12 @@ void main()
 }
 
 /*
-
 // calculates the color when using a point light.
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
 
     //Diffuse (Blinn Phong)
-    vec3 lightDir = normalize(light.position-fragPos);
+    vec3 lightDir = normalize(lightPos-fragPos);
     float lambertian = max(dot(normal, lightDir), 0.0);
     float specular = 0.0;
 
@@ -192,65 +191,44 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     return (ambientColor + diffuseColor + specularColor);
 
 }
+*/
 
 // calculates the color when using a spot light.
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
-    //Diffuse (Blinn Phong)
-    vec3 lightDir = normalize(light.position - fragPos);
-    float lambertian = max(dot(normal, lightDir), 0.0);
-    float specular = 0.0;
-
-    if(lambertian > 0.0f)
-    {
-        vec3 halfDir = normalize(lightDir + viewDir);
-        float specAngle = max(dot(halfDir, normal), 0.0);
-        specular = pow(specAngle, material.shininess);
-    }
-
-    // Calculate the spotlight direction
-    vec3 spotDir = normalize(light.direction);
-
-    // Calculate the spotlight factor based on cone angles
-    float spotAngle = dot(-lightDir, spotDir);
-    float spotFactor = smoothstep(light.outerCutOff, light.cutOff, spotAngle);
-
     //Calculate Ambient
-    vec3 ambientColor = light.ambient * object.diffuse;
+    vec3 ambientColor = light.ambient;
 
     // Calculate the diffuse component
-    float diff = max(dot(normal, lightDir), 0.0);
-    vec3 diffuseColor = light.diffuse * object.diffuse * (lambertian * spotFactor);
+    vec3 lightDir = normalize(lightPos - fs_in.FragPos);
+    float diff = max(dot(lightDir, fs_in.Normal), 0.0);
+    vec3 diffuseColor = diff * light.diffuse;
 
-    // Calculate the specular component
-    vec3 specularColor = light.specular * object.specular * (specular * spotFactor);
-
-    if(hasTexture)
-    {
-        //Calculate Ambient
-        ambientColor = light.ambient * vec3(texture(texture_diffuse1, scaledTexCoords));
-
-        // Calculate the diffuse component
-        float diff = max(dot(normal, lightDir), 0.0);
-        diffuseColor = light.diffuse * vec3(texture(texture_diffuse1, scaledTexCoords)) * (lambertian * spotFactor) * object.diffuse;
-
-        // Calculate the specular component
-        specularColor = light.specular * vec3(texture(texture_specular1, scaledTexCoords)) * (specular * spotFactor);
-
-    }
+    // Calculate specular component
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = 0.0;
+    vec3 halfwayDir = normalize(lightDir + viewDir);  
+    spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
+    vec3 specularColor = spec * light.specular;  
 
     // Calculate the attenuation factor
-    float distance = length(light.position - fragPos);
+    float distance = length(lightPos - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
+
     // calculate shadow
-    float shadow = ShadowCalculation(fs_in.FragPosLightSpace);                      
-    vec3 lighting = (ambientColor + (1.0 - shadow) * (diffuseColor + specularColor));    
+    float shadow = ShadowCalculation(fs_in.FragPosLightSpace, normal, lightDir);        //The object texture v 
+    
+    // Apply shadow to diffuse and specular components separately
+    vec3 diffuseWithShadow = (1.0 - shadow) * diffuseColor;
+    vec3 specularWithShadow = (1.0 - shadow) * specularColor;
+
+    vec3 lighting = (ambientColor + diffuseWithShadow + specularColor) * vec3(texture(diffuseTexture, scaledTexCoords));    
     
     return lighting * attenuation;
-    //return (ambientColor + diffuseColor + specularColor) * attenuation;
 }
 
+/*
 // calculates the color when using a directional light.
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 {

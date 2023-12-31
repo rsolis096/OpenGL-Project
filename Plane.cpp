@@ -69,7 +69,6 @@ void Plane::Draw(Shader& shader)
 
 void Plane::ShadowMapDraw(Shader& shader)
 {
-    std::cout << "Draw Plane" << std::endl;
     //glDisable(GL_CULL_FACE);
     shader.use();
     m_Model = glm::mat4(1.0f);

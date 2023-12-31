@@ -335,7 +335,7 @@ void RenderQuad()
 
 int main()
 {
-    glm::vec3 lightPos(-2.0f, 4.0f, -1.0f);
+    
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -392,14 +392,15 @@ int main()
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[2]);    
     myScene.createLightController();
     //myScene.m_LightController->addPointLight();
-    myScene.m_LightController->addSpotLight();
-    glm::vec3 spotLightPos = lightPos;
-    glm::vec3 spotLightDir = glm::vec3(0.0f, 0.0f, 0.0f);
+    //myScene.m_LightController->addSpotLight();
+    
+    glm::vec3 spotLightPos = glm::vec3(-2.0f, 25.0f, -1.0f);
+    glm::vec3 spotLightDir = glm::vec3(-2.0f, 0.0f, -1.0f);
     myScene.m_LightController->addSpotLight(spotLightPos, spotLightDir);
     //myScene.m_LightController->m_PointLights[0]->setLightPos(glm::vec3(-31.0f, 9.0f, 26.0f));
     myScene.m_SceneObjects[0]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
     myScene.m_SceneObjects[0]->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
-    myScene.m_SceneObjects[1]->setPosition(glm::vec3(0.0f, 1.5f, 0.0));
+    myScene.m_SceneObjects[1]->setPosition(glm::vec3(-2.0f, 0.0f, -1.0f));
     //myScene.m_SceneObjects[2]->setScale(glm::vec3(1000.0f));
     //myScene.m_SceneObjects[2]->setPosition(glm::vec3(0.0f,-0.5,0.0f));
 
@@ -463,6 +464,7 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
+        view = myCamera->GetViewMatrix();
         updateCamera(shader, view, projection);
         //Use this to get framerate info
         float currentFrame = glfwGetTime();
@@ -476,9 +478,10 @@ int main()
 
         // 1. render depth of scene to texture (from light's perspective)
         // --------------------------------------------------------------
-        float near_plane = 1.0f, far_plane = 7.5f;
-        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-        glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+        float near_plane = 1.0f, far_plane = 75.0f;
+        //glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        glm::mat4 lightProjection = glm::perspective<float>(glm::radians(90.0f), 1, near_plane, far_plane);
+        glm::mat4 lightView = glm::lookAt(spotLightPos, glm::normalize(spotLightDir), glm::vec3(0.0, 1.0, 0.0));
         glm::mat4 lightSpaceMatrix = lightProjection * lightView;
         // render scene from light's point of view
         simpleDepthShader.use();
@@ -494,18 +497,18 @@ int main()
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glCheckError();
    
+        
         // 2. render scene as normal using the generated depth/shadow map  
         // --------------------------------------------------------------
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
-        view = myCamera->GetViewMatrix();
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
 
         // set light uniforms
         shader.setVec3("viewPos", myCamera->cameraPos);
-        shader.setVec3("lightPos", lightPos);
+        shader.setVec3("lightPos", spotLightPos);
         shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
         glActiveTexture(GL_TEXTURE0);
@@ -524,8 +527,6 @@ int main()
         myScene.m_SceneObjects[2]->ShadowMapDraw(shader);
         myScene.m_SceneObjects[0]->ShadowMapDraw(shader);
         myScene.m_SceneObjects[1]->ShadowMapDraw(shader);
-
-        //myScene.drawScene(projection, deltaTime, shader);
         
 
         /*

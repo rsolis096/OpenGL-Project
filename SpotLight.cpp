@@ -36,10 +36,11 @@ SpotLight::SpotLight(Shader& lightingShader, Camera& cam) :
 SpotLight::SpotLight(Shader& lightingShader, glm::vec3& pos, glm::vec3& dir) : 
 	m_lightingShader(lightingShader), m_LightPos(pos), m_lightDirection(dir), playerCamera(false)
 {
+	m_lightDirection = -glm::normalize(dir - pos);
 	spotLightID = spotLightCount;
 	spotLightCount++;
 	//Light color properties
-	m_Ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_Ambient = glm::vec3(0.1f, 0.1f, 0.1f);
 	m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_Specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
@@ -70,7 +71,7 @@ void SpotLight::renderLight()
 	m_lightingShader.use();
 	m_lightingShader.setVec3("spotLights[" + std::to_string(spotLightID) + "].position", m_LightPos);
 	m_lightingShader.setVec3("spotLights[" + std::to_string(spotLightID) + "].direction", m_lightDirection);
-	//if(playerCamera)
+	if(playerCamera)
 		m_lightingShader.setVec3("viewPos", m_LightPos);
 }
 
