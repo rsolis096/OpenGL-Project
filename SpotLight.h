@@ -10,8 +10,8 @@
 class SpotLight
 {
 public:
-	SpotLight(Shader& lightingShader, Camera& cam);
-	SpotLight(Shader& lightingShader, glm::vec3& pos, glm::vec3& dir);
+	SpotLight(Shader* lightingShader, Camera& cam);
+	SpotLight(Shader* lightingShader, glm::vec3& pos, glm::vec3& dir);
 	void renderLight();
 	~SpotLight();
 
@@ -30,7 +30,7 @@ public:
 
 
 private:
-	Shader& m_lightingShader;
+	Shader* m_lightingShader;
 	bool playerCamera;
 	static int spotLightCount;
 	int spotLightID;

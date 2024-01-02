@@ -1,7 +1,7 @@
 #include "LightController.h"
 
 LightController::LightController
-(Shader& lightingShader, Shader& objectShader, Camera* cam)
+(Shader* lightingShader, Shader* objectShader, Camera* cam)
 	:m_WordLight(new DirectionalLight(lightingShader))
 {
 	m_LightingShader = lightingShader;

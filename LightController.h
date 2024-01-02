@@ -8,10 +8,10 @@
 class LightController
 {
 public:
-	LightController(Shader&, Shader&, Camera*);
+	LightController(Shader*, Shader*, Camera*);
 
-	Shader m_LightingShader; //How the light interacts with the world
-	Shader m_ObjectShader; //How the light source itself is drawn
+	Shader* m_LightingShader; //How the light interacts with the world
+	Shader* m_ObjectShader; //How the light source itself is drawn
 	Camera* m_PlayerCamera;
 
 	DirectionalLight* m_WordLight;

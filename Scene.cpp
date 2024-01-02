@@ -37,8 +37,7 @@ Scene::Scene(Camera* mC)
 	cubeMapShader = new Shader("cubeMapShader.vert", "cubeMapShader.frag");
 	//General Rasterized lighting
 	glCheckError();
-	//lightingShader = new Shader("lightingShader.vert", "lightingShader.frag");
-	lightingShader = new Shader("shadow_mapping.vert", "shadow_mapping.frag");
+	lightingShader = new Shader("lightingShader.vert", "lightingShader.frag");
 	//For objects that are also light sources
 	glCheckError();
 	pointLightShader = new Shader("pointLightShader.vert", "pointLightShader.frag");
@@ -94,7 +93,7 @@ void Scene::createLightController()
 {
 	if (m_LightController != nullptr)
 		removeLightController();
-	m_LightController = new LightController(*lightingShader, *pointLightShader, mainCamera);;
+	m_LightController = new LightController(lightingShader, pointLightShader, mainCamera);;
 }
 
 //Add a LightController to the scene

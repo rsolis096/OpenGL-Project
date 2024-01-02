@@ -283,29 +283,6 @@ void RenderCube()
     glBindVertexArray(0);
 }
 
-void RenderScene(Shader& shader)
-{
-    // floor
-    glm::mat4 model = glm::mat4(1.0f);
-    // cubes
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0));
-    model = glm::scale(model, glm::vec3(0.5f));
-    shader.setMat4("model", model);
-    RenderCube();
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(2.0f, 0.0f, 1.0));
-    model = glm::scale(model, glm::vec3(0.5f));
-    shader.setMat4("model", model);
-    RenderCube();
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 2.0));
-    model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
-    model = glm::scale(model, glm::vec3(0.25));
-    shader.setMat4("model", model);
-    RenderCube();
-}
-
 void RenderQuad()
 {
     if (quadVAO == 0)
@@ -375,7 +352,7 @@ int main()
     //Gamma Correction
     //glEnable(GL_FRAMEBUFFER_SRGB);
     //Enable this to only render front facing polygons (for performance)
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
     //ShadowMap Debugging Shaders
     Shader shader("shadow_mapping.vert", "shadow_mapping.frag");
@@ -394,13 +371,13 @@ int main()
     //myScene.m_LightController->addPointLight();
     //myScene.m_LightController->addSpotLight();
     
-    glm::vec3 spotLightPos = glm::vec3(-2.0f, 25.0f, -1.0f);
+    glm::vec3 spotLightPos = glm::vec3(-2.0f, 10.0f, -1.0f);
     glm::vec3 spotLightDir = glm::vec3(-2.0f, 0.0f, -1.0f);
     myScene.m_LightController->addSpotLight(spotLightPos, spotLightDir);
     //myScene.m_LightController->m_PointLights[0]->setLightPos(glm::vec3(-31.0f, 9.0f, 26.0f));
     myScene.m_SceneObjects[0]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
     myScene.m_SceneObjects[0]->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
-    myScene.m_SceneObjects[1]->setPosition(glm::vec3(-2.0f, 0.0f, -1.0f));
+    myScene.m_SceneObjects[1]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
     //myScene.m_SceneObjects[2]->setScale(glm::vec3(1000.0f));
     //myScene.m_SceneObjects[2]->setPosition(glm::vec3(0.0f,-0.5,0.0f));
 
@@ -448,9 +425,9 @@ int main()
 
     // shader configuration
     // --------------------
-    shader.use();
-    shader.setInt("diffuseTexture", 0);
-    shader.setInt("shadowMap", 1);
+    myScene.lightingShader->use();
+    myScene.lightingShader->setInt("diffuseTexture", 0);
+    myScene.lightingShader->setInt("shadowMap", 1);
     debugDepthQuad.use();
     debugDepthQuad.setInt("depthMap", 0);
     //***********************************************************************************************
@@ -459,13 +436,12 @@ int main()
     myScene.mainCamera = (myCamera);
     glCheckError();
 
-
     //Main loop
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
         view = myCamera->GetViewMatrix();
-        updateCamera(shader, view, projection);
+        updateCamera(*myScene.lightingShader, view, projection);
         //Use this to get framerate info
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -476,58 +452,58 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glCheckError();
 
+        //Shadow Pass
         // 1. render depth of scene to texture (from light's perspective)
-        // --------------------------------------------------------------
-        float near_plane = 1.0f, far_plane = 75.0f;
-        //glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-        glm::mat4 lightProjection = glm::perspective<float>(glm::radians(90.0f), 1, near_plane, far_plane);
+        float near_plane = 0.5f, far_plane = 80.0f;
+        //glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane); //For Directional Lighting (like the sun)
+        glm::mat4 lightProjection = glm::perspective<float>(glm::radians(45.0f), (float) SHADOW_WIDTH /SHADOW_HEIGHT, near_plane, far_plane);
         glm::mat4 lightView = glm::lookAt(spotLightPos, glm::normalize(spotLightDir), glm::vec3(0.0, 1.0, 0.0));
         glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-        // render scene from light's point of view
         simpleDepthShader.use();
         simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
         glCullFace(GL_FRONT);
-        myScene.m_SceneObjects[2]->ShadowMapDraw(simpleDepthShader);
-        myScene.m_SceneObjects[0]->ShadowMapDraw(simpleDepthShader);
-        myScene.m_SceneObjects[1]->ShadowMapDraw(simpleDepthShader);
+        myScene.m_SceneObjects[0]->Draw(simpleDepthShader);
+        myScene.m_SceneObjects[1]->Draw(simpleDepthShader);       
+        myScene.m_SceneObjects[2]->Draw(simpleDepthShader);
         glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glCheckError();
-   
+
         
-        // 2. render scene as normal using the generated depth/shadow map  
+        // 2. Lighting Pass
         // --------------------------------------------------------------
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shader.use();
-        shader.setMat4("projection", projection);
-        shader.setMat4("view", view);
+        myScene.lightingShader->use();
+        myScene.lightingShader->setMat4("projection", projection);
+        myScene.lightingShader->setMat4("view", view);
 
         // set light uniforms
-        shader.setVec3("viewPos", myCamera->cameraPos);
-        shader.setVec3("lightPos", spotLightPos);
-        shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+        myScene.lightingShader->setVec3("viewPos", myCamera->cameraPos);
+        myScene.lightingShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, woodTexture.ID);
-        GLint diffuseLocation = glGetUniformLocation(shader.ID, "diffuseTexture");
+        GLint diffuseLocation = glGetUniformLocation(myScene.lightingShader->ID, "diffuseTexture");
         glUniform1i(diffuseLocation, 0); // 0 corresponds to GL_TEXTURE0
 
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, depthMap);
-        GLint specularLocation = glGetUniformLocation(shader.ID, "shadowMap");
+        GLint specularLocation = glGetUniformLocation(myScene.lightingShader->ID, "shadowMap");
         glUniform1i(specularLocation, 1); // 1 corresponds to GL_TEXTURE1
 
         glCheckError();
 
         //PLANE MUST BE RENDERED FIRST
-        myScene.m_SceneObjects[2]->ShadowMapDraw(shader);
-        myScene.m_SceneObjects[0]->ShadowMapDraw(shader);
-        myScene.m_SceneObjects[1]->ShadowMapDraw(shader);
-        
+        myScene.m_SceneObjects[0]->Draw(*myScene.lightingShader);
+        myScene.m_SceneObjects[1]->Draw(*myScene.lightingShader);
+        myScene.m_SceneObjects[2]->Draw(*myScene.lightingShader);
+
+        myScene.m_LightController->m_SpotLights[0]->renderLight();
+
 
         /*
         // render Depth map to quad for visual debugging
@@ -552,6 +528,8 @@ int main()
     }
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
+
+
 
 
     //Delete everything
