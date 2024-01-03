@@ -8,8 +8,8 @@ Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Ob
     //Set some rendering properties
     m_hasTexture = true;
     //Open and load diffuse map and specular map, save their Cubes
-    m_DiffuseMap = new Texture(texturePathDiffuse, false, "texture_diffuse");
-    m_SpecularMap = new Texture(texturePathSpecular, false, "texture_specular");
+    m_DiffuseMap = new Texture(texturePathDiffuse, false, "material.diffuse");
+    m_SpecularMap = new Texture(texturePathSpecular, false, "material.diffuse");
     m_DisplayName = "Cube" + std::to_string(cubeCount);
     m_ObjectID = cubeCount;
     cubeCount++;
@@ -34,31 +34,24 @@ void Cube::Draw(Shader& shader)
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
     shader.setMat4("model", m_Model);
-
+    shader.setBool("hasTexture", m_hasTexture);
     //Bind texture and send texture to fragment shader
     if (m_hasTexture)
     {
-        glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
         glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
+        glActiveTexture(GL_TEXTURE2); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
 
-        GLint diffuseLocation = glGetUniformLocation(shader.ID, "texture_diffuse1");
-        GLint specularLocation = glGetUniformLocation(shader.ID, "texture_specular1");
+        GLint diffuseLocation = glGetUniformLocation(shader.ID, "material.diffuse");
+        GLint specularLocation = glGetUniformLocation(shader.ID, "material.specular");
 
         if (diffuseLocation != -1)
-            glUniform1i(diffuseLocation, 0); // 0 corresponds to GL_TEXTURE0
+            glUniform1i(diffuseLocation, 1); // 0 corresponds to GL_TEXTURE0
 
         if (specularLocation != -1)
-            glUniform1i(specularLocation, 1); // 1 corresponds to GL_TEXTURE1
+            glUniform1i(specularLocation, 2); // 1 corresponds to GL_TEXTURE1
 
-        shader.use();
-        shader.setBool("hasTexture", true);
-    }
-    else
-    {
-        shader.use();
-        shader.setBool("hasTexture", false);
     }
 
     //Bind Cube
@@ -68,9 +61,26 @@ void Cube::Draw(Shader& shader)
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    //glBindTexture(GL_TEXTURE_2D, 0);
     glCheckError();
 }
+
+void Cube::ShadowMapDraw(Shader& shader)
+{
+    shader.use();
+    shader.setMat4("model", m_Model);
+    shader.setBool("hasTexture", false);
+
+    //Bind Cube
+    glBindVertexArray(m_vao);
+    //Render
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    // Unbind buffers and reset state
+    glBindVertexArray(0);
+    glCheckError();
+}
+
 
 void Cube::buildCube()
 {
@@ -217,12 +227,11 @@ void Cube::buildCube()
     glGenBuffers(1, &m_vbo);
 
     //Assign vertices to Cube
-    glBindVertexArray(m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_InterleavedVertices.size(), m_InterleavedVertices.data(), GL_STATIC_DRAW);
 
     // Set up vertex attribute pointers (vertices, normals, texcoords)
-
+    glBindVertexArray(m_vao);
     //Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
     //Normal Attribute
@@ -236,8 +245,8 @@ void Cube::buildCube()
 
 
     // unbind VAO and VBOs
-    glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 int Cube::updateTexture(std::vector<std::string> texturePaths)

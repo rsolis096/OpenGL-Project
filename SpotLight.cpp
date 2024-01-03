@@ -1,15 +1,50 @@
 #include "SpotLight.h"
 
 bool firstFrame2 = true;
+int SpotLight::spotLightCount = 0;
 
-SpotLight::SpotLight(Shader& lightingShader, Camera& cam) : playerCamera(cam)
+
+SpotLight::SpotLight(Shader* lightingShader, Shader* objectShader, Camera& cam) :
+	m_lightingShader(lightingShader), m_ObjectShader(objectShader), m_LightPos(cam.cameraPos), m_lightDirection(cam.cameraFront), playerCamera(true)
 {
-	m_lightingShader = lightingShader;
-	//playerCamera = cam;
-	m_LightPos = playerCamera.cameraPos;
-
+	spotLightID = spotLightCount;
+	spotLightCount++;
+	m_LightShape = nullptr;
 	//Light color properties
 	m_Ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_Specular = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	//For Attenuation (defaults)
+	m_Constant = 1.0f;
+	m_Linear = 0.09f;
+	m_Quadratic = 0.032f;
+
+	m_lightingShader->use();
+	m_lightingShader->setInt("numberOfSpotLights", spotLightCount);
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].position", m_LightPos);
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].direction", m_lightDirection);
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].ambient", m_Ambient);
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].diffuse", m_Diffuse);
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].specular", m_Specular);
+	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].constant", m_Constant);
+	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].linear", m_Linear);
+	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].quadratic", m_Quadratic);
+	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].cutOff", glm::cos(glm::radians(12.5f)));
+	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].outerCutOff", glm::cos(glm::radians(15.0f)));;
+}
+
+SpotLight::SpotLight(Shader* lightingShader, Shader* objectShader, glm::vec3& pos, glm::vec3& dir) :
+	m_lightingShader(lightingShader), m_ObjectShader(objectShader), m_LightPos(pos), m_lightDirection(dir), playerCamera(false)
+{
+	m_lightDirection = glm::normalize(dir - pos);
+	spotLightID = spotLightCount;
+	spotLightCount++;
+	m_LightShape = new Sphere();
+	m_LightShape->setPosition(pos);
+	m_LightShape->setScale(glm::vec3(0.2f));
+	//Light color properties
+	m_Ambient = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_Specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
@@ -17,37 +52,36 @@ SpotLight::SpotLight(Shader& lightingShader, Camera& cam) : playerCamera(cam)
 	m_Constant = 1.0f;
 	m_Linear = 0.09f;
 	m_Quadratic = 0.032f;
+
+	m_lightingShader->use();
+	m_lightingShader->setInt("numberOfSpotLights", spotLightCount);
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].position", m_LightPos);
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].direction", m_lightDirection);
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].ambient", m_Ambient);
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].diffuse", m_Diffuse);
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].specular", m_Specular);
+	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].constant", m_Constant);
+	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].linear", m_Linear);
+	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].quadratic", m_Quadratic);
+	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].cutOff", glm::cos(glm::radians(12.5f)));
+	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].outerCutOff", glm::cos(glm::radians(15.0f)));;
 }
 
-void SpotLight::renderLight()
+void SpotLight::Draw()
 {
-	//initializeLight();
-
-	//Update the spotlights location (these stuff change every frame so always need to be updated
-	m_lightingShader.use();
-	m_lightingShader.setVec3("spotLight.position", playerCamera.cameraPos);
-	m_lightingShader.setVec3("spotLight.direction", playerCamera.cameraFront);
-	m_lightingShader.setVec3("viewPos", playerCamera.cameraPos);
-	
-	//These are not changing every fram. They can be changed in their corresponding "set" method
-	//These are only initially set in the renderLight method and not the constructor as to not render light with the constructor call
-	if (firstFrame2)
-	{
-		m_lightingShader.setVec3("spotLight.ambient", m_Ambient);
-		m_lightingShader.setVec3("spotLight.diffuse", m_Diffuse);
-		m_lightingShader.setVec3("spotLight.specular", m_Specular);
-		m_lightingShader.setFloat("spotLight.constant", m_Constant);
-		m_lightingShader.setFloat("spotLight.linear", m_Linear);
-		m_lightingShader.setFloat("spotLight.quadratic", m_Quadratic);
-		m_lightingShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-		m_lightingShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
-
-		// material properties
-		m_lightingShader.setFloat("material.shininess", 32.0f);
+	//If the spotlight is attached to the player than it will certainly change pos and dir every frame
+	//other types of spotlights have their attibutes changes in setter functions
+	if(playerCamera)
+	{	
+		m_lightingShader->use();
+		m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].position", m_LightPos);
+		m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].direction", m_lightDirection);
+		m_lightingShader->setVec3("viewPos", m_LightPos);
 	}
-
-
-
+	if(m_LightShape != nullptr)
+	{
+		m_LightShape->Draw(*m_ObjectShader);
+	}
 }
 
 SpotLight::~SpotLight()
@@ -58,50 +92,52 @@ SpotLight::~SpotLight()
 void SpotLight::setLightPos(glm::vec3 lightPos)
 {
 	m_LightPos = lightPos;
-	m_lightingShader.use();
-	m_lightingShader.setVec3("spotLight.position", m_LightPos);
+	m_lightingShader->use();
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].position", m_LightPos);
+	if(m_LightShape!=nullptr)
+		m_LightShape->setPosition(lightPos);
 }
 
 void SpotLight::setAmbient(glm::vec3 ambient)
 {
 	m_Ambient = ambient;
-	m_lightingShader.use();
-	m_lightingShader.setVec3("spotLight.ambient", m_Ambient);
+	m_lightingShader->use();
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].ambient", m_Ambient);
 
 }
 
 void SpotLight::setDiffuse(glm::vec3 diffuse)
 {
 	m_Diffuse = diffuse;
-	m_lightingShader.use();
-	m_lightingShader.setVec3("spotLight.diffuse", m_Diffuse);
+	m_lightingShader->use();
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].diffuse", m_Diffuse);
 }
 
 void SpotLight::setSpecular(glm::vec3 specular)
 {
 	m_Specular = specular;
-	m_lightingShader.use();
-	m_lightingShader.setVec3("spotLight.specular", m_Specular);
+	m_lightingShader->use();
+	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].specular", m_Specular);
 }
 
 //For Attenuation
 void SpotLight::setconstant(float constant)
 {
 	m_Constant = constant;
-	m_lightingShader.use();
-	m_lightingShader.setFloat("spotLight.constant", m_Constant);
+	m_lightingShader->use();
+	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].constant", m_Constant);
 }
 
 void SpotLight::setLinear(float linear)
 {
 	m_Linear = linear;
-	m_lightingShader.use();
-	m_lightingShader.setFloat("spotLight.linear", m_Linear);
+	m_lightingShader->use();
+	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].linear", m_Linear);
 }
 
 void SpotLight::setQuadratic(float quadratic)
 {
 	m_Quadratic = quadratic;
-	m_lightingShader.use();
-	m_lightingShader.setFloat("spotLight.quadratic", m_Quadratic);
+	m_lightingShader->use();
+	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].quadratic", m_Quadratic);
 }

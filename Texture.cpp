@@ -33,19 +33,22 @@ Texture::~Texture()
 }
 
 //Load Cube map texture
-Texture::Texture(std::string path) : ID(0)
+Texture::Texture(std::string path) : ID(0), m_Path(path), m_Type("CubeMap")
 {
     glGenTextures(1, &ID);
+    glCheckError();
     glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
+    glCheckError();
 
     int width, height, nrChannels;
 
     unsigned char* data;
     data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
     //Dimensions for each face
-    int faceWidth = width / 4;
-    int faceHeight = height / 3;
+    int faceWidth = width/4;
+    int faceHeight = height/3;
     std::cout << width << ", " << height << std::endl;
+    std::cout << faceWidth << ", " << faceHeight << std::endl;
     GLenum format = GL_RED;
     if (nrChannels == 1)
         format = GL_RED;
@@ -74,7 +77,10 @@ Texture::Texture(std::string path) : ID(0)
         GL_TEXTURE_CUBE_MAP_POSITIVE_Z, //Back
         GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, //Front
     };
-
+    glCheckError();
+    int maxTextureSize;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+    std::cout << "Max Texture Size: " << maxTextureSize << std::endl;
     if (data)
     {
         for (int i = 0; i < 6; ++i)
@@ -83,27 +89,31 @@ Texture::Texture(std::string path) : ID(0)
             int offsetY = positions[i].second;
 
             glPixelStorei(GL_UNPACK_ROW_LENGTH, width);
+            glCheckError();
             glPixelStorei(GL_UNPACK_SKIP_PIXELS, offsetX);
+            glCheckError();
             glPixelStorei(GL_UNPACK_SKIP_ROWS, offsetY);
 
+            glCheckError();
             glTexImage2D(
-                targets[i],
-                0,
-                format,
-                faceWidth,
-                faceHeight,
-                0,
-                format,
-                GL_UNSIGNED_BYTE,
+                targets[i], 
+                0, 
+                format, 
+                faceWidth, 
+                faceHeight, 
+                0, 
+                format, 
+                GL_UNSIGNED_BYTE, 
                 data
             );
 
-
+            glCheckError();
         }
         // Reset pixel store parameters to their default values
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
         glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+        glCheckError();
     }
     else
     {
@@ -111,12 +121,13 @@ Texture::Texture(std::string path) : ID(0)
     }
     stbi_image_free(data);
 
-
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glCheckError();
 }
 
 //Load Cube map texture

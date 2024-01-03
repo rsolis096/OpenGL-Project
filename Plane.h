@@ -12,6 +12,7 @@ public:
 
 
     void Draw(Shader& shader) override;
+    void ShadowMapDraw(Shader& shader) override;
     int updateTexture(std::vector<std::string> texturePaths) override;
 
 private:

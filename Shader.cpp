@@ -53,11 +53,11 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 
     glLinkProgram(ID); //Link the two shaders, order matters. Always attach vertex shader before fragment shader to match rendering pipeline
     glCheckError();
-    checkCompileErrors(vertexShader, "VERTEX");
+    checkCompileErrors(vertexShader, "VERTEX", vertexPath);
     glCheckError();
-    checkCompileErrors(fragmentShader, "FRAGMENT");
+    checkCompileErrors(fragmentShader, "FRAGMENT", fragmentPath);
     glCheckError();
-    checkCompileErrors(ID, "PROGRAM");
+    checkCompileErrors(ID, "PROGRAM", "PROGRAM");
     glCheckError();
     //The vertexShader and fragmentShader shader objects are already linked to the program object. Its ok to delete them.
     glDeleteShader(vertexShader);
@@ -67,6 +67,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 
 Shader::Shader()
 {
+    
 }
 
 void Shader::use()
@@ -74,7 +75,7 @@ void Shader::use()
     glUseProgram(ID);
 }
 
-void Shader::checkCompileErrors(unsigned int shader, std::string type)
+void Shader::checkCompileErrors(unsigned int shader, std::string type, std::string path)
 {
     int  success;
     char infoLog[512];
@@ -89,6 +90,7 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
         if (!success)
         {
             std::cout << "SHADER::" << type << "::COMPILATION_FAILED\n" << infoLog << std::endl;
+            std::cout << path << std::endl;
         }
     }
 
@@ -103,11 +105,11 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
 
         if (!success) {
             std::cout << "Program Linking Failed: " << infoLog << std::endl;
+            std::cout << path << std::endl;
+
         }
     }
 }
-
-
 
 void Shader::setBool(const std::string& name, bool value) const
 {
@@ -123,9 +125,8 @@ void Shader::setFloat(const std::string& name, float value) const
 }
 void Shader::setMat4(const std::string& name, glm::mat4& value) const
 {
-    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 }
-
 void Shader::setVec3(const std::string& name, const glm::vec3& value) const
 {
     glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);

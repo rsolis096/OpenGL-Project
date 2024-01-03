@@ -13,6 +13,8 @@ public:
 
     //Methods
     void Draw(Shader& shader) override;
+    void ShadowMapDraw(Shader& shader) override;
+
 
 private:
     //Used for construction of primitives

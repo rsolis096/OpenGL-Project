@@ -36,6 +36,7 @@ void Sphere::Draw(Shader& shader)
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
     shader.setMat4("model", m_Model);
+    m_hasTexture = false;
 
     //Bind texture and send texture to fragment shader
     if (m_hasTexture)
@@ -63,10 +64,31 @@ void Sphere::Draw(Shader& shader)
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
+    glCheckError();
+
+}
+
+void Sphere::ShadowMapDraw(Shader& shader)
+{
+    shader.use();
+
+    shader.setMat4("model", m_Model);
+    shader.setBool("hasTexture", false);
+
+    //Bind Sphere
+    glBindVertexArray(m_vao);
+
+    //Choose render type - indices list(EBO)
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+    glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+
+    // Unbind buffers and reset state
+    glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glCheckError();
 
 }
+
 
 void Sphere::buildSphere()
 {

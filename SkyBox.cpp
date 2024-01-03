@@ -155,9 +155,13 @@ int SkyBox::setCubeMapTexture(std::string s)
 {
     if (s.size() != 0)
     {
+        glCheckError();
         delete m_CubeMap;
+        glCheckError();
         m_CubeMap = nullptr;
+        glCheckError();
         m_CubeMap = new Texture(s);
+        glCheckError();
     }
     return 0;
 }

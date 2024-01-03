@@ -2,15 +2,17 @@
 
 #include <iostream>
 #include <vector>
-#include "Object.h"
 #include "Shader.h"
 #include "Camera.h"
+#include "Sphere.h"
+
 
 class SpotLight
 {
 public:
-	SpotLight(Shader& lightingShader, Camera& cam);
-	void renderLight();
+	SpotLight(Shader*, Shader* ,Camera& );
+	SpotLight(Shader*, Shader* ,glm::vec3& , glm::vec3& );
+	void Draw();
 	~SpotLight();
 
 	//For Light Properties
@@ -28,9 +30,15 @@ public:
 
 
 private:
-	Shader m_lightingShader;
-	Camera& playerCamera;
-	glm::vec3 m_LightPos;
+	Shader* m_lightingShader;
+	Shader* m_ObjectShader;
+
+	bool playerCamera;
+	static int spotLightCount;
+	int spotLightID;
+	glm::vec3& m_lightDirection;
+	glm::vec3& m_LightPos;
+	Sphere* m_LightShape;
 
 	glm::vec3 m_Ambient;
 	glm::vec3 m_Diffuse;

@@ -7,7 +7,7 @@
 class DirectionalLight
 {
 public:
-	DirectionalLight(Shader& lightingShader);
+	DirectionalLight(Shader* lightingShader);
 	void renderLight();
 	~DirectionalLight();
 
@@ -22,7 +22,7 @@ public:
 
 
 private:
-	Shader m_lightingShader;
+	Shader* m_lightingShader;
 	glm::vec3 m_direction;
 
 

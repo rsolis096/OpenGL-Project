@@ -7,17 +7,15 @@
 #include "Vendors/imgui/imgui_impl_opengl3.h"
 
 #include <iostream>
-#include "Shader.h"
 #include "Texture.h"
 #include "GUI.h"
-
+#include "ShadowMap.h"
 //Objects
 
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "DirectionalLight.h"
 #include "SkyBox.h"
-#include "Scene.h"
 #include "Model.h"
 
 #include "LightController.h"
@@ -34,8 +32,6 @@
 // settings
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
-
-
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 bool firstMouse = true;
@@ -43,21 +39,14 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool cursorLocked = true;
 bool isWindowHidden = true;
-
-//For key input (debounce timer)
 double lastKeyPressTime = 0.0;
 double debounceThreshold = 0.2; // Adjust this value based on your needs
-
-//Save cursor location for unlock/lock
-double mouseX = 0, mouseY = 0;
+double mouseX = 0, mouseY = 0; //Save cursor position when gui is opened
 float xpos = 0, ypos = 0;
 
 
 //Initialize Camera
 Camera* myCamera = new Camera();
-
-//Lighting position
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
@@ -69,14 +58,25 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void updateCamera(Shader& lightingShader, glm::mat4& view, glm::mat4& projection)
 {
+    glCheckError();
     lightingShader.use();
+    glCheckError();
     //View Matrix (Do after camera)
     view = myCamera->GetViewMatrix();
+    glCheckError();
+
     //Projection Matrix (fov change with scroll wheel) last value changes render distance
     projection = glm::perspective(glm::radians(myCamera->getFOV()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 1500.0f);
+    glCheckError();
+
     //Send View and Projection matrices to shader (for camera)]]
+    
     lightingShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.    
+    glCheckError();
+
     lightingShader.setMat4("view", view);
+    glCheckError();
+
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -191,8 +191,41 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     myCamera->processScroll(xoffset, yoffset);
 }
 
+unsigned int cubeVAO = 0;
+unsigned int cubeVBO = 0;
+unsigned int quadVAO = 0;
+unsigned int quadVBO;
+
+void RenderQuad()
+{
+    if (quadVAO == 0)
+    {
+        float quadVertices[] = {
+            // positions        // texture Coords
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        };
+        // setup plane VAO
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    }
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+}
+
 int main()
 {
+    
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -231,102 +264,109 @@ int main()
     glEnable(GL_DEPTH_TEST);
     //Gamma Correction
     //glEnable(GL_FRAMEBUFFER_SRGB);
+    
     //Enable this to only render front facing polygons (for performance)
     glEnable(GL_CULL_FACE);
 
-    //Defaults, not needed to be specified (just for reference)
-    //glCullFace(GL_BACK);
-    //glFrontFace(GL_CCW);
-    glCheckError();
-
     Scene myScene(myCamera);
-    glCheckError();
-    //Create Scene Manager and some default objects
     //myScene.addObject(new Model("resources/objects/dragon/dragon.obj"));
     myScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
-    glCheckError();
-
-    myScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
-    glCheckError();
-
-    myScene.addObject(new Plane("Assets/woodparquet_93_basecolor-2K.png", "Assets/woodparquet_93_basecolor-2K.png"));
-    glCheckError();
-
+    myScene.addObject(new Sphere());
+    myScene.addObject(new Plane());
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[0]);
-    glCheckError();
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[1]);
-    glCheckError();
-    myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[2]);
-    glCheckError();
-    myScene.createLightController();
-    glCheckError();
+    myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[2]);    
+    //myScene.m_LightController->addPointLight();
+    //myScene.m_LightController->addSpotLight();
+    
+    glm::vec3 spotLightPos = glm::vec3(-10.0f, 3.0f, 0.0f);
+    glm::vec3 spotLightDir = glm::vec3(-1.0f, 3.0f, 0.0f);
+    myScene.m_LightController->addSpotLight(spotLightPos, spotLightDir);
+    //Cube
+    myScene.m_SceneObjects[0]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
+    myScene.m_SceneObjects[0]->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
+    //Sphere
+    myScene.m_SceneObjects[1]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
 
-    myScene.m_LightController->addPointLight();
-    glCheckError();
+    //ShadowMap shadowMap = ShadowMap(myScene, spotLightPos, spotLightDir);
 
-    myScene.m_LightController->addSpotLight();
-    glCheckError();
-
-    myScene.m_LightController->m_PointLights[0]->setLightPos(glm::vec3(-4.0f, 7.0f, 2.0f));
-    glCheckError();
-
-    myScene.m_SceneObjects[0]->setPosition(glm::vec3(1.0f));
-    glCheckError();
-
-    myScene.m_SceneObjects[1]->setPosition(glm::vec3(1.0f, 4.0f, -3.0f));
-    glCheckError();
-
-    myScene.m_SceneObjects[2]->setScale(glm::vec3(100.0f));
     glCheckError();
 
     //Create the SkyBox
     SkyBox* mySkyBox = new SkyBox(*myScene.cubeMapShader, myCamera);
-    //mySkyBox->setCubeMapTexture("Assets/skybox/rocky_ridge_puresky2.png");
+    //This feature does not work for high resolution images.
+    //mySkyBox->setCubeMapTexture("Assets/skybox/space.png");
 
     //Initialize the GUI
     GUI myGUI(window, myScene);
-
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Enable this line for wireframe display
 
     //Initialize View and Projection (These are changed in updateCamera() )
     glm::mat4 view;
     glm::mat4 projection;
 
-
-    //Set window size of ImGUI window
-    //ImGui::SetNextWindowSize(ImVec2(100, 75)); // Set the desired width and height
+    // Shader configuration
+    myScene.lightingShader->use();
+    myScene.lightingShader->setInt("shadowMap", 1);
 
     myScene.mainCamera = (myCamera);
 
+    glCheckError();
     //Main loop
     while (!glfwWindowShouldClose(window))
     {
-        // input
-        // -----
         processInput(window);
-
+        view = myCamera->GetViewMatrix();
+        updateCamera(*myScene.lightingShader, view, projection);
         //Use this to get framerate info
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         myScene.fps = 1 / deltaTime;
-
         //Rendering Starts Here
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glCheckError();
 
-
+        //SHADOW PASS
+        myScene.m_ShadowMap->ShadowPass();
+        //END OF SHADOW PASS
+        
+        //LIGHTING PASS
+        //***************************************************************************
+        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //Point Light Lamp
+        myScene.pointLightShader->use();
+        myScene.pointLightShader->setMat4("projection", projection);
+        myScene.pointLightShader->setMat4("view", view);
+        //Main Shader
         myScene.lightingShader->use();
+        myScene.lightingShader->setMat4("projection", projection);
+        myScene.lightingShader->setMat4("view", view);
         myScene.lightingShader->setVec3("viewPos", myCamera->cameraPos);
-        // Update the camera
-        updateCamera(*myScene.lightingShader, view, projection);
-        //Draw Scene
-        glCheckError();
+        myScene.lightingShader->setMat4("lightSpaceMatrix", myScene.m_ShadowMap->getLightSpaceMatrx());
+        //SHADOW MAP TEXTURE
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, myScene.m_ShadowMap->getDepthMapID());
+        GLint specularLocation = glGetUniformLocation(myScene.lightingShader->ID, "shadowMap");
+        glUniform1i(specularLocation, 0); // 0 corresponds to GL_TEXTURE0
+        myScene.drawScene(deltaTime);
+        //***************************************************************************
+        // END OF LIGHTING PASS
+        GLint maxTextureUnits;
+        glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
+        /*
+        // render Depth map to quad for visual debugging
+        // ---------------------------------------------
+        debugDepthQuad.use();
+        debugDepthQuad.setFloat("near_plane", near_plane);
+        debugDepthQuad.setFloat("far_plane", far_plane);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        updateCamera(debugDepthQuad, view, projection);
+        RenderQuad();
+        */
 
-        myScene.drawScene(projection, deltaTime);
-        glCheckError();
-
-        //Draw SkyBox
         mySkyBox->draw(projection);
         glCheckError();
 
@@ -339,6 +379,8 @@ int main()
     }
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
+
+
 
 
     //Delete everything
@@ -359,3 +401,20 @@ int main()
 
     return 0;
 }
+
+
+
+
+/*
+* Short Term Goals:
+*   - Refactor the code to work more fluidly with eachother, less back and forth
+*   - Remove as many hard coded situations as possible and give the user freedom
+*       - Adding / removing light sources
+*       - Adjusting light intensity and colours
+*       - Adjusting light positions
+*       - Object identities and names for more convenient and personalized editing
+*       - Enable a flash light option (only 1 flashlight)
+*   - Adjust the GUI to be more intuitive and template more options
+*   - Make some tests
+*   - 
+*/

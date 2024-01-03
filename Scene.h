@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "LightController.h"
 #include "PhysicsWorld.h"
+#include "ShadowMap.h"
 #include <typeinfo>
 
 class Scene
@@ -19,12 +20,11 @@ public:
 	LightController* m_LightController;
 	PhysicsWorld* m_PhysicsWorld;
 
-	//Compile and link shaders
 	Shader* cubeMapShader;
-	//General Rasterized lighting
 	Shader* lightingShader;
-	//For objects that are also light sources
 	Shader* pointLightShader;
+
+	ShadowMap* m_ShadowMap;
 
 	// Scene Objects (All)
 	std::vector<Object*> m_SceneObjects;
@@ -45,5 +45,6 @@ public:
 
 	//void addShader(Shader&);
 
-	void drawScene(glm::mat4 projection, float deltaTime);
+	void drawScene(float deltaTime);
+	void drawScene(float deltaTime, Shader& shader);
 };
