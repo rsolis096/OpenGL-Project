@@ -7,17 +7,15 @@
 #include "Vendors/imgui/imgui_impl_opengl3.h"
 
 #include <iostream>
-#include "Shader.h"
 #include "Texture.h"
 #include "GUI.h"
-
+#include "ShadowMap.h"
 //Objects
 
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "DirectionalLight.h"
 #include "SkyBox.h"
-#include "Scene.h"
 #include "Model.h"
 
 #include "LightController.h"
@@ -49,7 +47,6 @@ float xpos = 0, ypos = 0;
 
 //Initialize Camera
 Camera* myCamera = new Camera();
-
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
@@ -194,94 +191,10 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     myCamera->processScroll(xoffset, yoffset);
 }
 
-unsigned int planeVBO = 0;
-unsigned int planeVAO = 0;
 unsigned int cubeVAO = 0;
 unsigned int cubeVBO = 0;
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
-
-float planeVertices[] = {
-    // positions            // normals         // texcoords
-     25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-    -25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-    -25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
-
-     25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-    -25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
-     25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,  25.0f, 25.0f
-};
-
-void RenderCube()
-{
-    // initialize (if necessary)
-    if (cubeVAO == 0)
-    {
-        float vertices[] = {
-            // back face
-            -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-             1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-             1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right         
-             1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-            -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-            -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
-            // front face
-            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-             1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
-             1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-             1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-            -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
-            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-            // left face
-            -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-            -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
-            -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-            -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-            -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-            -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-            // right face
-             1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-             1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-             1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right         
-             1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-             1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-             1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left     
-             // bottom face
-             -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-              1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
-              1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-              1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-             -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-             -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-             // top face
-             -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-              1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-              1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right     
-              1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-             -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-             -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left        
-        };
-        glGenVertexArrays(1, &cubeVAO);
-        glGenBuffers(1, &cubeVBO);
-        // fill buffer
-        glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        // link vertex attributes
-        glBindVertexArray(cubeVAO);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-    }
-    // render Cube
-    glBindVertexArray(cubeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
-}
 
 void RenderQuad()
 {
@@ -351,35 +264,31 @@ int main()
     glEnable(GL_DEPTH_TEST);
     //Gamma Correction
     //glEnable(GL_FRAMEBUFFER_SRGB);
+    
     //Enable this to only render front facing polygons (for performance)
     glEnable(GL_CULL_FACE);
 
-    //ShadowMap Debugging Shaders
-    Shader shader("shadow_mapping.vert", "shadow_mapping.frag");
-    Shader simpleDepthShader("shadow_mapping_depth.vert", "shadow_mapping_depth.frag");
-    Shader debugDepthQuad("debug_quad.vert", "debug_quad_depth.frag");
-
     Scene myScene(myCamera);
     //myScene.addObject(new Model("resources/objects/dragon/dragon.obj"));
-    myScene.addObject(new Cube());
+    myScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
     myScene.addObject(new Sphere());
     myScene.addObject(new Plane());
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[0]);
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[1]);
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[2]);    
-    myScene.createLightController();
     //myScene.m_LightController->addPointLight();
     //myScene.m_LightController->addSpotLight();
     
-    glm::vec3 spotLightPos = glm::vec3(-2.0f, 10.0f, -1.0f);
-    glm::vec3 spotLightDir = glm::vec3(-2.0f, 0.0f, -1.0f);
+    glm::vec3 spotLightPos = glm::vec3(-10.0f, 3.0f, 0.0f);
+    glm::vec3 spotLightDir = glm::vec3(-1.0f, 3.0f, 0.0f);
     myScene.m_LightController->addSpotLight(spotLightPos, spotLightDir);
-    //myScene.m_LightController->m_PointLights[0]->setLightPos(glm::vec3(-31.0f, 9.0f, 26.0f));
+    //Cube
     myScene.m_SceneObjects[0]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
     myScene.m_SceneObjects[0]->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
+    //Sphere
     myScene.m_SceneObjects[1]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
-    //myScene.m_SceneObjects[2]->setScale(glm::vec3(1000.0f));
-    //myScene.m_SceneObjects[2]->setPosition(glm::vec3(0.0f,-0.5,0.0f));
+
+    //ShadowMap shadowMap = ShadowMap(myScene, spotLightPos, spotLightDir);
 
     glCheckError();
 
@@ -395,47 +304,13 @@ int main()
     glm::mat4 view;
     glm::mat4 projection;
 
-    //Set window size of ImGUI window
-    //ImGui::SetNextWindowSize(ImVec2(100, 75)); // Set the desired width and height
-
-    //***********************************************************************************************
-    // configure depth map FBO
-    // -----------------------
-    Texture woodTexture("Assets/woodparquet_93_basecolor-2K.png", false, "shadow");
-    const unsigned int SHADOW_WIDTH = 1024*2, SHADOW_HEIGHT = 1024*2;
-    unsigned int depthMapFBO;
-    glGenFramebuffers(1, &depthMapFBO);
-    // create depth texture
-    unsigned int depthMap;
-    glGenTextures(1, &depthMap);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-    // attach depth texture as FBO's depth buffer
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    // shader configuration
-    // --------------------
+    // Shader configuration
     myScene.lightingShader->use();
-    myScene.lightingShader->setInt("diffuseTexture", 0);
     myScene.lightingShader->setInt("shadowMap", 1);
-    debugDepthQuad.use();
-    debugDepthQuad.setInt("depthMap", 0);
-    //***********************************************************************************************
-    glCheckError();
 
     myScene.mainCamera = (myCamera);
-    glCheckError();
 
+    glCheckError();
     //Main loop
     while (!glfwWindowShouldClose(window))
     {
@@ -452,59 +327,34 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glCheckError();
 
-        //Shadow Pass
-        // 1. render depth of scene to texture (from light's perspective)
-        float near_plane = 0.5f, far_plane = 80.0f;
-        //glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane); //For Directional Lighting (like the sun)
-        glm::mat4 lightProjection = glm::perspective<float>(glm::radians(45.0f), (float) SHADOW_WIDTH /SHADOW_HEIGHT, near_plane, far_plane);
-        glm::mat4 lightView = glm::lookAt(spotLightPos, glm::normalize(spotLightDir), glm::vec3(0.0, 1.0, 0.0));
-        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-        simpleDepthShader.use();
-        simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glCullFace(GL_FRONT);
-        myScene.m_SceneObjects[0]->Draw(simpleDepthShader);
-        myScene.m_SceneObjects[1]->Draw(simpleDepthShader);       
-        myScene.m_SceneObjects[2]->Draw(simpleDepthShader);
-        glCullFace(GL_BACK);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glCheckError();
-
+        //SHADOW PASS
+        myScene.m_ShadowMap->ShadowPass();
+        //END OF SHADOW PASS
         
-        // 2. Lighting Pass
-        // --------------------------------------------------------------
+        //LIGHTING PASS
+        //***************************************************************************
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //Point Light Lamp
+        myScene.pointLightShader->use();
+        myScene.pointLightShader->setMat4("projection", projection);
+        myScene.pointLightShader->setMat4("view", view);
+        //Main Shader
         myScene.lightingShader->use();
         myScene.lightingShader->setMat4("projection", projection);
         myScene.lightingShader->setMat4("view", view);
-
-        // set light uniforms
         myScene.lightingShader->setVec3("viewPos", myCamera->cameraPos);
-        myScene.lightingShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
+        myScene.lightingShader->setMat4("lightSpaceMatrix", myScene.m_ShadowMap->getLightSpaceMatrx());
+        //SHADOW MAP TEXTURE
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, woodTexture.ID);
-        GLint diffuseLocation = glGetUniformLocation(myScene.lightingShader->ID, "diffuseTexture");
-        glUniform1i(diffuseLocation, 0); // 0 corresponds to GL_TEXTURE0
-
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glBindTexture(GL_TEXTURE_2D, myScene.m_ShadowMap->getDepthMapID());
         GLint specularLocation = glGetUniformLocation(myScene.lightingShader->ID, "shadowMap");
-        glUniform1i(specularLocation, 1); // 1 corresponds to GL_TEXTURE1
-
-        glCheckError();
-
-        //PLANE MUST BE RENDERED FIRST
-        myScene.m_SceneObjects[0]->Draw(*myScene.lightingShader);
-        myScene.m_SceneObjects[1]->Draw(*myScene.lightingShader);
-        myScene.m_SceneObjects[2]->Draw(*myScene.lightingShader);
-
-        myScene.m_LightController->m_SpotLights[0]->renderLight();
-
-
+        glUniform1i(specularLocation, 0); // 0 corresponds to GL_TEXTURE0
+        myScene.drawScene(deltaTime);
+        //***************************************************************************
+        // END OF LIGHTING PASS
+        GLint maxTextureUnits;
+        glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
         /*
         // render Depth map to quad for visual debugging
         // ---------------------------------------------
@@ -518,6 +368,7 @@ int main()
         */
 
         mySkyBox->draw(projection);
+        glCheckError();
 
         //GUI should always be drawn last
         myGUI.displayWindow();
@@ -552,3 +403,18 @@ int main()
 }
 
 
+
+
+/*
+* Short Term Goals:
+*   - Refactor the code to work more fluidly with eachother, less back and forth
+*   - Remove as many hard coded situations as possible and give the user freedom
+*       - Adding / removing light sources
+*       - Adjusting light intensity and colours
+*       - Adjusting light positions
+*       - Object identities and names for more convenient and personalized editing
+*       - Enable a flash light option (only 1 flashlight)
+*   - Adjust the GUI to be more intuitive and template more options
+*   - Make some tests
+*   - 
+*/

@@ -9,9 +9,10 @@ class LightController
 {
 public:
 	LightController(Shader*, Shader*, Camera*);
-
-	Shader* m_LightingShader; //How the light interacts with the world
-	Shader* m_ObjectShader; //How the light source itself is drawn
+	
+	//Given by the scene
+	Shader* m_LightingShader;
+	Shader* m_ObjectShader;
 	Camera* m_PlayerCamera;
 
 	DirectionalLight* m_WordLight;
@@ -27,5 +28,5 @@ public:
 	void addSpotLight(glm::vec3&, glm::vec3&);
 	void removeSpotLight();
 
-	void drawLighting(glm::mat4, glm::mat4);
+	void drawLighting();
 };

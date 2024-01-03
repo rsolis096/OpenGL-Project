@@ -263,6 +263,16 @@ void GUI::drawList()
 				}	
 				ImGui::EndTabItem();
 			}
+			if (ImGui::BeginTabItem("Shadows"))
+			{
+				float near_plane = myScene.m_ShadowMap->getNearPlane();
+				if (ImGui::InputFloat("Near Plane", &near_plane, 0.1f, 1.0f, "%.3f", 0))
+					myScene.m_ShadowMap->setNearPlane(near_plane);
+				float far_plane = myScene.m_ShadowMap->getFarPlane();
+				if (ImGui::InputFloat("Far Plane", &far_plane, 0.1f, 1.0f, "%.3f", 0))
+					myScene.m_ShadowMap->setFarPlane(far_plane);
+				ImGui::EndTabItem();
+			}
 			ImGui::EndTabBar();
 		}
 		ImGui::EndChild();

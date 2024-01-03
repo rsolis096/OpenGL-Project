@@ -22,24 +22,24 @@ void LightController::removePointLight()
 
 void LightController::addSpotLight()
 {
-	m_SpotLights.push_back(new SpotLight(m_LightingShader, *m_PlayerCamera));
+	m_SpotLights.push_back(new SpotLight(m_LightingShader, m_ObjectShader, *m_PlayerCamera));
 }
 
 void LightController::addSpotLight(glm::vec3& pos, glm::vec3& dir)
 {
-	m_SpotLights.push_back(new SpotLight(m_LightingShader, pos, dir));
+	m_SpotLights.push_back(new SpotLight(m_LightingShader, m_ObjectShader, pos, dir));
 }
 
 void LightController::removeSpotLight()
 {
 }
 
-void LightController::drawLighting(glm::mat4 view, glm::mat4 projection)
+void LightController::drawLighting()
 {
-	for (PointLight* pointLight : m_PointLights)
-		pointLight->renderLight(view, projection);
+	//for (PointLight* pointLight : m_PointLights)
+		//pointLight->Draw();
 	for (SpotLight* spotLights : m_SpotLights)
-		spotLights->renderLight();
+		spotLights->Draw();
 
-	m_WordLight->renderLight();
+	//m_WordLight->renderLight();
 }

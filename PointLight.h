@@ -16,7 +16,7 @@ class PointLight
 {
 	public:
 		PointLight(Shader* lightingShader, Shader* lightCubeShader, Camera& cam);
-		void renderLight(glm::mat4 view, glm::mat4 projection);
+		void Draw();
 		~PointLight();
 		static int pointLightCount;
 		int lightID;

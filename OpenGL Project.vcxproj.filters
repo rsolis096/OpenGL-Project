@@ -147,6 +147,9 @@
     <ClCompile Include="stb_image_write.cpp">
       <Filter>Source Files\Vendors</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowMap.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="lightingShader.frag" />
@@ -243,6 +246,9 @@
     </ClInclude>
     <ClInclude Include="DebugUtils.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowMap.h">
+      <Filter>Header Files\Lighting</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

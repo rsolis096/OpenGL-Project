@@ -4,7 +4,6 @@ const int NR_POINT_LIGHTS = 8;
 const int NR_SPOT_LIGHTS = 8;
 
 //Shadow Map
-uniform sampler2D diffuseTexture;
 uniform sampler2D shadowMap;
 
 //Material Textures
@@ -16,6 +15,9 @@ uniform sampler2D shadowMap;
 
 struct Material {
     float shininess;
+    sampler2D ambient;
+    sampler2D diffuse;
+    sampler2D specular;
 }; 
 
 struct DirLight {
@@ -176,37 +178,40 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir)
     float spotAngle = dot(-lightDir, spotDir);
     float spotFactor = smoothstep(light.outerCutOff, light.cutOff, spotAngle);
 
-    //Calculate Ambient
-    //Multiply by spotFactor to create a focused spot light (little ambient)
-    vec3 ambient = light.ambient;// * spotFactor;
-
     // Calculate the diffuse component
     float diff = max(dot(normal, lightDir), 0.0);
     float shadow = ShadowCalculation(fs_in.FragPosLightSpace, light.position);                      
 
-    if(diff > 0)
+    vec3 diffuse;
+    vec3 specular;
+    vec3 ambient;
+
+    if(hasTexture)
     {
-        vec3 diffuse = (light.diffuse * (lambertian * spotFactor)) * object.diffuse;
-
-        // Calculate the specular component
-        vec3 specular = light.specular * object.specular * (spec * spotFactor);
-
-        // Calculate the attenuation factor
-        float distance = length(light.position - fs_in.FragPos);
-        float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-        float intensity = 1.0;
-        if(distance > 10)
-            intensity = 0.7;
-
-        ambient *= attenuation;
-        diffuse *= attenuation;
-        specular *= attenuation;
-        
-        vec3 lighting = (ambient  + ((shadow) * (diffuse + specular))) * texture(diffuseTexture, fs_in.TexCoords).rgb;
-
-        //Used to compensate for an otherwise dark scene
-        float spotLightBrightness = 2.0;
-        return 2.0 * (lighting);
+        ambient = vec3(texture(material.diffuse, fs_in.TexCoords));
+        diffuse = vec3(texture(material.diffuse, fs_in.TexCoords));
+        specular  = vec3(texture(material.diffuse, fs_in.TexCoords));
     }
-    return 0.3* texture(diffuseTexture, fs_in.TexCoords).rgb;
+    else
+    {
+        ambient = light.ambient * spotFactor;
+        diffuse = object.diffuse * spotFactor;
+        specular = object.specular;
+    }
+
+    diffuse *= light.diffuse * lambertian * spotFactor;
+    specular *= light.specular * spec * spotFactor;
+        
+    // Calculate the attenuation factor
+    float distance = length(light.position - fs_in.FragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+
+    ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
+        
+    vec3 lighting = (ambient  + ((shadow) * (diffuse + specular)));
+
+    return lighting;
+
 }

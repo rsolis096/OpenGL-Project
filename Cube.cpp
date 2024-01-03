@@ -8,8 +8,8 @@ Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Ob
     //Set some rendering properties
     m_hasTexture = true;
     //Open and load diffuse map and specular map, save their Cubes
-    m_DiffuseMap = new Texture(texturePathDiffuse, false, "texture_diffuse");
-    m_SpecularMap = new Texture(texturePathSpecular, false, "texture_specular");
+    m_DiffuseMap = new Texture(texturePathDiffuse, false, "material.diffuse");
+    m_SpecularMap = new Texture(texturePathSpecular, false, "material.diffuse");
     m_DisplayName = "Cube" + std::to_string(cubeCount);
     m_ObjectID = cubeCount;
     cubeCount++;
@@ -34,31 +34,24 @@ void Cube::Draw(Shader& shader)
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
     shader.setMat4("model", m_Model);
-    m_hasTexture = false;
+    shader.setBool("hasTexture", m_hasTexture);
     //Bind texture and send texture to fragment shader
     if (m_hasTexture)
     {
-        glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
         glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
+        glActiveTexture(GL_TEXTURE2); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
 
-        GLint diffuseLocation = glGetUniformLocation(shader.ID, "texture_diffuse1");
-        GLint specularLocation = glGetUniformLocation(shader.ID, "texture_specular1");
+        GLint diffuseLocation = glGetUniformLocation(shader.ID, "material.diffuse");
+        GLint specularLocation = glGetUniformLocation(shader.ID, "material.specular");
 
         if (diffuseLocation != -1)
-            glUniform1i(diffuseLocation, 0); // 0 corresponds to GL_TEXTURE0
+            glUniform1i(diffuseLocation, 1); // 0 corresponds to GL_TEXTURE0
 
         if (specularLocation != -1)
-            glUniform1i(specularLocation, 1); // 1 corresponds to GL_TEXTURE1
+            glUniform1i(specularLocation, 2); // 1 corresponds to GL_TEXTURE1
 
-        shader.use();
-        shader.setBool("hasTexture", true);
-    }
-    else
-    {
-        shader.use();
-        shader.setBool("hasTexture", false);
     }
 
     //Bind Cube

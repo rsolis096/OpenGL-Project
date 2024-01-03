@@ -7,23 +7,19 @@ Scene::Scene()
 	mainCamera = nullptr;
 	m_LightController = nullptr;
 
-	//Compile and link shaders
 	cubeMapShader = new Shader("cubeMapShader.vert", "cubeMapShader.frag");
-	glCheckError();
-
-	//General Rasterized lighting
 	lightingShader = new Shader("lightingShader.vert", "lightingShader.frag");
-	glCheckError();
-
-	//For objects that are also light sources
 	pointLightShader = new Shader("pointLightShader.vert", "pointLightShader.frag");
-	glCheckError();
-
-
+	
 	m_PhysicsWorld = new PhysicsWorld();
 
-	glCheckError();
+	createLightController();
 
+	glm::vec3 spotLightPos = glm::vec3(-10.0f, 3.0f, 0.0f);
+	glm::vec3 spotLightDir = glm::vec3(-1.0f, 3.0f, 0.0f);
+	m_ShadowMap = new ShadowMap(&m_SceneObjects, spotLightPos, spotLightDir);
+
+	glCheckError();
 }
 
 Scene::Scene(Camera* mC)
@@ -31,18 +27,17 @@ Scene::Scene(Camera* mC)
 	objectCount = 0;
 	fps = 0;
 	mainCamera = mC;
-	m_LightController = nullptr;
 
-	//Compile and link shaders
 	cubeMapShader = new Shader("cubeMapShader.vert", "cubeMapShader.frag");
-	//General Rasterized lighting
-	glCheckError();
 	lightingShader = new Shader("lightingShader.vert", "lightingShader.frag");
-	//For objects that are also light sources
-	glCheckError();
 	pointLightShader = new Shader("pointLightShader.vert", "pointLightShader.frag");
-	glCheckError();
 	m_PhysicsWorld = new PhysicsWorld();
+	createLightController();	
+
+	glm::vec3 spotLightPos = glm::vec3(-10.0f, 3.0f, 0.0f);
+	glm::vec3 spotLightDir = glm::vec3(-1.0f, 3.0f, 0.0f);
+	m_ShadowMap = new ShadowMap(&m_SceneObjects, spotLightPos, spotLightDir);
+
 	glCheckError();
 }
 
@@ -50,9 +45,10 @@ Scene::Scene(Camera* mC)
 //Add an object to the scene (only objects part of a scene are rendered)
 int Scene::addObject(Object* obj)
 {
-	std::vector<Object*>::iterator it = std::find(m_SceneObjects.begin(), m_SceneObjects.end(), obj);
 	if (obj == nullptr)
 		return 1;
+
+	std::vector<Object*>::iterator it = std::find(m_SceneObjects.begin(), m_SceneObjects.end(), obj);
 	if (it == m_SceneObjects.end())
 	{
 		m_SceneObjects.push_back(obj);
@@ -109,47 +105,35 @@ void Scene::removeLightController()
 
 }
 
-void Scene::drawScene(glm::mat4 projection, float deltaTime)
+void Scene::drawScene(float deltaTime)
 {
-	//Update Scene Objects
-	for (auto& element : m_SceneObjects)
-	{
-		m_PhysicsWorld->step(glfwGetTime(), deltaTime);
-		if (typeid(element).name()[0] == 'S')
-		{
-			element->translatePosition(glm::vec3(0.001f));
-		}
-		if (typeid(element).name()[0] == 'M')
-		{
-			element->Draw(*lightingShader);
-		}
-		if (typeid(element).name()[0] != 'M')
-			element->Draw(*lightingShader);
-	}
+	//Update physics
+	m_PhysicsWorld->step(glfwGetTime(), deltaTime);
 
 	//Draw Lights
-	m_LightController->drawLighting(mainCamera->GetViewMatrix(), projection);
+	m_LightController->drawLighting();
+
+	//Draw Objects
+	for (Object* element : m_SceneObjects)
+	{
+		element->Draw(*lightingShader);
+	}
 }
 
-void Scene::drawScene(glm::mat4 projection, float deltaTime, Shader& shader)
+void Scene::drawScene(float deltaTime, Shader& shader)
 {
-	//Update Scene Objects
+	//Update physics
+	m_PhysicsWorld->step(glfwGetTime(), deltaTime);
+
+	//Draw Lights (Only the light objects)
+	m_LightController->drawLighting();
+
+	//Draw Objects
 	for (auto& element : m_SceneObjects)
 	{
-		//m_PhysicsWorld->step(glfwGetTime(), deltaTime);
 		if (typeid(element).name()[0] == 'S')
-		{
-			element->translatePosition(glm::vec3(0.001f));
-		}
-		if (typeid(element).name()[0] == 'M')
-		{
-			element->Draw(shader);
-		}
-		if (typeid(element).name()[0] != 'M')
-			element->Draw(shader);
+			element->translatePosition(glm::vec3(0.001f)); //Translate the sphere for debugging purposes
+		element->Draw(shader);
 	}
-
-	//Draw Lights
-	m_LightController->drawLighting(mainCamera->GetViewMatrix(), projection);
 }
 
