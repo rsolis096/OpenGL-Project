@@ -28,6 +28,14 @@ public:
 	void setDiffuse(glm::vec3 diffuse);
 	void setSpecular(glm::vec3 specular);
 
+	//For Light Properties
+	glm::vec3 getAmbient();
+	glm::vec3 getDiffuse();
+	glm::vec3 getSpecular();
+
+	float getIntensity();
+	void setIntensity(float i);
+	std::string m_DisplayName;
 
 private:
 	Shader* m_lightingShader;
@@ -48,4 +56,6 @@ private:
 	float m_Constant;
 	float m_Linear;
 	float m_Quadratic;
+	float m_Intensity;
+
 };

@@ -43,6 +43,7 @@ Texture::Texture(std::string path) : ID(0), m_Path(path), m_Type("CubeMap")
     int width, height, nrChannels;
 
     unsigned char* data;
+    std::cout << "Loading Texture: " << path << std::endl;
     data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
     //Dimensions for each face
     int faceWidth = width/4;
@@ -140,6 +141,7 @@ Texture::Texture(std::vector<std::string> paths) : ID(0)
     unsigned char* data;
     for (unsigned int i = 0; i < paths.size(); i++)
     {
+        std::cout << "Loading Texture: " << paths[i]<< std::endl;
         data = stbi_load(paths[i].c_str(), &width, &height, &nrChannels, 0);
         if (data)
         {
@@ -147,11 +149,12 @@ Texture::Texture(std::vector<std::string> paths) : ID(0)
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
                 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
             );
+            std::cout << "Successfully loaded texture: " << paths[i] << std::endl;
 
         }
         else
         {
-            std::cout << "Failed to load texture" << std::endl;
+            std::cout << "Failed to load texture: " << paths[i]<< std::endl;
         }
         stbi_image_free(data);
     }
@@ -174,6 +177,7 @@ int Texture::updateTexture(const char* filePath, bool flipOnY)
 
     m_Path = filePath;
     int width, height, nrChannels;
+    std::cout << "Loading Texture: " << filePath << std::endl;
     unsigned char* data = stbi_load(filePath, &width, &height, &nrChannels, 0);
     if (data)
     {

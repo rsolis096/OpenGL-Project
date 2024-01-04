@@ -151,7 +151,7 @@ void main()
     //for(int i = 0; i < numberOfSpotLights; i++)
     {
     }
-                result += CalcSpotLight(spotLights[0], normal, viewDir);           
+        result += CalcSpotLight(spotLights[0], normal, viewDir);           
 
     FragColor = vec4(result, 1.0);   
 }
@@ -194,7 +194,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir)
     }
     else
     {
-        ambient = light.ambient * spotFactor;
+        ambient = light.ambient * spotFactor * object.ambient;
         diffuse = object.diffuse * spotFactor;
         specular = object.specular;
     }

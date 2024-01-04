@@ -20,7 +20,6 @@ void Model::Draw(Shader& shader)
     shader.setBool("hasTexture", m_hasTexture);
     if (!m_hasTexture)
     {
-        shader.use();
         shader.setVec3("object.ambient", m_Ambient);
         shader.setVec3("object.diffuse", m_Diffuse);
         shader.setVec3("object.specular", m_Specular);
@@ -28,6 +27,17 @@ void Model::Draw(Shader& shader)
 
     for (unsigned int i = 0; i < meshes.size(); i++)
         meshes[i].Draw(shader, m_hasTexture);
+    glCheckError();
+}
+
+void Model::ShadowMapDraw(Shader& shader)
+{
+    shader.use();
+    shader.setMat4("model", m_Model);
+    shader.setBool("hasTexture", false);
+
+    for (unsigned int i = 0; i < meshes.size(); i++)
+        meshes[i].Draw(shader, false);
     glCheckError();
 }
 

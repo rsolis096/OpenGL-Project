@@ -7,9 +7,12 @@ Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
     m_Diffuse = glm::vec3(1.0f);
     m_Specular = glm::vec3(0.1f);
     m_Position = glm::vec3(0.0f);
+    m_Rotation = glm::vec3(0.0f);
     m_Scale = glm::vec3(1.0f);
     m_Model = glm::mat4(1.0f);
     m_ObjectID = 0;
+    m_RotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+    m_RotationIndex = 0;
 
     m_Force = glm::vec3(0.0f);
     m_Velocity = glm::vec3(0.0f);
@@ -38,7 +41,6 @@ Object::~Object()
     //Texture Properties
     delete m_DiffuseMap;
     delete m_SpecularMap;
-
 }
 
 void Object::setAmbient(glm::vec3 newAmbient)
@@ -74,6 +76,14 @@ void Object::setPosition(glm::vec3 newPosition)
     updateObject();
 }
 
+void Object::setRotation(glm::vec3& newRotation, glm::vec3 axis, int index)
+{
+    m_Rotation[index] = newRotation[index];
+    m_RotationAxis = axis;
+    m_RotationIndex = index;
+    updateObject();
+}
+
 void Object::setScale(glm::vec3 newScale)
 {
     m_Scale = newScale;
@@ -93,7 +103,13 @@ void Object::updateObject()
     m_Model = glm::translate(m_Model, m_Position);
     // Apply scaling transformation
     m_Model = glm::scale(m_Model, m_Scale);
+    // Apply Rotation
+    m_Model = glm::rotate(m_Model, glm::radians(m_Rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+    m_Model = glm::rotate(m_Model, glm::radians(m_Rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+    m_Model = glm::rotate(m_Model, glm::radians(m_Rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
 }
+
+
 
 void Object::buildInterleavedVertices()
 {

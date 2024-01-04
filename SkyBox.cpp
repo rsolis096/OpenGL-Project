@@ -4,12 +4,12 @@ SkyBox::SkyBox(Shader& s, Camera* c) : m_CubeMapShader(s), m_PlayerCamera(c)
 {
     //Skybox faces
     m_Faces = {
-        "Assets/skybox/right.jpg",
-        "Assets/skybox/left.jpg",
-        "Assets/skybox/top.jpg",
-        "Assets/skybox/bottom.jpg",
-        "Assets/skybox/front.jpg",
-        "Assets/skybox/back.jpg"
+        "Assets/skybox/city/right.jpg",
+        "Assets/skybox/city/left.jpg",
+        "Assets/skybox/city/top.jpg",
+        "Assets/skybox/city/bottom.jpg",
+        "Assets/skybox/city/front.jpg",
+        "Assets/skybox/city/back.jpg"
     };
 
     m_Vertices = {

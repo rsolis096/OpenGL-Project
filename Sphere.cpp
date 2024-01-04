@@ -36,24 +36,26 @@ void Sphere::Draw(Shader& shader)
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
     shader.setMat4("model", m_Model);
-    m_hasTexture = false;
+    shader.setBool("hasTexture", m_hasTexture);
 
     //Bind texture and send texture to fragment shader
     if (m_hasTexture)
     {
-        glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
         glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
+        glActiveTexture(GL_TEXTURE2); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
 
-        shader.use();
-        shader.setBool("hasTexture", true);
+        GLint diffuseLocation = glGetUniformLocation(shader.ID, "material.diffuse");
+        GLint specularLocation = glGetUniformLocation(shader.ID, "material.specular");
+
+        if (diffuseLocation != -1)
+            glUniform1i(diffuseLocation, 1); // 0 corresponds to GL_TEXTURE0
+
+        if (specularLocation != -1)
+            glUniform1i(specularLocation, 2); // 1 corresponds to GL_TEXTURE1
     }
-    else
-    {
-        shader.use();
-        shader.setBool("hasTexture", false);
-    }
+
 
     //Bind Sphere
     glBindVertexArray(m_vao);

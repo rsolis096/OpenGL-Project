@@ -1,5 +1,7 @@
 #include "Scene.h"
 
+class PhysicsWorld;
+
 Scene::Scene()
 {
 	objectCount = 0;

@@ -10,8 +10,8 @@ private:
 
 public:	
 	PhysicsWorld();
-	int addObject(Object* obj);
-	int removeObject(Object* obj);
+	int addObject(Object*);
+	int removeObject(Object*);
 	void removeAllObjects();
 	void step(float totalTime, float deltaTime);
 };

@@ -7,10 +7,14 @@
 #include "Vendors/imgui/imgui_impl_opengl3.h"
 
 #include <iostream>
+
+
+#include "PhysicsWorld.h"
+
 #include "Texture.h"
 #include "GUI.h"
 #include "ShadowMap.h"
-//Objects
+#include "Model.h"
 
 #include "PointLight.h"
 #include "SpotLight.h"
@@ -20,8 +24,7 @@
 
 #include "LightController.h"
 
-//Physics
-#include "PhysicsWorld.h"
+
 
 
 //Matrix Multiplication
@@ -97,7 +100,7 @@ void processInput(GLFWwindow* window)
 
 
     //Return mouse movement when tab is pressed
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS)
     {
         double currentTime = glfwGetTime();
         if (currentTime - lastKeyPressTime > debounceThreshold)
@@ -167,7 +170,6 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
             xpos = static_cast<float>(xposIn);
             ypos = static_cast<float>(yposIn);
         }
-
 
         if (firstMouse)
         {
@@ -269,24 +271,29 @@ int main()
     glEnable(GL_CULL_FACE);
 
     Scene myScene(myCamera);
-    //myScene.addObject(new Model("resources/objects/dragon/dragon.obj"));
+    myScene.addObject(new Model("resources/objects/dragon/dragon.obj"));
     myScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
-    myScene.addObject(new Sphere());
+    myScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
     myScene.addObject(new Plane());
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[0]);
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[1]);
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[2]);    
+    myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[3]);
     //myScene.m_LightController->addPointLight();
     //myScene.m_LightController->addSpotLight();
     
     glm::vec3 spotLightPos = glm::vec3(-10.0f, 3.0f, 0.0f);
     glm::vec3 spotLightDir = glm::vec3(-1.0f, 3.0f, 0.0f);
     myScene.m_LightController->addSpotLight(spotLightPos, spotLightDir);
+    myScene.m_LightController->addSpotLight(); //Flashlight
     //Cube
-    myScene.m_SceneObjects[0]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
-    myScene.m_SceneObjects[0]->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
+    myScene.m_SceneObjects[1]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
+    myScene.m_SceneObjects[1]->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
     //Sphere
-    myScene.m_SceneObjects[1]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
+    myScene.m_SceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
+    //Model
+    myScene.m_SceneObjects[0]->setPosition(glm::vec3(6.7f, 0.0f, 0.0f));
+    myScene.m_SceneObjects[0]->setScale(glm::vec3(0.01f));
 
     //ShadowMap shadowMap = ShadowMap(myScene, spotLightPos, spotLightDir);
 
