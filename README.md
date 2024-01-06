@@ -1,15 +1,15 @@
 # A simple 3D rasterizer
 
 ## Controls
-### - Mouse   - Look Around
-### -   W     - Move Forwards
-### -   A     - Move Left
-### -   S     - Move Backwards
-### -   D     - Move Right
-### - LSHIFT  - Increase Movement Speed
-### -   `     - Open Menu, once GUI is open use Mouse to interact
-### - Scroll Wheel - Increase/Decrease Field of View (Zoom)
-### -  ESC    - Close Program
+### Mouse   - Look Around
+###    W     - Move Forwards
+###    A     - Move Left
+###    S     - Move Backwards
+###    D     - Move Right
+###  LSHIFT  - Increase Movement Speed
+###    `     - Open Menu, once GUI is open use Mouse to interact
+###  Scroll Wheel - Increase/Decrease Field of View (Zoom)
+###   ESC    - Close Program
 
 ## Includes
 ### - Real time manipulation of 3D objects such as Position, Rotation, Textures, Colours through a Graphical User Interface
