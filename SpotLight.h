@@ -16,7 +16,10 @@ public:
 	~SpotLight();
 
 	//For Light Properties
-	void setLightPos(glm::vec3 lightPos);
+	void setLightPos(glm::vec3);
+	glm::vec3 getLightPos();
+	void setLightDirection(glm::vec3);
+	glm::vec3 getLightDirection();
 
 	//For Attenuation
 	void setconstant(float constant);
@@ -36,6 +39,11 @@ public:
 	float getIntensity();
 	void setIntensity(float i);
 	std::string m_DisplayName;
+
+	float getNearPlane();
+	void setNearPlane(float&);
+	float getFarPlane();
+	void setFarPlane(float&);
 
 private:
 	Shader* m_lightingShader;
@@ -57,5 +65,9 @@ private:
 	float m_Linear;
 	float m_Quadratic;
 	float m_Intensity;
+
+	//For shadows
+	float m_NearPlane;
+	float m_FarPlane;
 
 };

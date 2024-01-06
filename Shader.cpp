@@ -117,6 +117,8 @@ void Shader::setBool(const std::string& name, bool value) const
 }
 void Shader::setInt(const std::string& name, int value) const
 {
+    // Set the value of the uniform
+    glUseProgram(ID);
     glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 void Shader::setFloat(const std::string& name, float value) const

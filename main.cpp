@@ -279,23 +279,26 @@ int main()
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[1]);
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[2]);    
     myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[3]);
-    //myScene.m_LightController->addPointLight();
-    //myScene.m_LightController->addSpotLight();
     
-    glm::vec3 spotLightPos = glm::vec3(-10.0f, 3.0f, 0.0f);
-    glm::vec3 spotLightDir = glm::vec3(-1.0f, 3.0f, 0.0f);
-    myScene.m_LightController->addSpotLight(spotLightPos, spotLightDir);
-    myScene.m_LightController->addSpotLight(); //Flashlight
+    glm::vec3 spotLightPos1 = glm::vec3(4.0f, 3.0f, -17.0f);
+    glm::vec3 spotLightDir1 = glm::vec3(-20.0f, -5.0f, 45.0f);
+    spotLightDir1 = glm::normalize(spotLightDir1 - spotLightPos1);
+
+    glm::vec3 spotLightPos2 = glm::vec3(10.0f, 3.0f, 0.0f);
+    glm::vec3 spotLightDir2 = glm::vec3(-4.50f, -3.0f, 14.0f);
+    spotLightDir2 = glm::normalize(spotLightDir2 - spotLightPos2);
+
+    myScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
+    //myScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
     //Cube
     myScene.m_SceneObjects[1]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
     myScene.m_SceneObjects[1]->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
     //Sphere
     myScene.m_SceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
     //Model
-    myScene.m_SceneObjects[0]->setPosition(glm::vec3(6.7f, 0.0f, 0.0f));
+    myScene.m_SceneObjects[0]->setPosition(glm::vec3(-3.0f, 0.0f, 14.0f));
     myScene.m_SceneObjects[0]->setScale(glm::vec3(0.01f));
 
-    //ShadowMap shadowMap = ShadowMap(myScene, spotLightPos, spotLightDir);
 
     glCheckError();
 
@@ -312,8 +315,8 @@ int main()
     glm::mat4 projection;
 
     // Shader configuration
-    myScene.lightingShader->use();
-    myScene.lightingShader->setInt("shadowMap", 1);
+    //myScene.lightingShader->use();
+    //myScene.lightingShader->setInt("shadowMap", 1);
 
     myScene.mainCamera = (myCamera);
 
@@ -332,45 +335,46 @@ int main()
         //Rendering Starts Here
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glCheckError();
 
         //SHADOW PASS
         myScene.m_ShadowMap->ShadowPass();
-        //END OF SHADOW PASS
         
-        //LIGHTING PASS
-        //***************************************************************************
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //Point Light Lamp
+        //Point Light Lamp (light spheres)
         myScene.pointLightShader->use();
         myScene.pointLightShader->setMat4("projection", projection);
         myScene.pointLightShader->setMat4("view", view);
+
         //Main Shader
         myScene.lightingShader->use();
         myScene.lightingShader->setMat4("projection", projection);
         myScene.lightingShader->setMat4("view", view);
         myScene.lightingShader->setVec3("viewPos", myCamera->cameraPos);
-        myScene.lightingShader->setMat4("lightSpaceMatrix", myScene.m_ShadowMap->getLightSpaceMatrx());
-        //SHADOW MAP TEXTURE
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, myScene.m_ShadowMap->getDepthMapID());
-        GLint specularLocation = glGetUniformLocation(myScene.lightingShader->ID, "shadowMap");
-        glUniform1i(specularLocation, 0); // 0 corresponds to GL_TEXTURE0
+
+        glUseProgram(myScene.lightingShader->ID);
+        glUniformMatrix4fv(
+            glGetUniformLocation(myScene.lightingShader->ID, "lightSpaceMatrices"),
+            myScene.m_ShadowMap->getLightSpaceMatrices().size(),
+            GL_FALSE, 
+            glm::value_ptr(myScene.m_ShadowMap->getLightSpaceMatrices()[0])
+        );
+
+        myScene.m_ShadowMap->drawShadowMap(myScene.lightingShader->ID);
         myScene.drawScene(deltaTime);
-        //***************************************************************************
         // END OF LIGHTING PASS
-        GLint maxTextureUnits;
-        glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
-        /*
+        
+
         // render Depth map to quad for visual debugging
         // ---------------------------------------------
-        debugDepthQuad.use();
-        debugDepthQuad.setFloat("near_plane", near_plane);
-        debugDepthQuad.setFloat("far_plane", far_plane);
+
+        /*
+        myScene.m_ShadowMap->debugDepthShader.use();
+        myScene.m_ShadowMap->debugDepthShader.setFloat("near_plane", myScene.m_LightController->m_SpotLights[1]->getNearPlane());
+        myScene.m_ShadowMap->debugDepthShader.setFloat("far_plane", myScene.m_LightController->m_SpotLights[1]->getFarPlane());
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
-        updateCamera(debugDepthQuad, view, projection);
+        glBindTexture(GL_TEXTURE_2D, myScene.m_ShadowMap->getDepthMapID(1));
+        updateCamera(myScene.m_ShadowMap->debugDepthShader, view, projection);
         RenderQuad();
         */
 
@@ -386,9 +390,6 @@ int main()
     }
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-
-
-
 
     //Delete everything
     myScene.m_PhysicsWorld->removeAllObjects();

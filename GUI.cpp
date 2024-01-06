@@ -75,7 +75,7 @@ void GUI::drawList()
 	ImGui::Text("Object Count: %d", myScene.m_SceneObjects.size());
 
 	//Left Side of window
-	static int selected = 0; //Default selected object is first object in scene
+	static int selected; //Default selected object is first object in scene
 
 	//Current Tab from left to right
 	static int currentTab = 1;
@@ -86,10 +86,11 @@ void GUI::drawList()
 		ImGui::BeginChild("left pane top", ImVec2(150, -ImGui::GetFrameHeightWithSpacing()), true);
 		for (int i = 0; i < myScene.m_SceneObjects.size(); i++)
 		{
-			// FIXME: Good candidate to use ImGuiSelectableFlags_SelectOnNav
 			char label[128];
+			bool isSelected = (selected == i);
+
 			sprintf_s(label, myScene.m_SceneObjects[i]->m_DisplayName.c_str(), i);
-			if (ImGui::Selectable(label, false))
+			if (ImGui::Selectable(label, isSelected))
 			{
 				selected = i;
 			}
@@ -105,10 +106,11 @@ void GUI::drawList()
 		ImGui::BeginChild("left pane top", ImVec2(150, -ImGui::GetFrameHeightWithSpacing()), true);
 		for (int i = 0; i < myScene.m_LightController->m_SpotLights.size(); i++)
 		{
-			// FIXME: Good candidate to use ImGuiSelectableFlags_SelectOnNav
 			char label[128];
+			bool isSelected = (selected == i);
+
 			sprintf_s(label, myScene.m_LightController->m_SpotLights[i]->m_DisplayName.c_str(), i);
-			if (ImGui::Selectable(label, false))
+			if (ImGui::Selectable(label, isSelected))
 			{
 				selected = i;
 			}
@@ -151,18 +153,12 @@ void GUI::drawList()
 					// Position
 					{
 						//For transformation
-						static float vec4f[4] = { 0.00f, 0.00f, 0.00f, 0.00f };
 						glm::vec3 pos = selectedObject->m_Position;
-						ImGui::Text("Current Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
-						ImGui::InputFloat3("##Position", vec4f);
-						if (ImGui::Button("Set##SetPosition")) {
-							pos[0] = vec4f[0];
-							pos[1] = vec4f[1];
-							pos[2] = vec4f[2];
-							selectedObject->setPosition(pos);
-							vec4f[0] = 0.00f;
-							vec4f[1] = 0.00f;
-							vec4f[2] = 0.00f;
+						float vec4f[3] = { pos[0], pos[1], pos[2] };
+						ImGui::Text("Current Object Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
+						if (ImGui::InputFloat3("##Position", vec4f))
+						 {			
+							selectedObject->setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
 							selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
 							selectedObject->startFall = glfwGetTime();
 						}
@@ -319,11 +315,13 @@ void GUI::drawList()
 			//Lighting Tab
 			if (ImGui::BeginTabItem("Lighting"))
 			{
+				SpotLight* selectedSpotLight = myScene.m_LightController->m_SpotLights[selected];
 				currentTab = 2;
-				glm::vec3 diffuse = myScene.m_LightController->m_SpotLights[0]->getDiffuse();
-				glm::vec3 ambient = myScene.m_LightController->m_SpotLights[0]->getAmbient();
-				glm::vec3 specular = myScene.m_LightController->m_SpotLights[0]->getSpecular();
-				float intensity = myScene.m_LightController->m_SpotLights[0]->getIntensity();
+				glm::vec3 diffuse = selectedSpotLight->getDiffuse();
+				glm::vec3 ambient = selectedSpotLight->getAmbient();
+				glm::vec3 specular = selectedSpotLight->getSpecular();
+				float intensity = selectedSpotLight->getIntensity();
+
 				// Intensity
 				{
 					ImGui::Spacing();
@@ -332,10 +330,10 @@ void GUI::drawList()
 					{
 						if (intensity <= 0)
 							intensity = 1;
-						myScene.m_LightController->m_SpotLights[0]->setIntensity(intensity);
-						myScene.m_LightController->m_SpotLights[0]->setDiffuse(diffuse);
-						myScene.m_LightController->m_SpotLights[0]->setDiffuse(ambient);
-						myScene.m_LightController->m_SpotLights[0]->setDiffuse(specular);
+						selectedSpotLight->setIntensity(intensity);
+						selectedSpotLight->setDiffuse(diffuse);
+						selectedSpotLight->setDiffuse(ambient);
+						selectedSpotLight->setDiffuse(specular);
 					}
 				}
 
@@ -349,17 +347,17 @@ void GUI::drawList()
 					bool change = false;
 					if (ImGui::ColorEdit3("Diffuse###Lightcolor 1", d))
 					{
-						myScene.m_LightController->m_SpotLights[0]->setDiffuse(glm::vec3(d[0], d[1], d[2]));
+						selectedSpotLight->setDiffuse(glm::vec3(d[0], d[1], d[2]));
 						change = true;
 					}
 					if (ImGui::ColorEdit3("Ambient###Lightcolor 2", a))
 					{
-						myScene.m_LightController->m_SpotLights[0]->setAmbient(glm::vec3(a[0], a[1], a[2]));
+						selectedSpotLight->setAmbient(glm::vec3(a[0], a[1], a[2]));
 						change = true;
 					}
 					if (ImGui::ColorEdit3("Specular###Lightcolor 3", s))
 					{
-						myScene.m_LightController->m_SpotLights[0]->setSpecular(glm::vec3(s[0], s[1], s[2]));
+						selectedSpotLight->setSpecular(glm::vec3(s[0], s[1], s[2]));
 						change = true;
 					}
 
@@ -371,16 +369,93 @@ void GUI::drawList()
 					ImGui::Spacing();
 				}
 
+				// Light Position
+				{
+					ImGui::Spacing();
+					glm::vec3 lightPosition = selectedSpotLight->getLightPos();
+					float pos[3] = { lightPosition[0], lightPosition[1], lightPosition[2] };
+					ImGui::Text("Position");
+					if (ImGui::InputFloat3("##Position", pos, "%.3f", 0))
+					{
+						selectedSpotLight->setLightPos(glm::vec3(pos[0], pos[1], pos[2]));
+					}
+				}
+				
+				// Light Direction (Needs Work)
+				{
+					ImGui::Spacing();
+					glm::vec3 lightDir = selectedSpotLight->getLightDirection();
+					//Direction
+					static float dir[3] = {lightDir[0], lightDir[1], lightDir[2]};
+					ImGui::Text("Direction");
+					if(ImGui::DragFloat("##Direction1", &dir[0], 0.1f, -100.0f, 100.0f, "%.2f",0))
+					{
+						selectedSpotLight->setLightDirection(
+							glm::vec3(
+								dir[0],
+								dir[1],
+								dir[2])
+						);
+					}
+
+					if (ImGui::DragFloat("##Direction2", &dir[1], 0.1f, -100.0f, 100.0f, "%.2f", 0))
+					{
+						selectedSpotLight->setLightDirection(
+							glm::vec3(
+								dir[0],
+								dir[1],
+								dir[2])
+						);
+					}
+
+					if (ImGui::DragFloat("##Direction3", &dir[2], 0.1f, -100.0f, 100.0f, "%.2f", 0))
+					{
+						selectedSpotLight->setLightDirection(
+							glm::vec3(
+								dir[0],
+								dir[1],
+								dir[2])
+						);
+					}
+
+
+					/* Light Rotation (Better for direction but no implemented yet)
+					ImGui::Spacing();
+					ImGui::Text("Rotation");
+					float rX = selectedObject->m_Rotation[0];
+					float rY = selectedObject->m_Rotation[2];
+					float rZ = selectedObject->m_Rotation[1];
+					glm::vec3 currentRotation = glm::vec3(rX, rY, rZ);
+
+					if (ImGui::DragFloat("x", &rX, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+					{
+
+						currentRotation[0] = rX;
+						selectedObject->setRotation(currentRotation, glm::vec3(1.0f, 0.0f, 0.0f), 0);
+					}
+					if (ImGui::DragFloat("z", &rZ, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+					{
+						currentRotation[1] = rZ;
+						selectedObject->setRotation(currentRotation, glm::vec3(0.0f, 1.0f, 0.0f), 1);
+					}
+					if (ImGui::DragFloat("y", &rY, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+					{
+						currentRotation[2] = rY;
+						selectedObject->setRotation(currentRotation, glm::vec3(0.0f, 0.0f, 1.0f), 2);
+					}
+					*/
+				}
+
 				//ShadowMap
 				{
 					ImGui::Spacing();
 					ImGui::Text("Shadows");
-					float near_plane = myScene.m_ShadowMap->getNearPlane();
+					float near_plane = selectedSpotLight->getNearPlane();
 					if (ImGui::InputFloat("Near Plane", &near_plane, 0.1f, 1.0f, "%.3f", 0))
-						myScene.m_ShadowMap->setNearPlane(near_plane);
-					float far_plane = myScene.m_ShadowMap->getFarPlane();
+						selectedSpotLight->setNearPlane(near_plane);
+					float far_plane = selectedSpotLight->getFarPlane();
 					if (ImGui::InputFloat("Far Plane", &far_plane, 0.1f, 1.0f, "%.3f", 0))
-						myScene.m_ShadowMap->setFarPlane(far_plane);
+						selectedSpotLight->setFarPlane(far_plane);
 				}
 
 				ImGui::EndTabItem();

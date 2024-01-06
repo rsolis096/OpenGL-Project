@@ -184,8 +184,6 @@
     <None Include="lightingShader.vert" />
     <None Include="pointLightShader.frag" />
     <None Include="pointLightShader.vert" />
-    <None Include="shadow_mapping.frag" />
-    <None Include="shadow_mapping.vert" />
     <None Include="shadow_mapping_depth.frag" />
     <None Include="shadow_mapping_depth.vert" />
   </ItemGroup>

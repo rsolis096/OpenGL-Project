@@ -19,7 +19,7 @@ Scene::Scene()
 
 	glm::vec3 spotLightPos = glm::vec3(-10.0f, 3.0f, 0.0f);
 	glm::vec3 spotLightDir = glm::vec3(-1.0f, 3.0f, 0.0f);
-	m_ShadowMap = new ShadowMap(&m_SceneObjects, spotLightPos, spotLightDir);
+	m_ShadowMap = new ShadowMap(&m_SceneObjects, &m_LightController->m_SpotLights);
 
 	glCheckError();
 }
@@ -38,7 +38,7 @@ Scene::Scene(Camera* mC)
 
 	glm::vec3 spotLightPos = glm::vec3(-10.0f, 3.0f, 0.0f);
 	glm::vec3 spotLightDir = glm::vec3(-1.0f, 3.0f, 0.0f);
-	m_ShadowMap = new ShadowMap(&m_SceneObjects, spotLightPos, spotLightDir);
+	m_ShadowMap = new ShadowMap(&m_SceneObjects, &m_LightController->m_SpotLights);
 
 	glCheckError();
 }

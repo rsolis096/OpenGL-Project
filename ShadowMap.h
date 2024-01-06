@@ -2,30 +2,31 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Object.h"
+#include "LightController.h"
+#include <glm/gtx/string_cast.hpp>
 
 class ShadowMap
 {
 	private:
-		Shader depthShader;
-		Shader debugDepthShader;
+
 		std::vector<Object*>* m_SceneObjects;
-		GLuint depthMapFBO;
-		GLuint depthMap;
+		std::vector<SpotLight*>* m_SpotLights;
+		std::vector<GLuint> depthMapFBO;
+		std::vector<GLuint> depthMap;
 		const unsigned int SHADOW_WIDTH = 2048;
 		const unsigned int SHADOW_HEIGHT = 2048;
-		float m_NearPlane;
-		float m_FarPlane;
-		glm::vec3 m_LightPos;
-		glm::vec3 m_LightDir;
-		glm::mat4 m_LightSpaceMatrix;
+		std::vector<glm::mat4> m_LightSpaceMatrices;
+
 	public:
-		ShadowMap(std::vector<Object*>*, glm::vec3, glm::vec3);
+		Shader depthShader;
+		Shader debugDepthShader;
+		ShadowMap(std::vector<Object*>*, std::vector<SpotLight*>*);
 		void ShadowPass();
-		GLuint getFBO();
-		GLuint getDepthMapID();
-		glm::mat4& getLightSpaceMatrx();
-		float getNearPlane();
-		void setNearPlane(float&);
-		float getFarPlane();
-		void setFarPlane(float&);
+		glm::mat4& getLightSpaceMatrix(int);
+		std::vector<glm::mat4>& getLightSpaceMatrices();
+		void drawShadowMap(GLuint&);
+
+		GLuint getDepthMapID(int);
+		GLuint getDepthMapFBOID(int);
+		
 };
