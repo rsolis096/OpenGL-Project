@@ -13,8 +13,11 @@ ShadowMap::ShadowMap(std::vector<Object*>* objects, std::vector<SpotLight*>* spo
     depthMapFBO.push_back(0);
     depthMap.push_back(0);
 
+    depthMapFBO.push_back(0);
+    depthMap.push_back(0);
 
-    for (int i = 0; i < 2; i++)
+
+    for (int i = 0; i < 3; i++)
     {
         // Generate framebuffer and depth map texture
         glGenFramebuffers(1, &depthMapFBO[i]);
@@ -38,8 +41,8 @@ ShadowMap::ShadowMap(std::vector<Object*>* objects, std::vector<SpotLight*>* spo
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         //Debug Quad
-        //debugDepthShader.use();
-        //debugDepthShader.setInt("depthMap", 0);
+        debugDepthShader.use();
+        debugDepthShader.setInt("depthMap", 0);
     }
 }
 
@@ -53,6 +56,7 @@ void ShadowMap::ShadowPass()
     m_LightSpaceMatrices.resize(m_SpotLights->size(), glm::mat4(1.0f));
     depthShader.setInt("numberOfShadowMaps", (*m_SpotLights).size());
 
+    //Generate the light space matrices
     for (int i = 0; i < (*m_SpotLights).size(); i++)
     {
         // Calculate light projection matrix
@@ -75,20 +79,21 @@ void ShadowMap::ShadowPass()
         glCheckError();
     }  
 
-    // Use the depth shader for rendering
-    depthShader.use();
-    // Pass the light-space matrices to the shader
-    glUniformMatrix4fv(
-        glGetUniformLocation(depthShader.ID, "lightSpaceMatrices"),
-        getLightSpaceMatrices().size(),
-        GL_FALSE,
-        glm::value_ptr(getLightSpaceMatrices()[0])
-    );
 
-
-    // Loop through each shadow map
+    // Loop through each depth/shadow map FBO
     for (int i = 0; i < (*m_SpotLights).size(); i++)
     {
+
+        // Use the depth shader for rendering
+        depthShader.use();
+        // Pass the light-space matrices to the shader
+        glUniformMatrix4fv(
+            glGetUniformLocation(depthShader.ID, "lightSpaceMatrix"),
+            1, // Pass 1 matrix
+            GL_FALSE,
+            glm::value_ptr(getLightSpaceMatrices()[i])
+        );
+
         // Set the viewport and bind the framebuffer
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO[i]);

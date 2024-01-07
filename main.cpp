@@ -288,8 +288,14 @@ int main()
     glm::vec3 spotLightDir2 = glm::vec3(-4.50f, -3.0f, 14.0f);
     spotLightDir2 = glm::normalize(spotLightDir2 - spotLightPos2);
 
+    glm::vec3 spotLightPos3 = glm::vec3(-14.0f, 3.0f, -13.0f);
+    glm::vec3 spotLightDir3 = glm::vec3(0.0f, 0.0f, 1.0f);
+    spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
+
     myScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
-    //myScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
+    myScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
+    myScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
+
     //Cube
     myScene.m_SceneObjects[1]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
     myScene.m_SceneObjects[1]->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
@@ -339,6 +345,7 @@ int main()
         //SHADOW PASS
         myScene.m_ShadowMap->ShadowPass();
         
+        /**/
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         //Point Light Lamp (light spheres)
