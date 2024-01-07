@@ -21,6 +21,9 @@ Scene::Scene()
 	glm::vec3 spotLightDir = glm::vec3(-1.0f, 3.0f, 0.0f);
 	m_ShadowMap = new ShadowMap(&m_SceneObjects, &m_LightController->m_SpotLights);
 
+	//Initialize Skybox
+	m_SkyBox = nullptr;
+
 	glCheckError();
 }
 
@@ -39,6 +42,7 @@ Scene::Scene(Camera* mC)
 	glm::vec3 spotLightPos = glm::vec3(-10.0f, 3.0f, 0.0f);
 	glm::vec3 spotLightDir = glm::vec3(-1.0f, 3.0f, 0.0f);
 	m_ShadowMap = new ShadowMap(&m_SceneObjects, &m_LightController->m_SpotLights);
+	m_SkyBox = new SkyBox(*cubeMapShader, mainCamera);
 
 	glCheckError();
 }
@@ -107,8 +111,11 @@ void Scene::removeLightController()
 
 }
 
-void Scene::drawScene(float deltaTime)
-{
+void Scene::drawScene(float deltaTime, glm::mat4& proj)
+{	
+	//Activate the texture units and bind the correspoding depth map
+	m_ShadowMap->drawShadowMap(lightingShader->ID);
+
 	//Update physics
 	m_PhysicsWorld->step(glfwGetTime(), deltaTime);
 
@@ -120,10 +127,14 @@ void Scene::drawScene(float deltaTime)
 	{
 		element->Draw(*lightingShader);
 	}
+
+	m_SkyBox->draw(proj);
 }
 
-void Scene::drawScene(float deltaTime, Shader& shader)
+void Scene::drawScene(float deltaTime, Shader& shader, glm::mat4& proj)
 {
+	m_ShadowMap->drawShadowMap(lightingShader->ID);
+
 	//Update physics
 	m_PhysicsWorld->step(glfwGetTime(), deltaTime);
 
@@ -137,5 +148,7 @@ void Scene::drawScene(float deltaTime, Shader& shader)
 			element->translatePosition(glm::vec3(0.001f)); //Translate the sphere for debugging purposes
 		element->Draw(shader);
 	}
+
+	m_SkyBox->draw(proj);
 }
 

@@ -7,7 +7,6 @@
 class SkyBox
 {
 public:
-	std::vector<std::string> m_Faces;
 	std::vector<float> m_Vertices;
 	unsigned int m_SkyBoxVAO, m_SkyBoxVBO;
 	Camera* m_PlayerCamera;
@@ -16,7 +15,8 @@ public:
 	~SkyBox();
 	void draw(glm::mat4&);
 	Texture* m_CubeMap;
-	int setCubeMapTexture(std::vector<std::string>);
-	int setCubeMapTexture(std::string);
-
+	int setCubeMapTexture(int);
+	static std::vector<std::vector<std::string>> m_CubeMapPaths;
+	static std::vector<std::string> m_CubeMapNames;
+	int m_Current;
 };

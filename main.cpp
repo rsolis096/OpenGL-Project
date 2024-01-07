@@ -19,7 +19,6 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "DirectionalLight.h"
-#include "SkyBox.h"
 #include "Model.h"
 
 #include "LightController.h"
@@ -33,8 +32,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 // settings
-const unsigned int SCR_WIDTH = 1920;
-const unsigned int SCR_HEIGHT = 1080;
+unsigned int SCR_WIDTH = 1920;
+unsigned int SCR_HEIGHT = 1080;
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 bool firstMouse = true;
@@ -56,26 +55,24 @@ Camera* myCamera = new Camera();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     std::cout << "resize window called" << std::endl;
+    SCR_WIDTH = width;
+    SCR_HEIGHT = height;
     glViewport(0, 0, width, height);
 }
 
 void updateCamera(Shader& lightingShader, glm::mat4& view, glm::mat4& projection)
 {
-    glCheckError();
     lightingShader.use();
-    glCheckError();
+
     //View Matrix (Do after camera)
     view = myCamera->GetViewMatrix();
-    glCheckError();
 
     //Projection Matrix (fov change with scroll wheel) last value changes render distance
     projection = glm::perspective(glm::radians(myCamera->getFOV()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 1500.0f);
-    glCheckError();
 
     //Send View and Projection matrices to shader (for camera)]]
     
     lightingShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.    
-    glCheckError();
 
     lightingShader.setMat4("view", view);
     glCheckError();
@@ -145,6 +142,10 @@ void processInput(GLFWwindow* window)
             myCamera->processKeyboard(-1.0f * cameraSpeed, GLFW_KEY_A);
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             myCamera->processKeyboard(cameraSpeed, GLFW_KEY_D);
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+            myCamera->processKeyboard(cameraSpeed, GLFW_KEY_SPACE);
+        if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+            myCamera->processKeyboard(cameraSpeed, GLFW_KEY_LEFT_CONTROL);
     }
 }
 
@@ -271,6 +272,8 @@ int main()
     glEnable(GL_CULL_FACE);
 
     Scene myScene(myCamera);
+
+    //GENERATE INITIAL SCENE (ALL OF THESE CAN BE CHANGED IN REAL TIME)
     myScene.addObject(new Model("resources/objects/dragon/dragon.obj"));
     myScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
     myScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
@@ -305,14 +308,6 @@ int main()
     myScene.m_SceneObjects[0]->setPosition(glm::vec3(-3.0f, 0.0f, 14.0f));
     myScene.m_SceneObjects[0]->setScale(glm::vec3(0.01f));
 
-
-    glCheckError();
-
-    //Create the SkyBox
-    SkyBox* mySkyBox = new SkyBox(*myScene.cubeMapShader, myCamera);
-    //This feature does not work for high resolution images.
-    //mySkyBox->setCubeMapTexture("Assets/skybox/space.png");
-
     //Initialize the GUI
     GUI myGUI(window, myScene);
 
@@ -320,13 +315,10 @@ int main()
     glm::mat4 view;
     glm::mat4 projection;
 
-    // Shader configuration
-    //myScene.lightingShader->use();
-    //myScene.lightingShader->setInt("shadowMap", 1);
-
-    myScene.mainCamera = (myCamera);
+    myScene.mainCamera = myCamera;
 
     glCheckError();
+
     //Main loop
     while (!glfwWindowShouldClose(window))
     {
@@ -367,8 +359,7 @@ int main()
             glm::value_ptr(myScene.m_ShadowMap->getLightSpaceMatrices()[0])
         );
 
-        myScene.m_ShadowMap->drawShadowMap(myScene.lightingShader->ID);
-        myScene.drawScene(deltaTime);
+        myScene.drawScene(deltaTime, projection);
         // END OF LIGHTING PASS
         
 
@@ -385,18 +376,15 @@ int main()
         RenderQuad();
         */
 
-        mySkyBox->draw(projection);
         glCheckError();
 
-        //GUI should always be drawn last
+        //Ready the GUI in the background
         myGUI.displayWindow();
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);//swap back frame buffer with front frame buffer.
         glfwPollEvents();
     }
-    // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
 
     //Delete everything
     myScene.m_PhysicsWorld->removeAllObjects();
@@ -407,8 +395,6 @@ int main()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-
-
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
@@ -425,11 +411,7 @@ int main()
 *   - Refactor the code to work more fluidly with eachother, less back and forth
 *   - Remove as many hard coded situations as possible and give the user freedom
 *       - Adding / removing light sources
-*       - Adjusting light intensity and colours
-*       - Adjusting light positions
 *       - Object identities and names for more convenient and personalized editing
 *       - Enable a flash light option (only 1 flashlight)
-*   - Adjust the GUI to be more intuitive and template more options
 *   - Make some tests
-*   - 
 */

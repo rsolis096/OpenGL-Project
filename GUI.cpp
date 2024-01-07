@@ -460,6 +460,24 @@ void GUI::drawList()
 
 				ImGui::EndTabItem();
 			}
+
+			if (ImGui::BeginTabItem("SkyBox"))
+			{
+				currentTab = 3;
+				for (int i = 0; i < myScene.m_SkyBox->m_CubeMapNames.size(); i++)
+				{
+					char label[128];
+					bool isSelected = (selected == i);
+
+					sprintf_s(label, myScene.m_SkyBox->m_CubeMapNames[i].c_str(), i);
+					if (ImGui::Selectable(label, isSelected))
+					{
+						selected = i;
+						myScene.m_SkyBox->setCubeMapTexture(selected);
+					}
+				}
+				ImGui::EndTabItem();
+			}
 			ImGui::EndTabBar();
 		}
 		ImGui::EndChild();

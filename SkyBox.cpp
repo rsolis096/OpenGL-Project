@@ -1,17 +1,45 @@
 #include "SkyBox.h"
 
-SkyBox::SkyBox(Shader& s, Camera* c) : m_CubeMapShader(s), m_PlayerCamera(c)
-{
-    //Skybox faces
-    m_Faces = {
+//Pre Defined cube maps for sky boxes
+std::vector<std::vector<std::string>> SkyBox::m_CubeMapPaths = {
+
+    {
         "Assets/skybox/city/right.jpg",
         "Assets/skybox/city/left.jpg",
         "Assets/skybox/city/top.jpg",
         "Assets/skybox/city/bottom.jpg",
         "Assets/skybox/city/front.jpg",
         "Assets/skybox/city/back.jpg"
-    };
+    }
+    ,
+    {
+        "Assets/skybox/water/right.jpg",
+        "Assets/skybox/water/left.jpg",
+        "Assets/skybox/water/top.jpg",
+        "Assets/skybox/water/bottom.jpg",
+        "Assets/skybox/water/front.jpg",
+        "Assets/skybox/water/back.jpg"
+    }
+    ,
+    {
+        "Assets/skybox/mountain/right.jpg",
+        "Assets/skybox/mountain/left.jpg",
+        "Assets/skybox/mountain/top.jpg",
+        "Assets/skybox/mountain/bottom.jpg",
+        "Assets/skybox/mountain/front.jpg",
+        "Assets/skybox/mountain/back.jpg"
+    }
+};
 
+std::vector<std::string> SkyBox::m_CubeMapNames = {
+    "city",
+    "water",
+    "mountain"
+};
+
+SkyBox::SkyBox(Shader& s, Camera* c) : m_CubeMapShader(s), m_PlayerCamera(c)
+{
+    //Skybox faces
     m_Vertices = {
         // positions          
         -1.0f,  1.0f, -1.0f,
@@ -65,7 +93,9 @@ SkyBox::SkyBox(Shader& s, Camera* c) : m_CubeMapShader(s), m_PlayerCamera(c)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
     glCheckError();
-    m_CubeMap = new Texture(m_Faces);
+
+    m_CubeMap = new Texture(m_CubeMapPaths[0]);
+    m_Current = 0;
 }
 
 SkyBox::~SkyBox()
@@ -93,77 +123,20 @@ void SkyBox::draw(glm::mat4& projection)
     glCheckError();
 }
 
-int SkyBox::setCubeMapTexture(std::vector<std::string> v)
+int SkyBox::setCubeMapTexture(int i)
 {
-    if (v.size() != 6)
+    if (i < 0 || i > m_CubeMapNames.size() || m_Current != i)
     {
+        m_Current = i;
         delete m_CubeMap;
         m_CubeMap = nullptr;
-        m_CubeMap = new Texture(v);
-    }
-
-    /*
-    m_Vertices = {
-        // positions
-        // Face: Positive X
-        -10.0f,  10.0f, -10.0f,
-        -10.0f, -10.0f, -10.0f,
-        -10.0f, -10.0f,  10.0f,
-        -10.0f,  10.0f,  10.0f,
-
-        // Face: Negative X
-         10.0f,  10.0f,  10.0f,
-         10.0f, -10.0f,  10.0f,
-         10.0f, -10.0f, -10.0f,
-         10.0f,  10.0f, -10.0f,
-
-         // Face: Positive Y
-         -10.0f,  10.0f, -10.0f,
-         -10.0f,  10.0f,  10.0f,
-          10.0f,  10.0f,  10.0f,
-          10.0f,  10.0f, -10.0f,
-
-          // Face: Negative Y
-          -10.0f, -10.0f, -10.0f,
-           10.0f, -10.0f, -10.0f,
-           10.0f, -10.0f,  10.0f,
-          -10.0f, -10.0f,  10.0f,
-
-          // Face: Positive Z
-          -10.0f,  10.0f,  10.0f,
-          -10.0f, -10.0f,  10.0f,
-           10.0f, -10.0f,  10.0f,
-           10.0f,  10.0f,  10.0f,
-
-           // Face: Negative Z
-            10.0f,  10.0f, -10.0f,
-            10.0f, -10.0f, -10.0f,
-           -10.0f, -10.0f, -10.0f,
-           -10.0f,  10.0f, -10.0f
-    };
-    */
-
-    //glBindBuffer(GL_ARRAY_BUFFER, m_SkyBoxVBO);
-    //glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(float), &m_Vertices[0], GL_STATIC_DRAW);
-    //glEnableVertexAttribArray(0);
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-       
-    return 0;
-}
-
-int SkyBox::setCubeMapTexture(std::string s)
-{
-    if (s.size() != 0)
-    {
+        m_CubeMap = new Texture(m_CubeMapPaths[i]);
         glCheckError();
-        delete m_CubeMap;
-        glCheckError();
-        m_CubeMap = nullptr;
-        glCheckError();
-        m_CubeMap = new Texture(s);
-        glCheckError();
+        return 1;
     }
     return 0;
 }
+
+
 
 

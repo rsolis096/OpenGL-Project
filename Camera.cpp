@@ -27,8 +27,12 @@ void Camera::processKeyboard(float changeValue, unsigned int keyPressed)
 {
     if (keyPressed == GLFW_KEY_S || keyPressed == GLFW_KEY_W)
         cameraPos += changeValue * cameraFront;
-    else
+    else if (keyPressed == GLFW_KEY_D || keyPressed == GLFW_KEY_A)
         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * changeValue;
+    else if (keyPressed == GLFW_KEY_SPACE)
+        cameraPos.y += 0.05;
+    else if(keyPressed == GLFW_KEY_LEFT_CONTROL)
+        cameraPos.y -= 0.05;
 }
 
 void Camera::processMouse(double xpos, double ypos, GLboolean constrainPitch)

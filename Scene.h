@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "LightController.h"
 #include "ShadowMap.h"
+#include "SkyBox.h"
 #include <typeinfo>
 
 class Scene
@@ -26,6 +27,8 @@ public:
 
 	ShadowMap* m_ShadowMap;
 
+	SkyBox* m_SkyBox;
+
 	// Scene Objects (All)
 	std::vector<Object*> m_SceneObjects;
 
@@ -45,6 +48,6 @@ public:
 
 	//void addShader(Shader&);
 
-	void drawScene(float deltaTime);
-	void drawScene(float deltaTime, Shader& shader);
+	void drawScene(float, glm::mat4&);
+	void drawScene(float, Shader&, glm::mat4&);
 };
