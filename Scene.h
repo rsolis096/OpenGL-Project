@@ -7,6 +7,8 @@
 #include "ShadowMap.h"
 #include "SkyBox.h"
 #include <typeinfo>
+#include "TextureManager.h"
+#include <string>
 
 class Scene
 {
@@ -48,6 +50,7 @@ public:
 
 	//void addShader(Shader&);
 
-	void drawScene(float, glm::mat4&);
-	void drawScene(float, Shader&, glm::mat4&);
+	void drawScene(float, glm::mat4&, glm::mat4&);
+
 };
+

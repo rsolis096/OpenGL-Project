@@ -41,19 +41,17 @@ void Sphere::Draw(Shader& shader)
     //Bind texture and send texture to fragment shader
     if (m_hasTexture)
     {
-        glActiveTexture(GL_TEXTURE3); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-        glActiveTexture(GL_TEXTURE4); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-
         GLint diffuseLocation = glGetUniformLocation(shader.ID, "material.diffuse");
-        GLint specularLocation = glGetUniformLocation(shader.ID, "material.specular");
-
         if (diffuseLocation != -1)
-            glUniform1i(diffuseLocation, 3); // 0 corresponds to GL_TEXTURE0
+            glUniform1i(diffuseLocation, TextureManager::getCurrentUnit()); // 0 corresponds to GL_TEXTURE0
 
+        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
+        GLint specularLocation = glGetUniformLocation(shader.ID, "material.specular");
         if (specularLocation != -1)
-            glUniform1i(specularLocation, 4); // 1 corresponds to GL_TEXTURE1
+            glUniform1i(specularLocation, TextureManager::getCurrentUnit()); // 1 corresponds to GL_TEXTURE1
     }
 
 

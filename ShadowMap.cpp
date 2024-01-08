@@ -6,44 +6,35 @@ ShadowMap::ShadowMap(std::vector<Object*>* objects, std::vector<SpotLight*>* spo
     // Initialize shaders
 	depthShader = Shader("shadow_mapping_depth.vert", "shadow_mapping_depth.frag");
     debugDepthShader = Shader("debug_quad.vert", "debug_quad_depth.frag");
+    m_ShadowCasters = 0;
+}
 
+void ShadowMap::addShadowMap()
+{
     depthMapFBO.push_back(0);
     depthMap.push_back(0);
 
-    depthMapFBO.push_back(0);
-    depthMap.push_back(0);
+    // Generate framebuffer and depth map texture
+    glGenFramebuffers(1, &depthMapFBO[m_ShadowCasters]);
+    glGenTextures(1, &depthMap[m_ShadowCasters]);
 
-    depthMapFBO.push_back(0);
-    depthMap.push_back(0);
+    // Configure depth map texture
+    glBindTexture(GL_TEXTURE_2D, depthMap[m_ShadowCasters]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-
-    for (int i = 0; i < 3; i++)
-    {
-        // Generate framebuffer and depth map texture
-        glGenFramebuffers(1, &depthMapFBO[i]);
-        glGenTextures(1, &depthMap[i]);
-
-        // Configure depth map texture
-        glBindTexture(GL_TEXTURE_2D, depthMap[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-        // Attach depth texture as FBO's depth buffer
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO[i]);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap[i], 0);
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        //Debug Quad
-        debugDepthShader.use();
-        debugDepthShader.setInt("depthMap", 0);
-    }
+    // Attach depth texture as FBO's depth buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO[m_ShadowCasters]);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap[m_ShadowCasters], 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    m_ShadowCasters++;
 }
 
 
@@ -54,7 +45,6 @@ void ShadowMap::ShadowPass()
     // 1. render depth of scene to texture (from light's perspective)
     m_LightSpaceMatrices.clear();
     m_LightSpaceMatrices.resize(m_SpotLights->size(), glm::mat4(1.0f));
-    depthShader.setInt("numberOfShadowMaps", (*m_SpotLights).size());
 
     //Generate the light space matrices
     for (int i = 0; i < (*m_SpotLights).size(); i++)
@@ -102,10 +92,8 @@ void ShadowMap::ShadowPass()
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // Draw each object in the scene using the depth shader
-        (*m_SceneObjects)[0]->Draw(depthShader);
-        (*m_SceneObjects)[1]->Draw(depthShader);
-        (*m_SceneObjects)[2]->Draw(depthShader);
-        (*m_SceneObjects)[3]->Draw(depthShader);
+        for (Object* obj : *m_SceneObjects)
+            obj->Draw(depthShader);
 
         // Unbind the framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -131,7 +119,7 @@ void ShadowMap::drawShadowMap(GLuint& shaderID)
     for (int i = 0; i < (*m_SpotLights).size(); i++)
     {
         // Activate texture unit
-        glActiveTexture(GL_TEXTURE0 + i);
+        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit());
 
         // Bind the shadow map texture
         glBindTexture(GL_TEXTURE_2D, depthMap[i]);
@@ -143,7 +131,7 @@ void ShadowMap::drawShadowMap(GLuint& shaderID)
         GLint shadowMapLocation = glGetUniformLocation(shaderID, location.c_str());
 
         // Set the uniform value to the corresponding texture unit index
-        glUniform1i(shadowMapLocation, i);
+        glUniform1i(shadowMapLocation, TextureManager::getCurrentUnit());
     }
 }
 

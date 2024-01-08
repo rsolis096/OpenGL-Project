@@ -42,7 +42,7 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* objectShader, Camera& cam) 
 	m_lightingShader->setFloat("spotLights[" + std::to_string(spotLightID) + "].outerCutOff", glm::cos(glm::radians(15.0f)));;
 }
 
-SpotLight::SpotLight(Shader* lightingShader, Shader* objectShader, glm::vec3& pos, glm::vec3& dir) :
+SpotLight::SpotLight(Shader* lightingShader, Shader* objectShader, glm::vec3 pos, glm::vec3 dir) :
 	m_lightingShader(lightingShader), m_ObjectShader(objectShader), m_LightPos(pos), m_lightDirection(dir), playerCamera(false),
 	m_NearPlane(0.5f), m_FarPlane(70.0f)
 {
@@ -73,12 +73,21 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* objectShader, glm::vec3& po
 	m_lightingShader->setInt("numberOfSpotLightsVERT", spotLightCount);
 	m_lightingShader->setInt("numberOfSpotLightsFRAG", spotLightCount);
 
+
+
 	// Get the location of the uniform in the shader program
-	int numberOfShadowMapsLocation = glGetUniformLocation(m_lightingShader->ID, "numberOfShadowMapsVERT");
+	int numberOfShadowMapsLocation1 = glGetUniformLocation(m_lightingShader->ID, "numberOfShadowMapsFRAG");
 
 	// Set the value of the uniform
 	glUseProgram(m_lightingShader->ID);
-	glUniform1i(numberOfShadowMapsLocation, spotLightCount);
+	glUniform1i(numberOfShadowMapsLocation1, spotLightCount);
+
+	// Get the location of the uniform in the shader program
+	int numberOfShadowMapsLocation2 = glGetUniformLocation(m_lightingShader->ID, "numberOfShadowMapsVERT");
+
+	// Set the value of the uniform
+	glUseProgram(m_lightingShader->ID);
+	glUniform1i(numberOfShadowMapsLocation2, spotLightCount);
 
 	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].position", m_LightPos);
 	m_lightingShader->setVec3("spotLights[" + std::to_string(spotLightID) + "].direction", m_lightDirection);

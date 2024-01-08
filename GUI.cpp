@@ -75,7 +75,9 @@ void GUI::drawList()
 	ImGui::Text("Object Count: %d", myScene.m_SceneObjects.size());
 
 	//Left Side of window
-	static int selected; //Default selected object is first object in scene
+	static int propertiesSelected; //Default selected object is first object in scene
+	static int lightingSelected; //Default selected object is first object in scene
+	static int skyBoxSelected; //Default selected object is first object in scene
 
 	//Current Tab from left to right
 	static int currentTab = 1;
@@ -87,12 +89,12 @@ void GUI::drawList()
 		for (int i = 0; i < myScene.m_SceneObjects.size(); i++)
 		{
 			char label[128];
-			bool isSelected = (selected == i);
+			bool isSelected = (propertiesSelected == i);
 
 			sprintf_s(label, myScene.m_SceneObjects[i]->m_DisplayName.c_str(), i);
 			if (ImGui::Selectable(label, isSelected))
 			{
-				selected = i;
+				propertiesSelected = i;
 			}
 		}
 		ImGui::EndChild();
@@ -107,19 +109,27 @@ void GUI::drawList()
 		for (int i = 0; i < myScene.m_LightController->m_SpotLights.size(); i++)
 		{
 			char label[128];
-			bool isSelected = (selected == i);
+			bool isSelected = (lightingSelected == i);
 
 			sprintf_s(label, myScene.m_LightController->m_SpotLights[i]->m_DisplayName.c_str(), i);
 			if (ImGui::Selectable(label, isSelected))
 			{
-				selected = i;
+				lightingSelected = i;
 			}
 		}
 		ImGui::EndChild();
 		//Add Cube object to scene
 		if (ImGui::Button("+")) {
-			//myScene.addObject(new Cube());
-			//Add spotlight code
+
+			if (myScene.m_LightController->m_SpotLights.size() < 8)
+			{
+				glm::vec3 first = glm::vec3(10.0f, 3.0f, 0.0f);
+				glm::vec3 second = glm::vec3(-4.50f, -3.0f, 14.0f);
+				second = glm::normalize(first - second);
+				myScene.m_LightController->addSpotLight(first, second);
+			}
+			else
+				std::cout << "Max SpotLight Limit" << std::endl;
 		}
 	}
 	ImGui::EndGroup();
@@ -139,7 +149,7 @@ void GUI::drawList()
 			if (ImGui::BeginTabItem("Properties"))
 			{
 				//Update the selected item (default selected item is the 0th object)
-				Object* selectedObject = myScene.m_SceneObjects[selected];
+				Object* selectedObject = myScene.m_SceneObjects[propertiesSelected];
 				currentTab = 1;
 				//Display the Current selected object name
 				if (selectedObject != nullptr)
@@ -284,13 +294,14 @@ void GUI::drawList()
 						}
 
 						if (ImGui::Button("Set Texture##hasTextureTrue")) {
-							//[0]: diffuse
-							//[1]: specular					
-							//[2]: ambient
+
 							std::vector<std::string> newPaths = {
 								string(diffuseBuffer, 256),
 								string(specularBuffer, 256)
 							};
+							cout << newPaths[0] << endl;
+							cout << newPaths[1] << endl;
+							selectedObject->updateTexture(newPaths);
 						}	
 
 						ImGui::SameLine(); HelpMarker(
@@ -315,8 +326,9 @@ void GUI::drawList()
 			//Lighting Tab
 			if (ImGui::BeginTabItem("Lighting"))
 			{
-				SpotLight* selectedSpotLight = myScene.m_LightController->m_SpotLights[selected];
+				SpotLight* selectedSpotLight = myScene.m_LightController->m_SpotLights[lightingSelected];
 				currentTab = 2;
+
 				glm::vec3 diffuse = selectedSpotLight->getDiffuse();
 				glm::vec3 ambient = selectedSpotLight->getAmbient();
 				glm::vec3 specular = selectedSpotLight->getSpecular();
@@ -467,13 +479,13 @@ void GUI::drawList()
 				for (int i = 0; i < myScene.m_SkyBox->m_CubeMapNames.size(); i++)
 				{
 					char label[128];
-					bool isSelected = (selected == i);
+					bool isSelected = (skyBoxSelected == i);
 
 					sprintf_s(label, myScene.m_SkyBox->m_CubeMapNames[i].c_str(), i);
 					if (ImGui::Selectable(label, isSelected))
 					{
-						selected = i;
-						myScene.m_SkyBox->setCubeMapTexture(selected);
+						skyBoxSelected = i;
+						myScene.m_SkyBox->setCubeMapTexture(skyBoxSelected);
 					}
 				}
 				ImGui::EndTabItem();

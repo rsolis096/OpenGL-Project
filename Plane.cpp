@@ -40,10 +40,17 @@ void Plane::Draw(Shader& shader)
     //Bind texture and send texture to fragment shader
     if (m_hasTexture)
     {
-        glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glActiveTexture(GL_TEXTURE0 +TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-        glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
+        GLint diffuseLocation = glGetUniformLocation(shader.ID, "material.specular");
+        if (diffuseLocation != -1)
+            glUniform1i(diffuseLocation, TextureManager::getCurrentUnit()); // 0 corresponds to GL_TEXTURE0
+
+        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
+        GLint specularLocation = glGetUniformLocation(shader.ID, "material.specular");
+        if (diffuseLocation != -1)
+            glUniform1i(diffuseLocation, TextureManager::getCurrentUnit()); // 0 corresponds to GL_TEXTURE0
 
         shader.use();
         shader.setBool("hasTexture", true);

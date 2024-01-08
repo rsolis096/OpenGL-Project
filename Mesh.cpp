@@ -22,7 +22,7 @@ void Mesh::Draw(Shader& shader, bool hasTexture)
     {
         for (unsigned int i = 0; i < textures.size(); i++)
         {
-            glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
+            glActiveTexture(GL_TEXTURE0 +TextureManager::getNextUnit()); // active proper texture unit before binding
             // retrieve texture number (the N in diffuse_textureN)
             string number;
             string name = textures[i].m_Type;
@@ -36,7 +36,7 @@ void Mesh::Draw(Shader& shader, bool hasTexture)
                 number = std::to_string(heightNr++); // transfer unsigned int to string
 
             // now set the sampler to the correct texture unit
-            glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
+            glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), TextureManager::getCurrentUnit());
             // and finally bind the texture
             glBindTexture(GL_TEXTURE_2D, textures[i].ID);
         }

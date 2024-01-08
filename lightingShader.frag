@@ -1,13 +1,13 @@
 #version 330 core
 out vec4 FragColor;
-const int NR_POINT_LIGHTS = 8;
-const int NR_SPOT_LIGHTS = 8;
-const int NR_SHADOW_MAPS = 4;
+const int MAX_NR_POINT_LIGHTS = 8;
+const int MAX_NR_SPOT_LIGHTS = 8;
+const int MAX_NR_SHADOW_MAPS = 8;
 
 
 
 //Shadow Map
-uniform sampler2D shadowMap[NR_SHADOW_MAPS];
+uniform sampler2D shadowMap[MAX_NR_SHADOW_MAPS];
 
 
 struct Material {
@@ -60,7 +60,7 @@ in VS_OUT {
     vec3 FragPos;
     vec3 Normal;
     vec2 TexCoords;
-    vec4 FragPosLightSpace[NR_SHADOW_MAPS];
+    vec4 FragPosLightSpace[MAX_NR_SHADOW_MAPS];
 } fs_in;
 
 uniform vec3 viewPos;
@@ -68,9 +68,9 @@ uniform vec3 lightPos;
 
 
 uniform DirLight dirLight;
-uniform PointLight pointLights[NR_POINT_LIGHTS];
+uniform PointLight pointLights[MAX_NR_POINT_LIGHTS];
 uniform int numberOfPointLights;
-uniform SpotLight spotLights[NR_SPOT_LIGHTS];
+uniform SpotLight spotLights[MAX_NR_SPOT_LIGHTS];
 uniform int numberOfSpotLightsFRAG;
 
 uniform Material material;
@@ -133,17 +133,8 @@ void main()
     vec3 normal = normalize(fs_in.Normal);
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
     scaledTexCoords = fs_in.TexCoords * 1;
-    
+    vec3 result;
 
-    //TO DO: PUT THESE RESULTS IN IF STATEMENTS DEPENDING ON WHICH LIGHT IS ON
-
-    // phase 1: directional lighting
-    vec3 result;// = CalcDirLight(dirLight, normal, viewDir);
-    // phase 2: point lights
-    for(int i = 0; i < numberOfPointLights; i++)
-    {
-        //result += CalcPointLight(pointLights[i], normal, fs_in.FragPos, viewDir);           
-    }
     //phase 3: spot light
     for(int i = 0; i < numberOfSpotLightsFRAG; i++)
     {

@@ -11,7 +11,7 @@ class SpotLight
 {
 public:
 	SpotLight(Shader*, Shader* ,Camera& );
-	SpotLight(Shader*, Shader* ,glm::vec3& , glm::vec3& );
+	SpotLight(Shader*, Shader* ,glm::vec3 , glm::vec3 );
 	void Draw();
 	~SpotLight();
 
@@ -52,8 +52,8 @@ private:
 	bool playerCamera;
 	static int spotLightCount;
 	int spotLightID;
-	glm::vec3& m_lightDirection;
-	glm::vec3& m_LightPos;
+	glm::vec3 m_lightDirection;
+	glm::vec3 m_LightPos;
 	Sphere* m_LightShape;
 
 	glm::vec3 m_Ambient;

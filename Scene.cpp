@@ -17,11 +17,7 @@ Scene::Scene()
 
 	createLightController();
 
-	glm::vec3 spotLightPos = glm::vec3(-10.0f, 3.0f, 0.0f);
-	glm::vec3 spotLightDir = glm::vec3(-1.0f, 3.0f, 0.0f);
 	m_ShadowMap = new ShadowMap(&m_SceneObjects, &m_LightController->m_SpotLights);
-
-	//Initialize Skybox
 	m_SkyBox = nullptr;
 
 	glCheckError();
@@ -39,8 +35,6 @@ Scene::Scene(Camera* mC)
 	m_PhysicsWorld = new PhysicsWorld();
 	createLightController();	
 
-	glm::vec3 spotLightPos = glm::vec3(-10.0f, 3.0f, 0.0f);
-	glm::vec3 spotLightDir = glm::vec3(-1.0f, 3.0f, 0.0f);
 	m_ShadowMap = new ShadowMap(&m_SceneObjects, &m_LightController->m_SpotLights);
 	m_SkyBox = new SkyBox(*cubeMapShader, mainCamera);
 
@@ -95,7 +89,7 @@ void Scene::createLightController()
 {
 	if (m_LightController != nullptr)
 		removeLightController();
-	m_LightController = new LightController(lightingShader, pointLightShader, mainCamera);;
+	m_LightController = new LightController(lightingShader, pointLightShader, mainCamera, this);
 }
 
 //Add a LightController to the scene
@@ -111,8 +105,27 @@ void Scene::removeLightController()
 
 }
 
-void Scene::drawScene(float deltaTime, glm::mat4& proj)
+void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 {	
+	//Point Light Lamp (light spheres)
+	pointLightShader->use();
+	pointLightShader->setMat4("projection", proj);
+	pointLightShader->setMat4("view", view);
+
+	//Main Shader
+	lightingShader->use();
+	lightingShader->setMat4("projection", proj);
+	lightingShader->setMat4("view", view);
+	lightingShader->setVec3("viewPos", mainCamera->cameraPos);
+
+	glUseProgram(lightingShader->ID);
+	glUniformMatrix4fv(
+		glGetUniformLocation(lightingShader->ID, "lightSpaceMatrices"),
+		m_ShadowMap->getLightSpaceMatrices().size(),
+		GL_FALSE,
+		glm::value_ptr(m_ShadowMap->getLightSpaceMatrices()[0])
+	);
+
 	//Activate the texture units and bind the correspoding depth map
 	m_ShadowMap->drawShadowMap(lightingShader->ID);
 
@@ -129,26 +142,7 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj)
 	}
 
 	m_SkyBox->draw(proj);
+
+	//Reset current unit to zero for next render pass
+	TextureManager::m_CurrentUnit = 0;
 }
-
-void Scene::drawScene(float deltaTime, Shader& shader, glm::mat4& proj)
-{
-	m_ShadowMap->drawShadowMap(lightingShader->ID);
-
-	//Update physics
-	m_PhysicsWorld->step(glfwGetTime(), deltaTime);
-
-	//Draw Lights (Only the light objects)
-	m_LightController->drawLighting();
-
-	//Draw Objects
-	for (auto& element : m_SceneObjects)
-	{
-		if (typeid(element).name()[0] == 'S')
-			element->translatePosition(glm::vec3(0.001f)); //Translate the sphere for debugging purposes
-		element->Draw(shader);
-	}
-
-	m_SkyBox->draw(proj);
-}
-

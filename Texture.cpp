@@ -79,9 +79,7 @@ Texture::Texture(std::string path) : ID(0), m_Path(path), m_Type("CubeMap")
         GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, //Front
     };
     glCheckError();
-    int maxTextureSize;
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-    std::cout << "Max Texture Size: " << maxTextureSize << std::endl;
+
     if (data)
     {
         for (int i = 0; i < 6; ++i)
@@ -147,8 +145,16 @@ Texture::Texture(std::vector<std::string> paths) : ID(0)
         {
             glTexImage2D(
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+                0, 
+                GL_RGB, 
+                width, 
+                height, 
+                0, 
+                GL_RGB, 
+                GL_UNSIGNED_BYTE, 
+                data
             );
+
             std::cout << "Successfully loaded texture: " << paths[i] << std::endl;
 
         }

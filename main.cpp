@@ -298,6 +298,8 @@ int main()
     myScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
     myScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
     myScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
+    //myScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
+
 
     //Cube
     myScene.m_SceneObjects[1]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
@@ -337,35 +339,13 @@ int main()
         //SHADOW PASS
         myScene.m_ShadowMap->ShadowPass();
         
-        /**/
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //Point Light Lamp (light spheres)
-        myScene.pointLightShader->use();
-        myScene.pointLightShader->setMat4("projection", projection);
-        myScene.pointLightShader->setMat4("view", view);
-
-        //Main Shader
-        myScene.lightingShader->use();
-        myScene.lightingShader->setMat4("projection", projection);
-        myScene.lightingShader->setMat4("view", view);
-        myScene.lightingShader->setVec3("viewPos", myCamera->cameraPos);
-
-        glUseProgram(myScene.lightingShader->ID);
-        glUniformMatrix4fv(
-            glGetUniformLocation(myScene.lightingShader->ID, "lightSpaceMatrices"),
-            myScene.m_ShadowMap->getLightSpaceMatrices().size(),
-            GL_FALSE, 
-            glm::value_ptr(myScene.m_ShadowMap->getLightSpaceMatrices()[0])
-        );
-
-        myScene.drawScene(deltaTime, projection);
-        // END OF LIGHTING PASS
+        myScene.drawScene(deltaTime, projection, view);
         
 
         // render Depth map to quad for visual debugging
         // ---------------------------------------------
-
         /*
         myScene.m_ShadowMap->debugDepthShader.use();
         myScene.m_ShadowMap->debugDepthShader.setFloat("near_plane", myScene.m_LightController->m_SpotLights[1]->getNearPlane());

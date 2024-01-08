@@ -4,7 +4,7 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
 
-const int MAX_NR_SHADOW_MAPS = 4;
+const int MAX_NR_SHADOW_MAPS = 8;
 
 out VS_OUT {
     vec3 FragPos;

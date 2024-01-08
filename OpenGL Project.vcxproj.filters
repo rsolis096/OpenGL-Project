@@ -150,6 +150,9 @@
     <ClCompile Include="ShadowMap.cpp">
       <Filter>Source Files\Lighting</Filter>
     </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="lightingShader.frag" />
@@ -247,6 +250,9 @@
     </ClInclude>
     <ClInclude Include="ShadowMap.h">
       <Filter>Header Files\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

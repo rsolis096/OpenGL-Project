@@ -38,19 +38,18 @@ void Cube::Draw(Shader& shader)
     //Bind texture and send texture to fragment shader
     if (m_hasTexture)
     {
-        glActiveTexture(GL_TEXTURE3); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-        glActiveTexture(GL_TEXTURE4); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-
         GLint diffuseLocation = glGetUniformLocation(shader.ID, "material.diffuse");
-        GLint specularLocation = glGetUniformLocation(shader.ID, "material.specular");
-
         if (diffuseLocation != -1)
-            glUniform1i(diffuseLocation, 3); // 0 corresponds to GL_TEXTURE0
+            glUniform1i(diffuseLocation, TextureManager::getCurrentUnit()); // 0 corresponds to GL_TEXTURE0
 
+
+        GLint specularLocation = glGetUniformLocation(shader.ID, "material.specular");
+        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
         if (specularLocation != -1)
-            glUniform1i(specularLocation, 4); // 1 corresponds to GL_TEXTURE1
+            glUniform1i(specularLocation, TextureManager::getCurrentUnit()); // 1 corresponds to GL_TEXTURE1
 
     }
 
@@ -265,13 +264,15 @@ int Cube::updateTexture(std::vector<std::string> texturePaths)
 
         if (texturePaths.size() == 2)
         {
+            //If vector contains two strings, attempt to load their textures
             dSuccess = m_DiffuseMap->updateTexture(texturePaths[0].c_str(), false);
             sSuccess = m_SpecularMap->updateTexture(texturePaths[1].c_str(), false);
         }
 
         if (dSuccess == 1 || sSuccess == 1)
         {
-            //As of right now, all textures are deleted
+            //If 1 or the other texture from the previous if statements failes to load,
+            //delete the current textures and set the object to have no texture
             delete m_DiffuseMap;
             delete m_SpecularMap;
             m_DiffuseMap = nullptr;

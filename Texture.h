@@ -4,6 +4,7 @@
 #include "Vendors/stb_image_write.h"
 
 #include "Camera.h" //glad
+#include "TextureManager.h"
 #include <vector>
 #include <iostream>
 #include <string>

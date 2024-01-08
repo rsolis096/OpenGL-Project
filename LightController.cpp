@@ -1,8 +1,9 @@
 #include "LightController.h"
+#include "Scene.h" // We include "A.h" in the cpp file
 
 LightController::LightController
-(Shader* lightingShader, Shader* objectShader, Camera* cam)
-	:m_WordLight(new DirectionalLight(lightingShader))
+(Shader* lightingShader, Shader* objectShader, Camera* cam, Scene* s)
+	:m_WordLight(new DirectionalLight(lightingShader)), m_Scene(s)
 {
 	m_LightingShader = lightingShader;
 	m_ObjectShader = objectShader;
@@ -23,12 +24,14 @@ void LightController::removePointLight()
 void LightController::addSpotLight()
 {
 	m_SpotLights.push_back(new SpotLight(m_LightingShader, m_ObjectShader, *m_PlayerCamera));
+	m_Scene->m_ShadowMap->addShadowMap();
 }
 
-void LightController::addSpotLight(glm::vec3& pos, glm::vec3& dir)
+void LightController::addSpotLight(glm::vec3 pos, glm::vec3 dir)
 {
-	m_SpotLights.push_back(new SpotLight(m_LightingShader, m_ObjectShader, pos, dir));
-	
+	m_SpotLights.emplace_back(new SpotLight(m_LightingShader, m_ObjectShader, pos, dir));
+	m_Scene->m_ShadowMap->addShadowMap();	
+	cout << "Added " + (*(m_SpotLights.end() - 1))->m_DisplayName << endl;
 }
 
 void LightController::removeSpotLight()

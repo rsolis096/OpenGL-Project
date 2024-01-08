@@ -16,16 +16,18 @@ class ShadowMap
 		const unsigned int SHADOW_WIDTH = 2048;
 		const unsigned int SHADOW_HEIGHT = 2048;
 		std::vector<glm::mat4> m_LightSpaceMatrices;
+		unsigned int m_ShadowCasters;
 
 	public:
 		Shader depthShader;
 		Shader debugDepthShader;
 		ShadowMap(std::vector<Object*>*, std::vector<SpotLight*>*);
 		void ShadowPass();
+		void addShadowMap();
 		glm::mat4& getLightSpaceMatrix(int);
 		std::vector<glm::mat4>& getLightSpaceMatrices();
 		void drawShadowMap(GLuint&);
-
+		
 		GLuint getDepthMapID(int);
 		GLuint getDepthMapFBOID(int);
 		
