@@ -23,7 +23,7 @@
 
 ## How To Run
 
-A standalone execuatable does not currently exist and for that reason I recommend you run this application in Visual Studio. This will require you to compile a debug build of the assimp library from https://github.com/assimp/assimp. Once built, inside the assimp/build/bin/Debug folder you will find assimp-vc143-mtd.dll. Build this OpenGL project in debug and place this assimp-vc143-mtd.dll in OpenGL Project\x64\Debug.
+A standalone executable does not currently exist and for that reason I recommend running this application in Visual Studio. This will require you to compile a debug build of the assimp library from https://github.com/assimp/assimp. Once built, inside the assimp/build/bin/Debug folder you will find assimp-vc143-mtd.dll. Build this OpenGL project in debug and place this assimp-vc143-mtd.dll in OpenGL Project\x64\Debug.
 
 ![image](https://github.com/rsolis096/OpenGL-Project/assets/63280140/824838b2-cafa-46a1-b358-2600c045b7c2)
 
