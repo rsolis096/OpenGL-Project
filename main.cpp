@@ -296,10 +296,14 @@ int main()
     spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
 
     myScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
-    myScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
-    myScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
+    //myScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
     //myScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
-
+    //myScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
+    if (myScene.m_LightController->m_SpotLights.size() == 0)
+    {
+        std::cout << "MUST HAVE A SPOT LIGHT" << std::endl;
+        abort();
+    }
 
     //Cube
     myScene.m_SceneObjects[1]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
