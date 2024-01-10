@@ -274,7 +274,7 @@ int main()
     Scene myScene(myCamera);
 
     //GENERATE INITIAL SCENE (ALL OF THESE CAN BE CHANGED IN REAL TIME)
-    myScene.addObject(new Model("resources/objects/dragon/dragon.obj"));
+    myScene.addObject(new Model("Assets/models/dragon/dragon.obj"));
     myScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
     myScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
     myScene.addObject(new Plane());
