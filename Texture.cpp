@@ -6,7 +6,7 @@ Texture::Texture(const char* filePath, bool flipOnY, std::string type) : ID(0), 
     glGenTextures(1, &ID);
 
     //Ensure the texture applies
-    if (updateTexture(filePath, flipOnY))
+    if (!updateTexture(filePath, flipOnY))
     {
         //Failed to apply texture
         m_Type = "";
@@ -36,7 +36,6 @@ Texture::~Texture()
 Texture::Texture(std::string path) : ID(0), m_Path(path), m_Type("CubeMap")
 {
     glGenTextures(1, &ID);
-    glCheckError();
     glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
     glCheckError();
 
@@ -130,7 +129,7 @@ Texture::Texture(std::string path) : ID(0), m_Path(path), m_Type("CubeMap")
 }
 
 //Load Cube map texture
-Texture::Texture(std::vector<std::string> paths) : ID(0)
+Texture::Texture(std::vector<std::string> paths) : ID(0), m_Type("CubeMap")
 {
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
@@ -141,16 +140,27 @@ Texture::Texture(std::vector<std::string> paths) : ID(0)
     {
         std::cout << "Loading Texture: " << paths[i]<< std::endl;
         data = stbi_load(paths[i].c_str(), &width, &height, &nrChannels, 0);
+
+        GLenum format = GL_RED;
+        if (nrChannels == 1)
+            format = GL_RED;
+        else if (nrChannels == 3)
+            format = GL_RGB;
+        else if (nrChannels == 4)
+            format = GL_RGBA;
+        else
+            std::cout << "Invalid Format" << std::endl;
+
         if (data)
         {
             glTexImage2D(
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
                 0, 
-                GL_RGB, 
+                format, 
                 width, 
                 height, 
                 0, 
-                GL_RGB, 
+                format, 
                 GL_UNSIGNED_BYTE, 
                 data
             );
@@ -208,12 +218,12 @@ int Texture::updateTexture(const char* filePath, bool flipOnY)
 
         std::cout << "Successfully Loaded: " << filePath << std::endl;
         stbi_image_free(data);
-        return 0;
+        return 1;
     }
     glCheckError();
     std::cout << "Failed to load texture. Please verify filepath: " << filePath << std::endl;
     stbi_image_free(data);
-    return 1;
+    return 0;
 }
 
 

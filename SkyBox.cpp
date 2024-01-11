@@ -115,7 +115,8 @@ void SkyBox::draw(glm::mat4& projection)
     m_CubeMapShader.setMat4("projection", projection);
     // skybox cube
     glBindVertexArray(m_SkyBoxVAO);
-    glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit());
+    //glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit());
+    glActiveTexture(GL_TEXTURE0); //BUG THIS TEXTURE UNIT MUST BE 0, FIX THIS
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMap->ID);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
@@ -125,12 +126,13 @@ void SkyBox::draw(glm::mat4& projection)
 
 int SkyBox::setCubeMapTexture(int i)
 {
-    if (i < 0 || i > m_CubeMapNames.size() || m_Current != i)
+    if ((i <= 0 || i < m_CubeMapNames.size()) && m_Current != i)
     {
-        m_Current = i;
+        std::cout << " 0 < " << i << " <" << m_CubeMapNames.size() << std::endl;
         delete m_CubeMap;
         m_CubeMap = nullptr;
         m_CubeMap = new Texture(m_CubeMapPaths[i]);
+        m_Current = i;
         glCheckError();
         return 1;
     }

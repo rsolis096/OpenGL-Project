@@ -19,12 +19,6 @@ bool GUI::isWindowHidden = false;
 
 int selectedItemIndex = -1;
 static float vec3a[3] = { 0.00f, 0.00f, 0.00f };
-/*
-GUI::GUI() : window(nullptr)
-{
-	GUI::isWindowHidden = true;
-}
-*/
 
 GUI::GUI(GLFWwindow* windowParam, Scene& scene) : window(windowParam), myScene(scene)
 {
@@ -66,6 +60,11 @@ void GUI::displayWindow()
 	}
 }
 
+//Left Side of window
+static int propertiesSelected; //Default selected object is first object in scene
+static int lightingSelected; //Default selected object is first object in scene
+static int skyBoxSelected; //Default selected object is first object in scene
+
 void GUI::drawList()
 {
 	ImGui::Text("Player Position: x: %.2f, y: %.2f, z: %.2f", 
@@ -74,10 +73,7 @@ void GUI::drawList()
 		myScene.mainCamera->cameraPos[2]);
 	ImGui::Text("Object Count: %d", myScene.m_SceneObjects.size());
 
-	//Left Side of window
-	static int propertiesSelected; //Default selected object is first object in scene
-	static int lightingSelected; //Default selected object is first object in scene
-	static int skyBoxSelected; //Default selected object is first object in scene
+
 
 	//Current Tab from left to right
 	static int currentTab = 1;
