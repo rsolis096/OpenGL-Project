@@ -223,9 +223,8 @@ void RenderQuad()
     glBindVertexArray(0);
 }
 
-int main()
+GLFWwindow* setupWindow()
 {
-    
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -242,7 +241,7 @@ int main()
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
-        return -1;
+        return nullptr;
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -259,27 +258,31 @@ int main()
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
+        return nullptr;
     }
     glEnable(GL_DEPTH_TEST);
-    //Gamma Correction
+
+    //Gamma Correction (looks awful)
     //glEnable(GL_FRAMEBUFFER_SRGB);
     
     //Enable this to only render front facing polygons (for performance)
     glEnable(GL_CULL_FACE);
 
-    Scene myScene(myCamera);
+    return window;
+}
 
+void demoScene(Scene& demoScene)
+{
     //GENERATE INITIAL SCENE (ALL OF THESE CAN BE CHANGED IN REAL TIME)
-    myScene.addObject(new Model("Assets/models/dragon/dragon.obj"));
-    myScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
-    myScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
-    myScene.addObject(new Plane());
-    myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[0]);
-    myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[1]);
-    myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[2]);    
-    myScene.m_PhysicsWorld->addObject(myScene.m_SceneObjects[3]);
-    
+    demoScene.addObject(new Model("Assets/models/dragon/dragon.obj"));
+    demoScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
+    demoScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
+    demoScene.addObject(new Plane());
+    demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
+    demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[1]);
+    demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[2]);
+    demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[3]);
+
     glm::vec3 spotLightPos1 = glm::vec3(4.0f, 3.0f, -17.0f);
     glm::vec3 spotLightDir1 = glm::vec3(-20.0f, -5.0f, 45.0f);
     spotLightDir1 = glm::normalize(spotLightDir1 - spotLightPos1);
@@ -292,24 +295,30 @@ int main()
     glm::vec3 spotLightDir3 = glm::vec3(0.0f, 0.0f, 1.0f);
     spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
 
-    myScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
-    //myScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
-    //myScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
-    //myScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
-    if (myScene.m_LightController->m_SpotLights.size() == 0)
-    {
-        std::cout << "MUST HAVE A SPOT LIGHT" << std::endl;
-        abort();
-    }
+    demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
+    //demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
+    //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
+    //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
     //Cube
-    myScene.m_SceneObjects[1]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
-    myScene.m_SceneObjects[1]->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
+    demoScene.m_SceneObjects[1]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
+    demoScene.m_SceneObjects[1]->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
     //Sphere
-    myScene.m_SceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
+    demoScene.m_SceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
     //Model
-    myScene.m_SceneObjects[0]->setPosition(glm::vec3(-3.0f, 0.0f, 14.0f));
-    myScene.m_SceneObjects[0]->setScale(glm::vec3(0.01f));
+    demoScene.m_SceneObjects[0]->setPosition(glm::vec3(-3.0f, 0.0f, 14.0f));
+    demoScene.m_SceneObjects[0]->setScale(glm::vec3(0.01f));
+}
+
+int main()
+{
+    //Initialize GLFW and create window
+    GLFWwindow* window = setupWindow();
+
+    //Create the scene
+    Scene myScene(myCamera);
+    //Currently, this must be called
+    demoScene(myScene);
 
     //Initialize the GUI
     GUI myGUI(window, myScene);
@@ -317,8 +326,6 @@ int main()
     //Initialize View and Projection (These are changed in updateCamera() )
     glm::mat4 view;
     glm::mat4 projection;
-
-    myScene.mainCamera = myCamera;
 
     glCheckError();
 
@@ -383,16 +390,3 @@ int main()
 
     return 0;
 }
-
-
-
-
-/*
-* Short Term Goals:
-*   - Refactor the code to work more fluidly with eachother, less back and forth
-*   - Remove as many hard coded situations as possible and give the user freedom
-*       - Adding / removing light sources
-*       - Object identities and names for more convenient and personalized editing
-*       - Enable a flash light option (only 1 flashlight)
-*   - Make some tests
-*/
