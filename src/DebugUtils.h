@@ -1,7 +1,7 @@
 #ifndef DEBUG_UTILS_H
 #define DEBUG_UTILS_H
 
-#include <glad/glad.h> //Opengl functions
+#include <glad/glad.h>
 #include <iostream>
 
 inline GLenum glCheckError_(const char* file, int line)

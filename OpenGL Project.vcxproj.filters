@@ -31,21 +31,6 @@
     <Filter Include="Header Files\World">
       <UniqueIdentifier>{8631d001-8659-4bd6-8c74-7e7aa5f1995a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Dependencies">
-      <UniqueIdentifier>{cd42c7fb-f6bf-4e06-bf98-c8fbde7b1541}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Vendors">
-      <UniqueIdentifier>{e2a522fc-0993-4828-ad99-9a2d223cb76a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Dependencies">
-      <UniqueIdentifier>{e324ee03-b510-481e-a928-b03eadc154ea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Vendors">
-      <UniqueIdentifier>{705d496e-a94d-46bd-89d7-18d01d3b2621}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Lighting">
-      <UniqueIdentifier>{3d0ed324-0fa6-4a59-a38b-ce8dbf566fb6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\GUI">
       <UniqueIdentifier>{f8882871-c361-49aa-9cce-4327afcdc373}</UniqueIdentifier>
     </Filter>
@@ -55,204 +40,236 @@
     <Filter Include="Source Files\World">
       <UniqueIdentifier>{db8d41c2-a0b3-48a7-8fa6-3b2731be9d02}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\third-party">
+      <UniqueIdentifier>{e324ee03-b510-481e-a928-b03eadc154ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{5ba01b1c-93d4-45a9-a734-54fc11d6e60f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third-party\STB Image">
+      <UniqueIdentifier>{2daf179a-046c-4364-990e-75967b1c8906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUI\ImGui">
+      <UniqueIdentifier>{4b50ff9f-7ca0-4dc5-a8d1-27dc56004d3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\third-party">
+      <UniqueIdentifier>{a8afb3d3-9c63-467e-a192-47b9259afab5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Lighting">
+      <UniqueIdentifier>{46602195-b54d-46f2-85e6-8dba1f1f4880}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Shader.cpp">
+      <Filter>Source Files\Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\stb_image.cpp">
+      <Filter>Source Files\third-party\STB Image</Filter>
     </ClCompile>
-    <ClCompile Include="SpotLight.cpp">
-      <Filter>Source Files\Lighting</Filter>
+    <ClCompile Include="src\stb_image_write.cpp">
+      <Filter>Source Files\third-party\STB Image</Filter>
     </ClCompile>
-    <ClCompile Include="PointLight.cpp">
-      <Filter>Source Files\Lighting</Filter>
-    </ClCompile>
-    <ClCompile Include="Object.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="GUI.cpp">
+    <ClCompile Include="src\GUI.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
+    <ClCompile Include="src\Cube.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Model.cpp">
+    <ClCompile Include="src\Mesh.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Cube.cpp">
+    <ClCompile Include="src\Model.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="DirectionalLight.cpp">
-      <Filter>Source Files\Lighting</Filter>
-    </ClCompile>
-    <ClCompile Include="Plane.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Plane.cpp">
+    <ClCompile Include="src\Object.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Sphere.cpp">
+    <ClCompile Include="src\Plane.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicsWorld.h">
-      <Filter>Header Files\Physics</Filter>
+    <ClCompile Include="src\Sphere.cpp">
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicsWorld.cpp">
+    <ClCompile Include="src\PhysicsWorld.cpp">
       <Filter>Source Files\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Dependencies\includes\glad\glad.c">
-      <Filter>Source Files\Dependencies</Filter>
-    </ClCompile>
-    <ClCompile Include="Vendors\imgui\imgui_widgets.cpp">
-      <Filter>Source Files\Vendors</Filter>
-    </ClCompile>
-    <ClCompile Include="Vendors\imgui\imgui_tables.cpp">
-      <Filter>Source Files\Vendors</Filter>
-    </ClCompile>
-    <ClCompile Include="Vendors\imgui\imgui_impl_opengl3.cpp">
-      <Filter>Source Files\Vendors</Filter>
-    </ClCompile>
-    <ClCompile Include="Vendors\imgui\imgui_impl_glfw.cpp">
-      <Filter>Source Files\Vendors</Filter>
-    </ClCompile>
-    <ClCompile Include="Vendors\imgui\imgui_draw.cpp">
-      <Filter>Source Files\Vendors</Filter>
-    </ClCompile>
-    <ClCompile Include="Vendors\imgui\imgui_demo.cpp">
-      <Filter>Source Files\Vendors</Filter>
-    </ClCompile>
-    <ClCompile Include="Vendors\imgui\imgui.cpp">
-      <Filter>Source Files\Vendors</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
+    <ClCompile Include="src\Camera.cpp">
       <Filter>Source Files\World</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
+    <ClCompile Include="src\Scene.cpp">
       <Filter>Source Files\World</Filter>
     </ClCompile>
-    <ClCompile Include="LightController.cpp">
-      <Filter>Source Files\Lighting</Filter>
-    </ClCompile>
-    <ClCompile Include="SkyBox.cpp">
+    <ClCompile Include="src\SkyBox.cpp">
       <Filter>Source Files\World</Filter>
     </ClCompile>
-    <ClCompile Include="stb_image.cpp">
-      <Filter>Source Files\Vendors</Filter>
-    </ClCompile>
-    <ClCompile Include="stb_image_write.cpp">
-      <Filter>Source Files\Vendors</Filter>
-    </ClCompile>
-    <ClCompile Include="ShadowMap.cpp">
-      <Filter>Source Files\Lighting</Filter>
-    </ClCompile>
-    <ClCompile Include="TextureManager.cpp">
+    <ClCompile Include="src\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\TextureManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="third party\includes\glad\glad.c">
+      <Filter>Source Files\third-party</Filter>
+    </ClCompile>
+    <ClCompile Include="third party\includes\imgui\imgui.cpp">
+      <Filter>Source Files\GUI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="third party\includes\imgui\imgui_demo.cpp">
+      <Filter>Source Files\GUI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="third party\includes\imgui\imgui_draw.cpp">
+      <Filter>Source Files\GUI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="third party\includes\imgui\imgui_impl_glfw.cpp">
+      <Filter>Source Files\GUI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="third party\includes\imgui\imgui_impl_opengl3.cpp">
+      <Filter>Source Files\GUI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="third party\includes\imgui\imgui_tables.cpp">
+      <Filter>Source Files\GUI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="third party\includes\imgui\imgui_widgets.cpp">
+      <Filter>Source Files\GUI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DirectionalLight.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LightController.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PointLight.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShadowMap.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpotLight.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="lightingShader.frag" />
-    <None Include="lightingShader.vert" />
-    <None Include="pointLightShader.frag" />
-    <None Include="pointLightShader.vert" />
-    <None Include="cubeMapShader.frag" />
-    <None Include="cubeMapShader.vert" />
-    <None Include="debug_quad.vert" />
-    <None Include="debug_quad_depth.frag" />
-    <None Include="shadow_mapping_depth.vert" />
-    <None Include="shadow_mapping_depth.frag" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Cube.h">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="SpotLight.h">
+    <ClInclude Include="src\Model.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Object.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Plane.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sphere.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DirectionalLight.h">
       <Filter>Header Files\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="PointLight.h">
+    <ClInclude Include="src\LightController.h">
       <Filter>Header Files\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>Header Files\Objects</Filter>
+    <ClInclude Include="src\PointLight.h">
+      <Filter>Header Files\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files\Objects</Filter>
+    <ClInclude Include="src\ShadowMap.h">
+      <Filter>Header Files\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Header Files\Objects</Filter>
+    <ClInclude Include="src\SpotLight.h">
+      <Filter>Header Files\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="GUI.h">
+    <ClInclude Include="src\GUI.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="Vertex.h">
-      <Filter>Header Files\Objects</Filter>
+    <ClInclude Include="src\PhysicsWorld.h">
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Cube.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
-      <Filter>Header Files\Lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="Sphere.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
+    <ClInclude Include="src\Camera.h">
       <Filter>Header Files\World</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
+    <ClInclude Include="src\Scene.h">
       <Filter>Header Files\World</Filter>
     </ClInclude>
-    <ClInclude Include="Vendors\stb_image.h">
-      <Filter>Header Files\Vendors</Filter>
-    </ClInclude>
-    <ClInclude Include="Vendors\imgui\imstb_truetype.h">
-      <Filter>Header Files\Vendors</Filter>
-    </ClInclude>
-    <ClInclude Include="Vendors\imgui\imstb_rectpack.h">
-      <Filter>Header Files\Vendors</Filter>
-    </ClInclude>
-    <ClInclude Include="Vendors\imgui\imstb_textedit.h">
-      <Filter>Header Files\Vendors</Filter>
-    </ClInclude>
-    <ClInclude Include="Vendors\imgui\imgui_internal.h">
-      <Filter>Header Files\Vendors</Filter>
-    </ClInclude>
-    <ClInclude Include="Vendors\imgui\imgui_impl_opengl3_loader.h">
-      <Filter>Header Files\Vendors</Filter>
-    </ClInclude>
-    <ClInclude Include="Vendors\imgui\imgui_impl_opengl3.h">
-      <Filter>Header Files\Vendors</Filter>
-    </ClInclude>
-    <ClInclude Include="Vendors\imgui\imgui_impl_glfw.h">
-      <Filter>Header Files\Vendors</Filter>
-    </ClInclude>
-    <ClInclude Include="Vendors\imgui\imgui.h">
-      <Filter>Header Files\Vendors</Filter>
-    </ClInclude>
-    <ClInclude Include="Vendors\imgui\imconfig.h">
-      <Filter>Header Files\Vendors</Filter>
-    </ClInclude>
-    <ClInclude Include="LightController.h">
-      <Filter>Header Files\Lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="SkyBox.h">
+    <ClInclude Include="src\SkyBox.h">
       <Filter>Header Files\World</Filter>
     </ClInclude>
-    <ClInclude Include="DebugUtils.h">
+    <ClInclude Include="src\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowMap.h">
-      <Filter>Header Files\Lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="TextureManager.h">
+    <ClInclude Include="src\TextureManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\DebugUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third party\includes\imgui\imconfig.h">
+      <Filter>Header Files\third-party</Filter>
+    </ClInclude>
+    <ClInclude Include="third party\includes\imgui\imgui.h">
+      <Filter>Header Files\third-party</Filter>
+    </ClInclude>
+    <ClInclude Include="third party\includes\imgui\imgui_impl_glfw.h">
+      <Filter>Header Files\third-party</Filter>
+    </ClInclude>
+    <ClInclude Include="third party\includes\imgui\imgui_impl_opengl3.h">
+      <Filter>Header Files\third-party</Filter>
+    </ClInclude>
+    <ClInclude Include="third party\includes\imgui\imgui_impl_opengl3_loader.h">
+      <Filter>Header Files\third-party</Filter>
+    </ClInclude>
+    <ClInclude Include="third party\includes\imgui\imgui_internal.h">
+      <Filter>Header Files\third-party</Filter>
+    </ClInclude>
+    <ClInclude Include="third party\includes\imgui\imstb_rectpack.h">
+      <Filter>Header Files\third-party</Filter>
+    </ClInclude>
+    <ClInclude Include="third party\includes\imgui\imstb_textedit.h">
+      <Filter>Header Files\third-party</Filter>
+    </ClInclude>
+    <ClInclude Include="third party\includes\imgui\imstb_truetype.h">
+      <Filter>Header Files\third-party</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\shadow_mapping_depth.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\shadow_mapping_depth.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\pointLightShader.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\pointLightShader.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\lightingShader.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\lightingShader.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\debug_quad_depth.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\debug_quad.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\cubeMapShader.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\cubeMapShader.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

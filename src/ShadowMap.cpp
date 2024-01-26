@@ -4,8 +4,8 @@ ShadowMap::ShadowMap(std::vector<Object*>* objects, std::vector<SpotLight*>* spo
     m_SceneObjects(objects), m_SpotLights(spotlights)  
 {
     // Initialize shaders
-	depthShader = Shader("shadow_mapping_depth.vert", "shadow_mapping_depth.frag");
-    debugDepthShader = Shader("debug_quad.vert", "debug_quad_depth.frag");
+	depthShader = Shader("shaders/shadow_mapping_depth.vert", "shaders/shadow_mapping_depth.frag");
+    debugDepthShader = Shader("shaders/debug_quad.vert", "shaders/debug_quad_depth.frag");
     m_ShadowCasters = 0;
 }
 

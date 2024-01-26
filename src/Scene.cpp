@@ -9,9 +9,9 @@ Scene::Scene()
 	mainCamera = nullptr;
 	m_LightController = nullptr;
 
-	cubeMapShader = new Shader("cubeMapShader.vert", "cubeMapShader.frag");
-	lightingShader = new Shader("lightingShader.vert", "lightingShader.frag");
-	pointLightShader = new Shader("pointLightShader.vert", "pointLightShader.frag");
+	cubeMapShader = new Shader("shaders/cubeMapShader.vert", "shaders/cubeMapShader.frag");
+	lightingShader = new Shader("shaders/lightingShader.vert", "shaders/lightingShader.frag");
+	pointLightShader = new Shader("shaders/pointLightShader.vert", "shaders/pointLightShader.frag");
 	
 	m_PhysicsWorld = new PhysicsWorld();
 
@@ -29,9 +29,9 @@ Scene::Scene(Camera* mC)
 	fps = 0;
 	mainCamera = mC;
 
-	cubeMapShader = new Shader("cubeMapShader.vert", "cubeMapShader.frag");
-	lightingShader = new Shader("lightingShader.vert", "lightingShader.frag");
-	pointLightShader = new Shader("pointLightShader.vert", "pointLightShader.frag");
+	cubeMapShader = new Shader("shaders/cubeMapShader.vert", "shaders/cubeMapShader.frag");
+	lightingShader = new Shader("shaders/lightingShader.vert", "shaders/lightingShader.frag");
+	pointLightShader = new Shader("shaders/pointLightShader.vert", "shaders/pointLightShader.frag");
 	m_PhysicsWorld = new PhysicsWorld();
 	createLightController();	
 
