@@ -322,150 +322,154 @@ void GUI::drawList()
 			//Lighting Tab
 			if (ImGui::BeginTabItem("Lighting"))
 			{
-				SpotLight* selectedSpotLight = myScene.m_LightController->m_SpotLights[lightingSelected];
 				currentTab = 2;
 
-				glm::vec3 diffuse = selectedSpotLight->getDiffuse();
-				glm::vec3 ambient = selectedSpotLight->getAmbient();
-				glm::vec3 specular = selectedSpotLight->getSpecular();
-				float intensity = selectedSpotLight->getIntensity();
-
-				// Intensity
+				SpotLight* selectedSpotLight = nullptr;
+				if (myScene.m_LightController->m_SpotLights.size() > 0)
 				{
-					ImGui::Spacing();
-					ImGui::Text("SpotLight");
-					if (ImGui::DragFloat("Intensity", &intensity, 0.5f, 1.0f, 100.0f, "%.2f", 0))
+					selectedSpotLight = myScene.m_LightController->m_SpotLights[lightingSelected];
+					glm::vec3 diffuse = selectedSpotLight->getDiffuse();
+					glm::vec3 ambient = selectedSpotLight->getAmbient();
+					glm::vec3 specular = selectedSpotLight->getSpecular();
+					float intensity = selectedSpotLight->getIntensity();
+
+
+					// Intensity
 					{
-						if (intensity <= 0)
-							intensity = 1;
-						selectedSpotLight->setIntensity(intensity);
-						selectedSpotLight->setDiffuse(diffuse);
-						selectedSpotLight->setDiffuse(ambient);
-						selectedSpotLight->setDiffuse(specular);
+						ImGui::Spacing();
+						ImGui::Text("SpotLight");
+						if (ImGui::DragFloat("Intensity", &intensity, 0.5f, 1.0f, 100.0f, "%.2f", 0))
+						{
+							if (intensity <= 0)
+								intensity = 1;
+							selectedSpotLight->setIntensity(intensity);
+							selectedSpotLight->setDiffuse(diffuse);
+							selectedSpotLight->setDiffuse(ambient);
+							selectedSpotLight->setDiffuse(specular);
+						}
+					}
+
+					// Light Color
+					{
+						ImGui::Text("Light Color", "NULL");
+						float d[3] = { diffuse[0] / intensity , diffuse[1] / intensity, diffuse[2] / intensity };
+						float a[3] = { ambient[0] / intensity , ambient[1] / intensity, ambient[2] / intensity };
+						float s[3] = { specular[0] / intensity , specular[1] / intensity, specular[2] / intensity };
+
+						bool change = false;
+						if (ImGui::ColorEdit3("Diffuse###Lightcolor 1", d))
+						{
+							selectedSpotLight->setDiffuse(glm::vec3(d[0], d[1], d[2]));
+							change = true;
+						}
+						if (ImGui::ColorEdit3("Ambient###Lightcolor 2", a))
+						{
+							selectedSpotLight->setAmbient(glm::vec3(a[0], a[1], a[2]));
+							change = true;
+						}
+						if (ImGui::ColorEdit3("Specular###Lightcolor 3", s))
+						{
+							selectedSpotLight->setSpecular(glm::vec3(s[0], s[1], s[2]));
+							change = true;
+						}
+
+						ImGui::SameLine(); HelpMarker(
+							"Click on the color square to open a color picker.\n"
+							"Click and hold to use drag and drop.\n"
+							"Right-click on the color square to show options.\n"
+							"CTRL+click on individual component to input value.\n");
+						ImGui::Spacing();
+					}
+
+					// Light Position
+					{
+						ImGui::Spacing();
+						glm::vec3 lightPosition = selectedSpotLight->getLightPos();
+						float pos[3] = { lightPosition[0], lightPosition[1], lightPosition[2] };
+						ImGui::Text("Position");
+						if (ImGui::InputFloat3("##Position", pos, "%.3f", 0))
+						{
+							selectedSpotLight->setLightPos(glm::vec3(pos[0], pos[1], pos[2]));
+						}
+					}
+
+					// Light Direction (Needs Work)
+					{
+						ImGui::Spacing();
+						glm::vec3 lightDir = selectedSpotLight->getLightDirection();
+						//Direction
+						static float dir[3] = { lightDir[0], lightDir[1], lightDir[2] };
+						ImGui::Text("Direction");
+						if (ImGui::DragFloat("##Direction1", &dir[0], 0.1f, -100.0f, 100.0f, "%.2f", 0))
+						{
+							selectedSpotLight->setLightDirection(
+								glm::vec3(
+									dir[0],
+									dir[1],
+									dir[2])
+							);
+						}
+
+						if (ImGui::DragFloat("##Direction2", &dir[1], 0.1f, -100.0f, 100.0f, "%.2f", 0))
+						{
+							selectedSpotLight->setLightDirection(
+								glm::vec3(
+									dir[0],
+									dir[1],
+									dir[2])
+							);
+						}
+
+						if (ImGui::DragFloat("##Direction3", &dir[2], 0.1f, -100.0f, 100.0f, "%.2f", 0))
+						{
+							selectedSpotLight->setLightDirection(
+								glm::vec3(
+									dir[0],
+									dir[1],
+									dir[2])
+							);
+						}
+
+
+						/* Light Rotation (Better for direction but no implemented yet)
+						ImGui::Spacing();
+						ImGui::Text("Rotation");
+						float rX = selectedObject->m_Rotation[0];
+						float rY = selectedObject->m_Rotation[2];
+						float rZ = selectedObject->m_Rotation[1];
+						glm::vec3 currentRotation = glm::vec3(rX, rY, rZ);
+
+						if (ImGui::DragFloat("x", &rX, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						{
+
+							currentRotation[0] = rX;
+							selectedObject->setRotation(currentRotation, glm::vec3(1.0f, 0.0f, 0.0f), 0);
+						}
+						if (ImGui::DragFloat("z", &rZ, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						{
+							currentRotation[1] = rZ;
+							selectedObject->setRotation(currentRotation, glm::vec3(0.0f, 1.0f, 0.0f), 1);
+						}
+						if (ImGui::DragFloat("y", &rY, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						{
+							currentRotation[2] = rY;
+							selectedObject->setRotation(currentRotation, glm::vec3(0.0f, 0.0f, 1.0f), 2);
+						}
+						*/
+					}
+
+					//ShadowMap
+					{
+						ImGui::Spacing();
+						ImGui::Text("Shadows");
+						float near_plane = selectedSpotLight->getNearPlane();
+						if (ImGui::InputFloat("Near Plane", &near_plane, 0.1f, 1.0f, "%.3f", 0))
+							selectedSpotLight->setNearPlane(near_plane);
+						float far_plane = selectedSpotLight->getFarPlane();
+						if (ImGui::InputFloat("Far Plane", &far_plane, 0.1f, 1.0f, "%.3f", 0))
+							selectedSpotLight->setFarPlane(far_plane);
 					}
 				}
-
-				// Light Color
-				{
-					ImGui::Text("Light Color", "NULL");
-					float d[3] = { diffuse[0] / intensity , diffuse[1] / intensity, diffuse[2] / intensity };
-					float a[3] = { ambient[0] / intensity , ambient[1] / intensity, ambient[2] / intensity };
-					float s[3] = { specular[0] / intensity , specular[1] / intensity, specular[2] / intensity };
-
-					bool change = false;
-					if (ImGui::ColorEdit3("Diffuse###Lightcolor 1", d))
-					{
-						selectedSpotLight->setDiffuse(glm::vec3(d[0], d[1], d[2]));
-						change = true;
-					}
-					if (ImGui::ColorEdit3("Ambient###Lightcolor 2", a))
-					{
-						selectedSpotLight->setAmbient(glm::vec3(a[0], a[1], a[2]));
-						change = true;
-					}
-					if (ImGui::ColorEdit3("Specular###Lightcolor 3", s))
-					{
-						selectedSpotLight->setSpecular(glm::vec3(s[0], s[1], s[2]));
-						change = true;
-					}
-
-					ImGui::SameLine(); HelpMarker(
-						"Click on the color square to open a color picker.\n"
-						"Click and hold to use drag and drop.\n"
-						"Right-click on the color square to show options.\n"
-						"CTRL+click on individual component to input value.\n");
-					ImGui::Spacing();
-				}
-
-				// Light Position
-				{
-					ImGui::Spacing();
-					glm::vec3 lightPosition = selectedSpotLight->getLightPos();
-					float pos[3] = { lightPosition[0], lightPosition[1], lightPosition[2] };
-					ImGui::Text("Position");
-					if (ImGui::InputFloat3("##Position", pos, "%.3f", 0))
-					{
-						selectedSpotLight->setLightPos(glm::vec3(pos[0], pos[1], pos[2]));
-					}
-				}
-				
-				// Light Direction (Needs Work)
-				{
-					ImGui::Spacing();
-					glm::vec3 lightDir = selectedSpotLight->getLightDirection();
-					//Direction
-					static float dir[3] = {lightDir[0], lightDir[1], lightDir[2]};
-					ImGui::Text("Direction");
-					if(ImGui::DragFloat("##Direction1", &dir[0], 0.1f, -100.0f, 100.0f, "%.2f",0))
-					{
-						selectedSpotLight->setLightDirection(
-							glm::vec3(
-								dir[0],
-								dir[1],
-								dir[2])
-						);
-					}
-
-					if (ImGui::DragFloat("##Direction2", &dir[1], 0.1f, -100.0f, 100.0f, "%.2f", 0))
-					{
-						selectedSpotLight->setLightDirection(
-							glm::vec3(
-								dir[0],
-								dir[1],
-								dir[2])
-						);
-					}
-
-					if (ImGui::DragFloat("##Direction3", &dir[2], 0.1f, -100.0f, 100.0f, "%.2f", 0))
-					{
-						selectedSpotLight->setLightDirection(
-							glm::vec3(
-								dir[0],
-								dir[1],
-								dir[2])
-						);
-					}
-
-
-					/* Light Rotation (Better for direction but no implemented yet)
-					ImGui::Spacing();
-					ImGui::Text("Rotation");
-					float rX = selectedObject->m_Rotation[0];
-					float rY = selectedObject->m_Rotation[2];
-					float rZ = selectedObject->m_Rotation[1];
-					glm::vec3 currentRotation = glm::vec3(rX, rY, rZ);
-
-					if (ImGui::DragFloat("x", &rX, 1.0f, 0.0f, 360.0f, "%.2f", 0))
-					{
-
-						currentRotation[0] = rX;
-						selectedObject->setRotation(currentRotation, glm::vec3(1.0f, 0.0f, 0.0f), 0);
-					}
-					if (ImGui::DragFloat("z", &rZ, 1.0f, 0.0f, 360.0f, "%.2f", 0))
-					{
-						currentRotation[1] = rZ;
-						selectedObject->setRotation(currentRotation, glm::vec3(0.0f, 1.0f, 0.0f), 1);
-					}
-					if (ImGui::DragFloat("y", &rY, 1.0f, 0.0f, 360.0f, "%.2f", 0))
-					{
-						currentRotation[2] = rY;
-						selectedObject->setRotation(currentRotation, glm::vec3(0.0f, 0.0f, 1.0f), 2);
-					}
-					*/
-				}
-
-				//ShadowMap
-				{
-					ImGui::Spacing();
-					ImGui::Text("Shadows");
-					float near_plane = selectedSpotLight->getNearPlane();
-					if (ImGui::InputFloat("Near Plane", &near_plane, 0.1f, 1.0f, "%.3f", 0))
-						selectedSpotLight->setNearPlane(near_plane);
-					float far_plane = selectedSpotLight->getFarPlane();
-					if (ImGui::InputFloat("Far Plane", &far_plane, 0.1f, 1.0f, "%.3f", 0))
-						selectedSpotLight->setFarPlane(far_plane);
-				}
-
 				ImGui::EndTabItem();
 			}
 

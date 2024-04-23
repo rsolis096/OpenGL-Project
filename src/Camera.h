@@ -7,7 +7,6 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 
-
 class Camera
 {
 public:
@@ -19,12 +18,12 @@ public:
     glm::vec3 worldUp;
 
     Camera();
+
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix();
     void processKeyboard(float changeValue, unsigned int keyPressed);
     void processMouse(double xpos, double ypos, GLboolean constrainPitch = true); 
     void processScroll(double xoffset, double yoffset);
-
     void setMovementSpeed(float newSpeed);
     float getMovementSpeed();
     float getFOV();

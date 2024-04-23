@@ -1,5 +1,5 @@
 #include "LightController.h"
-#include "Scene.h" // We include "A.h" in the cpp file
+#include "Scene.h"
 
 LightController::LightController
 (Shader* lightingShader, Shader* objectShader, Camera* cam, Scene* s)

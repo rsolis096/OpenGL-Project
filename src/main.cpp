@@ -8,7 +8,6 @@
 
 #include <iostream>
 
-
 #include "PhysicsWorld.h"
 
 #include "Texture.h"
@@ -57,25 +56,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void updateCamera(Shader& lightingShader, glm::mat4& view, glm::mat4& projection)
-{
-    lightingShader.use();
-
-    //View Matrix (Do after camera)
-    view = myCamera->GetViewMatrix();
-
-    //Projection Matrix (fov change with scroll wheel) last value changes render distance
-    projection = glm::perspective(glm::radians(myCamera->getFOV()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 1500.0f);
-
-    //Send View and Projection matrices to shader (for camera)]]
-    
-    lightingShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.    
-
-    lightingShader.setMat4("view", view);
-    glCheckError();
-
-}
-
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow* window)
@@ -83,17 +63,7 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-    {
-        myCamera->setMovementSpeed(50.0f);
-    }
-    else
-    {
-        myCamera->setMovementSpeed(2.5f);
-    }
-
-
-    //Return mouse movement when tab is pressed
+    //Return mouse movement when tilde is pressed
     if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS)
     {
         double currentTime = glfwGetTime();
@@ -127,22 +97,33 @@ void processInput(GLFWwindow* window)
         }
     }
 
-    //Mouse Input
+    //Mouse Input (input disabled when imgui menu is opened)
     if (cursorLocked)
     {
-        const float cameraSpeed = myCamera->getMovementSpeed() * deltaTime;
+        float cameraSpeed = myCamera->getMovementSpeed() * deltaTime;
+        //Forward
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             myCamera->processKeyboard(cameraSpeed, GLFW_KEY_W);
+        //Backward
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
             myCamera->processKeyboard(-1.0f * cameraSpeed, GLFW_KEY_S);
+        //Left
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
             myCamera->processKeyboard(-1.0f * cameraSpeed, GLFW_KEY_A);
+        //Right
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             myCamera->processKeyboard(cameraSpeed, GLFW_KEY_D);
+        //Up
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
             myCamera->processKeyboard(cameraSpeed, GLFW_KEY_SPACE);
+        //Down
         if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
             myCamera->processKeyboard(cameraSpeed, GLFW_KEY_LEFT_CONTROL);
+        //Movement Speed
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            myCamera->setMovementSpeed(50.0f);
+        else
+            myCamera->setMovementSpeed(2.5f);
     }
 }
 
@@ -186,6 +167,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     }
 }
 
+//GLFW scroll_callback function sends scroll input to camera method
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     myCamera->processScroll(xoffset, yoffset);
@@ -195,6 +177,24 @@ unsigned int cubeVAO = 0;
 unsigned int cubeVBO = 0;
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
+
+void updateCamera(Shader& lightingShader, glm::mat4& view, glm::mat4& projection)
+{
+    lightingShader.use();
+
+    //View Matrix (Do after camera)
+    view = myCamera->GetViewMatrix();
+
+    //Projection Matrix (fov change with scroll wheel) last value changes render distance
+    projection = glm::perspective(glm::radians(myCamera->getFOV()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 1500.0f);
+
+    //Send View and Projection matrices to shader (for camera)]]
+    lightingShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.    
+
+    lightingShader.setMat4("view", view);
+    glCheckError();
+
+}
 
 void RenderQuad()
 {
@@ -295,7 +295,7 @@ void demoScene(Scene& demoScene)
     glm::vec3 spotLightDir3 = glm::vec3(0.0f, 0.0f, 1.0f);
     spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
 
-    demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
+    //demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
     //demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
     //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
     //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
@@ -324,8 +324,8 @@ int main()
     GUI myGUI(window, myScene);
 
     //Initialize View and Projection (These are changed in updateCamera() )
-    glm::mat4 view;
-    glm::mat4 projection;
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);;
 
     glCheckError();
 
@@ -333,18 +333,21 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
-        view = myCamera->GetViewMatrix();
+
+        //Update Camera
         updateCamera(*myScene.lightingShader, view, projection);
+
         //Use this to get framerate info
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         myScene.fps = 1 / deltaTime;
+
         //Rendering Starts Here
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //SHADOW PASS
+        //SHADOW PASS (Only update upon launch and press of "=" key, see func definition) 
         myScene.m_ShadowMap->ShadowPass();
         
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
@@ -353,7 +356,6 @@ int main()
         
 
         // render Depth map to quad for visual debugging
-        // ---------------------------------------------
         /*
         myScene.m_ShadowMap->debugDepthShader.use();
         myScene.m_ShadowMap->debugDepthShader.setFloat("near_plane", myScene.m_LightController->m_SpotLights[1]->getNearPlane());

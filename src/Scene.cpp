@@ -107,24 +107,26 @@ void Scene::removeLightController()
 
 void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 {	
-	//Point Light Lamp (light spheres)
+	//Draw Point Light Lamp (light spheres)
 	pointLightShader->use();
 	pointLightShader->setMat4("projection", proj);
 	pointLightShader->setMat4("view", view);
 
-	//Main Shader
+	//Set Main Shader matrices
 	lightingShader->use();
 	lightingShader->setMat4("projection", proj);
 	lightingShader->setMat4("view", view);
 	lightingShader->setVec3("viewPos", mainCamera->cameraPos);
 
-	glUseProgram(lightingShader->ID);
-	glUniformMatrix4fv(
-		glGetUniformLocation(lightingShader->ID, "lightSpaceMatrices"),
-		m_ShadowMap->getLightSpaceMatrices().size(),
-		GL_FALSE,
-		glm::value_ptr(m_ShadowMap->getLightSpaceMatrices()[0])
-	);
+	if (m_ShadowMap->getLightSpaceMatrices().size() > 0)
+	{
+		glUniformMatrix4fv(
+			glGetUniformLocation(lightingShader->ID, "lightSpaceMatrices"),
+			m_ShadowMap->getLightSpaceMatrices().size(),
+			GL_FALSE,
+			glm::value_ptr(m_ShadowMap->getLightSpaceMatrices()[0])
+		);
+	}
 
 	//Activate the texture units and bind the correspoding depth map
 	m_ShadowMap->drawShadowMap(lightingShader->ID);

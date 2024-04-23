@@ -17,6 +17,7 @@ class ShadowMap
 		const unsigned int SHADOW_HEIGHT = 2048;
 		std::vector<glm::mat4> m_LightSpaceMatrices;
 		unsigned int m_ShadowCasters;
+		bool m_UpdateShadowMap;
 
 	public:
 		Shader depthShader;
@@ -30,5 +31,6 @@ class ShadowMap
 		
 		GLuint getDepthMapID(int);
 		GLuint getDepthMapFBOID(int);
+		void setUpdateShadowMap();
 		
 };
