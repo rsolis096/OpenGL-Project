@@ -190,11 +190,12 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
     }
     else
     {
-        ambient = light.ambient * object.ambient* spotFactor;
+        ambient = object.ambient* spotFactor;
         diffuse = object.diffuse * spotFactor;
         specular = object.specular* spotFactor;
     }
 
+    ambient *= light.ambient;
     diffuse *= light.diffuse * lambertian ;
     specular *= light.specular * spec ;
         
@@ -233,16 +234,20 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
     //Apply light
     if(hasTexture)
     {
-        ambient = light.ambient * texture(material.diffuse, fs_in.TexCoords).rgb;
-        diffuse = light.diffuse * diff * texture(material.diffuse, fs_in.TexCoords).rgb;  
-        specular = light.specular * spec * texture(material.specular, fs_in.TexCoords).rgb;  
+        ambient = texture(material.diffuse, fs_in.TexCoords).rgb;
+        diffuse = texture(material.diffuse, fs_in.TexCoords).rgb;  
+        specular = texture(material.specular, fs_in.TexCoords).rgb;  
     }
     else
     {
-        ambient = light.ambient * object.diffuse;
-        diffuse = light.diffuse * diff * object.diffuse;  
-        specular = light.specular * spec * object.specular;  
+        ambient = object.ambient;
+        diffuse = object.diffuse;
+        specular = object.specular;
     }
+
+    ambient *= light.ambient;
+    diffuse *= light.diffuse * diff ;
+    specular *= light.specular * spec ;
 
     // attenuation
     float distance    = length(light.position - fs_in.FragPos);

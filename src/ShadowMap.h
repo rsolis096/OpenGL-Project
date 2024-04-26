@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "Shader.h"
 #include "Texture.h"
 #include "Object.h"
@@ -17,10 +16,10 @@ class ShadowMap
 		std::vector<SpotLight*>* m_SpotLights;
 		std::vector<GLuint> depthMapFBO;
 		std::vector<GLuint> depthMap;
-		const unsigned int SHADOW_WIDTH = 2048;
-		const unsigned int SHADOW_HEIGHT = 2048;
+		const unsigned short SHADOW_WIDTH = 2048;
+		const unsigned short SHADOW_HEIGHT = 2048;
 		std::vector<glm::mat4> m_LightSpaceMatrices;
-		unsigned int m_ShadowCasters;
+		unsigned short m_ShadowCasters;
 		bool m_UpdateShadowMap;
 
 	public:

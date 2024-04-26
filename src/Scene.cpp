@@ -4,7 +4,7 @@ class PhysicsWorld;
 
 Scene::Scene(Camera* mC)
 {
-	objectCount = 0;
+	m_SceneObjectCount = 0;
 	fps = 0;
 	mainCamera = mC;
 
@@ -88,6 +88,7 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 	lightingShader->setMat4("view", view);
 	lightingShader->setVec3("viewPos", mainCamera->cameraPos);
 
+	//Update shadows only if there exists light matrices (proj matrices from light source)
 	if (m_ShadowMap->getLightSpaceMatrices().size() > 0)
 	{
 		glUniformMatrix4fv(

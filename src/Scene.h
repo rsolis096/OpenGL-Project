@@ -19,7 +19,7 @@ class Scene
 public:
 
 	//Total Objects in scene
-	unsigned int objectCount;
+	unsigned short m_SceneObjectCount;
 	float fps;
 
 	Camera* mainCamera;

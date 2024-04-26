@@ -55,7 +55,7 @@ void PhysicsWorld::step(float totalTime, float deltaTime)
 			obj->m_Force += (obj->m_Mass) * (m_Gravity); //Units in Newtons
 
 			//Calculate the current velocity given the amount of time spent in air total (acceleration)
-			obj->m_Velocity += (obj->m_Force / obj->m_Mass) * (airTime * 0.05f); //(Newton (kg * (m/s^2)) / kg) * frametime = velocity
+			obj->m_Velocity += (obj->m_Force / obj->m_Mass) * (airTime * 0.1f); //(Newton (kg * (m/s^2)) / kg) * frametime = velocity
 
 			//Terminal Velocity in y direction
 			if (obj->m_Velocity[1] > 54)

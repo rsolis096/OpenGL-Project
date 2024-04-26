@@ -11,7 +11,7 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_LightDirection = glm::normalize(dir - pos);
 
 	m_SpotLightID = m_SpotLightCount;
-	m_DisplayName = "m_SpotLight" + std::to_string(m_SpotLightID);
+	m_DisplayName = "SpotLight" + std::to_string(m_SpotLightID);
 	m_SpotLightCount++;
 
 	//m_SpotLight takes the shape of a sphere

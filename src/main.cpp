@@ -262,10 +262,10 @@ void demoScene(Scene& demoScene)
     glm::vec3 spotLightDir3 = glm::vec3(0.0f, 0.0f, 1.0f);
     spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
 
-    demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
-    demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
-    demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
-    demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
+    //demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
+    //demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
+    //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
+    //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
     demoScene.m_LightController->addPointLight(glm::vec3(0.0f,10.0f,0.0f));
 

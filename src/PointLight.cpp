@@ -12,6 +12,7 @@ PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::
 	m_LightShape->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
 	m_LightID = m_PointLightCount;
+	m_DisplayName = "PointLight" + std::to_string(m_LightID);
 	m_PointLightCount++;
 	m_LightShape->m_DisplayName = "PointLight" + std::to_string(m_LightID);
 
@@ -75,7 +76,7 @@ void PointLight::setAmbient(const glm::vec3 ambient)
 	m_Ambient = ambient;
 	m_LightShape->m_Ambient = ambient;
 	m_LightingShader->use();
-	m_LightingShader->setVec3("pointlight[" + std::to_string(m_LightID) + "].ambient", m_Ambient);
+	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].ambient", m_Ambient);
 }
 
 void PointLight::setDiffuse(const glm::vec3 diffuse)
@@ -83,7 +84,7 @@ void PointLight::setDiffuse(const glm::vec3 diffuse)
 	m_Diffuse = diffuse;	
 	m_LightShape->m_Diffuse = diffuse;
 	m_LightingShader->use();
-	m_LightingShader->setVec3("pointlight[" + std::to_string(m_LightID) + "].diffuse", m_Diffuse);
+	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].diffuse", m_Diffuse);
 }
 
 void PointLight::setSpecular(const glm::vec3 specular)
@@ -91,30 +92,50 @@ void PointLight::setSpecular(const glm::vec3 specular)
 	m_Specular = specular;
 	m_LightShape->m_Specular = specular;
 	m_LightingShader->use();
-	m_LightingShader->setVec3("pointlight[" + std::to_string(m_LightID) + "].specular", m_Specular);
+	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].specular", m_Specular);
 }
 
 void PointLight::setconstant(const float constant)
 {
 	m_Constant = constant;
 	m_LightingShader->use();
-	m_LightingShader->setFloat("pointlight[" + std::to_string(m_LightID) + "].constant", m_Constant);
+	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].constant", m_Constant);
 }
 
 void PointLight::setLinear(const float linear)
 {
 	m_Linear = linear;
 	m_LightingShader->use();
-	m_LightingShader->setFloat("pointlight[" + std::to_string(m_LightID) + "].linear", m_Linear);
+	m_LightingShader->setFloat("pointLight[" + std::to_string(m_LightID) + "].linear", m_Linear);
 }
 
 void PointLight::setQuadratic(const float quadratic)
 {
 	m_Quadratic = quadratic;
 	m_LightingShader->use();
-	m_LightingShader->setFloat("pointlight[" + std::to_string(m_LightID) + "].quadratic", m_Quadratic);
+	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].quadratic", m_Quadratic);
 }
 
 /*###################################
 * ###     GETTER FUNCTIONS        ###
 ###################################*/
+
+glm::vec3 PointLight::getLightPos()
+{
+	return m_LightPos;
+}
+
+glm::vec3 PointLight::getAmbient()
+{
+	return m_Ambient;
+}
+
+glm::vec3 PointLight::getDiffuse()
+{
+	return m_Diffuse;
+}
+
+glm::vec3 PointLight::getSpecular()
+{
+	return m_Specular;
+}

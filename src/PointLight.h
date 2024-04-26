@@ -21,12 +21,18 @@ class PointLight
 		void setDiffuse(const glm::vec3 diffuse);
 		void setSpecular(const glm::vec3 specular);
 
+		glm::vec3 getLightPos();
+		glm::vec3 getAmbient();
+		glm::vec3 getDiffuse();
+		glm::vec3 getSpecular();
+
 		//For Attenuation
 		void setconstant(const float constant);
 		void setLinear(const float linear);
 		void setQuadratic(const float quadratic);
 
 		//Variables
+		std::string m_DisplayName;
 		static unsigned short m_PointLightCount;
 		unsigned short m_LightID;
 
