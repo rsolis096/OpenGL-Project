@@ -2,28 +2,6 @@
 
 class PhysicsWorld;
 
-Scene::Scene()
-{
-	//Initialize a scene
-	objectCount = 0;
-	fps = 0;
-
-	mainCamera = nullptr;
-	m_LightController = nullptr;
-	m_SkyBox = nullptr;
-
-	//Load and compile shaders
-	cubeMapShader = new Shader("shaders/cubeMapShader.vert", "shaders/cubeMapShader.frag");
-	lightingShader = new Shader("shaders/lightingShader.vert", "shaders/lightingShader.frag");
-	pointLightShader = new Shader("shaders/pointLightShader.vert", "shaders/pointLightShader.frag");
-	
-	m_PhysicsWorld = new PhysicsWorld();
-	m_LightController = new LightController(lightingShader, pointLightShader, mainCamera, this);
-	m_ShadowMap = new ShadowMap(&m_SceneObjects, &m_LightController->m_SpotLights);
-
-	glCheckError();
-}
-
 Scene::Scene(Camera* mC)
 {
 	objectCount = 0;

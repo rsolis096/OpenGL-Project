@@ -27,7 +27,7 @@ public:
 	LightController* m_LightController;
 	PhysicsWorld* m_PhysicsWorld;
 
-	Shader* cubeMapShader;
+	Shader* cubeMapShader; //skybox
 	Shader* lightingShader;
 	Shader* pointLightShader;
 
@@ -39,7 +39,6 @@ public:
 	std::vector<Model*> sceneModels;
 
 	//Constructors
-	Scene();
 	Scene(Camera*);
 
 

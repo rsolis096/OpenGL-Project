@@ -4,6 +4,7 @@
 #include "DirectionalLight.h"
 #include "SpotLight.h"
 
+//Forward Declaration (both depend on eachother)
 class Scene;
 
 class LightController
@@ -13,7 +14,7 @@ public:
 	
 	//Given by the scene
 	Shader* m_LightingShader;
-	Shader* m_ObjectShader;
+	Shader* m_LightSourceShader;
 	Camera* m_PlayerCamera;
 	Scene* m_Scene;
 
@@ -22,11 +23,10 @@ public:
 	std::vector<SpotLight*> m_SpotLights;
 
 	//Point Light Methods
-	void addPointLight();
+	void addPointLight(const glm::vec3&);
 	void removePointLight();
 
 	//Spot Light methods
-	void addSpotLight();
 	void addSpotLight(glm::vec3, glm::vec3);
 	void removeSpotLight();
 

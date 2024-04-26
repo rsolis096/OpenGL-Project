@@ -1,12 +1,13 @@
 //#include <glad/glad.h> //Opengl functions
 #include "DebugUtils.h"
+
+#include <iostream>
 #include <GLFW/glfw3.h> //Window functions
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
-#include <iostream>
 
 #include "PhysicsWorld.h"
 
@@ -15,11 +16,9 @@
 #include "ShadowMap.h"
 #include "Model.h"
 
-#include "PointLight.h"
-#include "SpotLight.h"
-#include "DirectionalLight.h"
 #include "Model.h"
 
+//Contains includes for all light types
 #include "LightController.h"
 
 //Matrix Multiplication
@@ -173,11 +172,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     myCamera->processScroll(xoffset, yoffset);
 }
 
-unsigned int cubeVAO = 0;
-unsigned int cubeVBO = 0;
-unsigned int quadVAO = 0;
-unsigned int quadVBO;
-
 void updateCamera(Shader& lightingShader, glm::mat4& view, glm::mat4& projection)
 {
     lightingShader.use();
@@ -194,33 +188,6 @@ void updateCamera(Shader& lightingShader, glm::mat4& view, glm::mat4& projection
     lightingShader.setMat4("view", view);
     glCheckError();
 
-}
-
-void RenderQuad()
-{
-    if (quadVAO == 0)
-    {
-        float quadVertices[] = {
-            // positions        // texture Coords
-            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        };
-        // setup plane VAO
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    }
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
 }
 
 GLFWwindow* setupWindow()
@@ -295,12 +262,12 @@ void demoScene(Scene& demoScene)
     glm::vec3 spotLightDir3 = glm::vec3(0.0f, 0.0f, 1.0f);
     spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
 
-    //demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
-    //demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
-    //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
-    //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
+    demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
+    demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
+    demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
+    demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
-    demoScene.m_LightController->addPointLight();
+    demoScene.m_LightController->addPointLight(glm::vec3(0.0f,10.0f,0.0f));
 
     //Cube
     demoScene.m_SceneObjects[1]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
@@ -355,18 +322,6 @@ int main()
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         myScene.drawScene(deltaTime, projection, view);
-        
-
-        // render Depth map to quad for visual debugging
-        /*
-        myScene.m_ShadowMap->debugDepthShader.use();
-        myScene.m_ShadowMap->debugDepthShader.setFloat("near_plane", myScene.m_LightController->m_SpotLights[1]->getNearPlane());
-        myScene.m_ShadowMap->debugDepthShader.setFloat("far_plane", myScene.m_LightController->m_SpotLights[1]->getFarPlane());
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, myScene.m_ShadowMap->getDepthMapID(1));
-        updateCamera(myScene.m_ShadowMap->debugDepthShader, view, projection);
-        RenderQuad();
-        */
 
         glCheckError();
 

@@ -1,8 +1,12 @@
 #pragma once
+
+
 #include "Shader.h"
 #include "Texture.h"
 #include "Object.h"
+#include "Model.h"
 #include "LightController.h"
+
 #include <glm/gtx/string_cast.hpp>
 
 class ShadowMap

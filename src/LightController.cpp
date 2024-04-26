@@ -6,14 +6,14 @@ LightController::LightController
 	:m_WordLight(new DirectionalLight(lightingShader)), m_Scene(s)
 {
 	m_LightingShader = lightingShader;
-	m_ObjectShader = objectShader;
+	m_LightSourceShader = objectShader;
 	m_PlayerCamera = cam;
 	glCheckError();
 }
 
-void LightController::addPointLight()
+void LightController::addPointLight(const glm::vec3& pos)
 {
-	m_PointLights.push_back(new PointLight(m_LightingShader, m_ObjectShader, *m_PlayerCamera));
+	m_PointLights.push_back(new PointLight(m_LightingShader, m_LightSourceShader, pos));
 	glCheckError();
 }
 
@@ -21,17 +21,10 @@ void LightController::removePointLight()
 {
 }
 
-void LightController::addSpotLight()
-{
-	m_SpotLights.push_back(new SpotLight(m_LightingShader, m_ObjectShader, *m_PlayerCamera));
-	m_Scene->m_ShadowMap->addShadowMap();
-}
-
 void LightController::addSpotLight(glm::vec3 pos, glm::vec3 dir)
 {
-	m_SpotLights.emplace_back(new SpotLight(m_LightingShader, m_ObjectShader, pos, dir));
+	m_SpotLights.emplace_back(new SpotLight(m_LightingShader, m_LightSourceShader, pos, dir));
 	m_Scene->m_ShadowMap->addShadowMap();	
-	cout << "Added " + (*(m_SpotLights.end() - 1))->m_DisplayName << endl;
 }
 
 void LightController::removeSpotLight()

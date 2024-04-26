@@ -1,51 +1,46 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
-
-#include "Model.h"
 #include "Cube.h"
 #include "Shader.h"
-#include "Camera.h"
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 
 class PointLight
 {
 	public:
-		PointLight(Shader* lightingShader, Shader* lightCubeShader, Camera& cam);
-		void Draw();
+
+		//Constructors
+		PointLight(Shader* lightingShader, Shader* lightCubeShader, const glm::vec3&);
 		~PointLight();
-		static int pointLightCount;
-		int lightID;
+
+		//Render Functions
+		void Draw();
 
 		//For Light Properties
-		void setLightPos(glm::vec3 lightPos);
-		void setAmbient(glm::vec3 ambient);
-		void setDiffuse(glm::vec3 diffuse);
-		void setSpecular(glm::vec3 specular);
+		void setLightPos(const glm::vec3 lightPos);
+		void setAmbient(const glm::vec3 ambient);
+		void setDiffuse(const glm::vec3 diffuse);
+		void setSpecular(const glm::vec3 specular);
 
 		//For Attenuation
-		void setconstant(float constant);
-		void setLinear(float linear);
-		void setQuadratic(float quadratic);
+		void setconstant(const float constant);
+		void setLinear(const float linear);
+		void setQuadratic(const float quadratic);
+
+		//Variables
+		static unsigned short m_PointLightCount;
+		unsigned short m_LightID;
 
 	private:
+
 		//Shaders (for lighting and for light object itself
-		Shader* m_ObjectShader;
-		Shader* m_lightingShader;
+		Shader* m_LightSourceShader;
+		Shader* m_LightingShader;
 
 		//Light Object (light is not invisible)
 		Cube* m_LightShape;
-		//Model m_LightModel;
-
-		//World Position
-		glm::vec3 m_LightPos;
 
 		//Light properties
+		glm::vec3 m_LightPos;
 		glm::vec3 m_Ambient;
 		glm::vec3 m_Diffuse;
 		glm::vec3 m_Specular;

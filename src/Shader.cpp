@@ -29,36 +29,27 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 
     const char* vShaderCode = vertexCode.c_str();
     const char* fShaderCode = fragmentCode.c_str();
-    glCheckError();
     //Create vertex shader object
     unsigned int vertexShader; //initialize vertex shader reference id
     vertexShader = glCreateShader(GL_VERTEX_SHADER); //Create shader of type GL_VERTEX_SHADER
     glShaderSource(vertexShader, 1, &vShaderCode, NULL); //Attach shader to shader source code
     glCompileShader(vertexShader); //Compile vertexShader
-    glCheckError();
     //Create fragmentShader object
     unsigned int fragmentShader; //initialize fragment shader reference id
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER); //Create shader of type GL_FRAGMENT_SHADER
     glShaderSource(fragmentShader, 1, &fShaderCode, NULL); //Attach shader to shader source code
     glCompileShader(fragmentShader); //compile fragmentShader
-    glCheckError();
     //To use the recently compiled shaders we have to link them to a shader program object and then activate this shader program
     //Links output of vertex shader to input of fragment shader
     ID = glCreateProgram();
     glAttachShader(ID, vertexShader); //Attach compiled shader object (vertexShader) to a shader program (shaderProgram)
-    glCheckError();
 
     glAttachShader(ID, fragmentShader); //Attach compiled shader object (fragmentShader) to a shader program (shaderProgram)
-    glCheckError();
 
     glLinkProgram(ID); //Link the two shaders, order matters. Always attach vertex shader before fragment shader to match rendering pipeline
-    glCheckError();
     checkCompileErrors(vertexShader, "VERTEX", vertexPath);
-    glCheckError();
     checkCompileErrors(fragmentShader, "FRAGMENT", fragmentPath);
-    glCheckError();
     checkCompileErrors(ID, "PROGRAM", "PROGRAM");
-    glCheckError();
     //The vertexShader and fragmentShader shader objects are already linked to the program object. Its ok to delete them.
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);

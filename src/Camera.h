@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include "DebugUtils.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
@@ -11,13 +12,14 @@ class Camera
 {
 public:
 
+    Camera();
+
     //glm::vec3 direction;
     glm::vec3 cameraPos;
     glm::vec3 cameraFront;
     glm::vec3 cameraUp;
     glm::vec3 worldUp;
 
-    Camera();
 
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix();
