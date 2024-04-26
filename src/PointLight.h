@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+
 #include "Model.h"
 #include "Cube.h"
 #include "Shader.h"
@@ -41,9 +42,6 @@ class PointLight
 		Cube* m_LightShape;
 		//Model m_LightModel;
 
-		//Reference to the camera
-		Camera& playerCamera;
-
 		//World Position
 		glm::vec3 m_LightPos;
 
@@ -57,4 +55,3 @@ class PointLight
 		float m_Linear;
 		float m_Quadratic;
 };
-

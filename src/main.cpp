@@ -300,6 +300,8 @@ void demoScene(Scene& demoScene)
     //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
     //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
+    demoScene.m_LightController->addPointLight();
+
     //Cube
     demoScene.m_SceneObjects[1]->setPosition(glm::vec3(2.0f, 1.0f, 1.0));
     demoScene.m_SceneObjects[1]->setScale(glm::vec3(0.5f, 0.5f, 0.5f));

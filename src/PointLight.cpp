@@ -3,11 +3,11 @@
 int PointLight::pointLightCount = 0;
 bool firstFrame = true;
 
-PointLight::PointLight(Shader* lightingShader, Shader* objectShader, Camera& cam) : playerCamera(cam),
+PointLight::PointLight(Shader* lightingShader, Shader* objectShader, Camera& cam) :
 m_lightingShader(lightingShader), m_ObjectShader(objectShader)
 {
 	m_LightShape = new Cube(); //Create the physical light object
-	setLightPos(glm::vec3(0.0f, 0.0f, 0.0f));
+	setLightPos(glm::vec3(0.0f, 10.0f, 0.0f));
 	m_LightShape->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
 	lightID = pointLightCount;

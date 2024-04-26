@@ -4,21 +4,22 @@ class PhysicsWorld;
 
 Scene::Scene()
 {
+	//Initialize a scene
 	objectCount = 0;
 	fps = 0;
+
 	mainCamera = nullptr;
 	m_LightController = nullptr;
+	m_SkyBox = nullptr;
 
+	//Load and compile shaders
 	cubeMapShader = new Shader("shaders/cubeMapShader.vert", "shaders/cubeMapShader.frag");
 	lightingShader = new Shader("shaders/lightingShader.vert", "shaders/lightingShader.frag");
 	pointLightShader = new Shader("shaders/pointLightShader.vert", "shaders/pointLightShader.frag");
 	
 	m_PhysicsWorld = new PhysicsWorld();
-
-	createLightController();
-
+	m_LightController = new LightController(lightingShader, pointLightShader, mainCamera, this);
 	m_ShadowMap = new ShadowMap(&m_SceneObjects, &m_LightController->m_SpotLights);
-	m_SkyBox = nullptr;
 
 	glCheckError();
 }
@@ -33,14 +34,13 @@ Scene::Scene(Camera* mC)
 	lightingShader = new Shader("shaders/lightingShader.vert", "shaders/lightingShader.frag");
 	pointLightShader = new Shader("shaders/pointLightShader.vert", "shaders/pointLightShader.frag");
 	m_PhysicsWorld = new PhysicsWorld();
-	createLightController();	
 
+	m_LightController = new LightController(lightingShader, pointLightShader, mainCamera, this);
 	m_ShadowMap = new ShadowMap(&m_SceneObjects, &m_LightController->m_SpotLights);
 	m_SkyBox = new SkyBox(*cubeMapShader, mainCamera);
 
 	glCheckError();
 }
-
 
 //Add an object to the scene (only objects part of a scene are rendered)
 int Scene::addObject(Object* obj)
@@ -82,14 +82,6 @@ void Scene::removeAllObjects()
 	for (auto it = m_SceneObjects.begin(); it != m_SceneObjects.end(); ++it)
 		delete* it;
 	m_SceneObjects.clear();
-}
-
-//Create a LightController within the scene
-void Scene::createLightController()
-{
-	if (m_LightController != nullptr)
-		removeLightController();
-	m_LightController = new LightController(lightingShader, pointLightShader, mainCamera, this);
 }
 
 //Add a LightController to the scene

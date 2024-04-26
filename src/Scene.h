@@ -2,12 +2,16 @@
 
 #include "PhysicsWorld.h"
 #include "Model.h"
+#include "SkyBox.h"
+
 #include "Camera.h"
+
 #include "LightController.h"
 #include "ShadowMap.h"
-#include "SkyBox.h"
-#include <typeinfo>
+
 #include "TextureManager.h"
+
+#include <typeinfo>
 #include <string>
 
 class Scene
@@ -15,7 +19,7 @@ class Scene
 public:
 
 	//Total Objects in scene
-	int objectCount;
+	unsigned int objectCount;
 	float fps;
 
 	Camera* mainCamera;
@@ -28,24 +32,22 @@ public:
 	Shader* pointLightShader;
 
 	ShadowMap* m_ShadowMap;
-
 	SkyBox* m_SkyBox;
 
-	// Scene Objects (All)
 	std::vector<Object*> m_SceneObjects;
 
-	//Scene Objects (Specific)
 	std::vector<Model*> sceneModels;
 
 	//Constructors
 	Scene();
 	Scene(Camera*);
+
+
 	int addObject(Object* obj);
 	int removeObject(Object* obj);
 	void removeAllObjects();
 
 	void addLightController(LightController* lc);
-	void createLightController();
 	void removeLightController();
 
 	//void addShader(Shader&);

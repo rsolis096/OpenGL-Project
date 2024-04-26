@@ -64,12 +64,12 @@ in VS_OUT {
 } fs_in;
 
 uniform vec3 viewPos;
-uniform vec3 lightPos;
-
 
 uniform DirLight dirLight;
+
 uniform PointLight pointLights[MAX_NR_POINT_LIGHTS];
 uniform int numberOfPointLights;
+
 uniform SpotLight spotLights[MAX_NR_SPOT_LIGHTS];
 uniform int numberOfSpotLightsFRAG;
 
@@ -80,7 +80,7 @@ uniform bool hasTexture;
 
 // function prototypes
 //vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
-//vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int mapIndex);
 
 uniform float textureScale;  // Scaling factor for texture coordinates
@@ -135,7 +135,15 @@ void main()
     scaledTexCoords = fs_in.TexCoords * 1;
     vec3 result;
 
-    //phase 3: spot light
+    // phase 1: directional lights
+
+    // phase 2: point lights
+    for(int i = 0; i < numberOfPointLights; i++)
+    {
+        result += CalcPointLight(pointLights[i], normal, viewDir);           
+    }
+
+    //phase 3: spot light 
     for(int i = 0; i < numberOfSpotLightsFRAG; i++)
     {
         result += CalcSpotLight(spotLights[i], normal, viewDir, i);           
@@ -202,4 +210,49 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
 
     return lighting;
 
+}
+
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
+{
+    // ambient
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+	
+    // calculate diffuse 
+    vec3 lightDir = normalize(light.position - fs_in.FragPos);
+    float diff = max(dot(normal, lightDir), 0.0);
+
+    // calculate specular
+    vec3 reflectDir = reflect(-lightDir, normal);  
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    //Blinn-Phong halfway vector
+    vec3 halfwayDir = normalize(lightDir + viewDir);  
+    spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
+    
+    //Apply light
+    if(hasTexture)
+    {
+        ambient = light.ambient * texture(material.diffuse, fs_in.TexCoords).rgb;
+        diffuse = light.diffuse * diff * texture(material.diffuse, fs_in.TexCoords).rgb;  
+        specular = light.specular * spec * texture(material.specular, fs_in.TexCoords).rgb;  
+    }
+    else
+    {
+        ambient = light.ambient * object.diffuse;
+        diffuse = light.diffuse * diff * object.diffuse;  
+        specular = light.specular * spec * object.specular;  
+    }
+
+    // attenuation
+    float distance    = length(light.position - fs_in.FragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+
+    ambient  *= attenuation;  
+    diffuse   *= attenuation;
+    specular *= attenuation;   
+        
+    vec3 result = ambient + diffuse + specular;
+
+    return result;
 }

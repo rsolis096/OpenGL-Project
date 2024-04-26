@@ -40,8 +40,8 @@ void LightController::removeSpotLight()
 
 void LightController::drawLighting()
 {
-	//for (PointLight* pointLight : m_PointLights)
-		//pointLight->Draw();
+	for (PointLight* pointLight : m_PointLights)
+		pointLight->Draw();
 	for (SpotLight* spotLights : m_SpotLights)
 		spotLights->Draw();
 

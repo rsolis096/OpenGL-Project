@@ -1,8 +1,8 @@
 #pragma once
 
 #include <iostream>
+
 #include "Shader.h"
-#include "Camera.h"
 
 class DirectionalLight
 {
@@ -19,11 +19,7 @@ public:
 	glm::vec3 m_Diffuse;
 	glm::vec3 m_Specular;
 
-
-
 private:
 	Shader* m_lightingShader;
 	glm::vec3 m_direction;
-
-
 };
