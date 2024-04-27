@@ -16,9 +16,9 @@
 | ESC  | Close Program  |
 
 ## Includes
-- Real time manipulation of 3D objects such as Position, Rotation, Textures and Colours through a Graphical User Interface
-- Real Time Shadows produces using shadow maps
-- Blinn Phong Lighting for Spot Lights, Point Lights and Directional Lights (Currently only SpotLights are available for shadow map purposes, other lights planned to be reintroduced)
+- Real time manipulation of 3D objects such as Position, Rotation, Textures and Colors through a Graphical User Interface
+- Real Time Shadows produces using shadow maps (Currently only SpotLights have shadows)
+- Blinn Phong Lighting for Spot Lights, Point Lights and Directional Lights 
 - Simple gravity implementation
 
 ## How To Run
