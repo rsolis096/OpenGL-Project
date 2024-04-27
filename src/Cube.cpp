@@ -57,7 +57,6 @@ void Cube::Draw(Shader& shader)
     glBindVertexArray(m_vao);
     //Render
     glDrawArrays(GL_TRIANGLES, 0, 36);
-
     // Unbind buffers and reset state
     glBindVertexArray(0);
     //glBindTexture(GL_TEXTURE_2D, 0);
@@ -74,7 +73,6 @@ void Cube::ShadowMapDraw(Shader& shader)
     glBindVertexArray(m_vao);
     //Render
     glDrawArrays(GL_TRIANGLES, 0, 36);
-
     // Unbind buffers and reset state
     glBindVertexArray(0);
     glCheckError();

@@ -233,7 +233,7 @@ GLFWwindow* setupWindow()
     //glEnable(GL_FRAMEBUFFER_SRGB);
     
     //Enable this to only render front facing polygons (for performance)
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
 
     return window;
 }
@@ -244,6 +244,7 @@ void demoScene(Scene& demoScene)
     demoScene.addObject(new Model("Assets/models/dragon/dragon.obj"));
     demoScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
     demoScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
+    //demoScene.addObject(new Cube());
     demoScene.addObject(new Plane());
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[1]);

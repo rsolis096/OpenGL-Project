@@ -221,20 +221,30 @@ void GUI::drawList()
 					// Scaling
 					{
 						//For Scale
-						static float vec3f[4] = { 1.00f, 1.00f, 1.00f };
-						glm::vec3 currentScale = selectedObject->m_Scale;
-						ImGui::Text("Current Scale:\tx: %.2f, y: %.2f, z: %.2f",
-							currentScale.x, currentScale.y, currentScale.z);
-						ImGui::InputFloat3("##Scale", vec3f);
-						if (ImGui::Button("Set##SetScale")) {
-							currentScale[0] = vec3f[0];
-							currentScale[1] = vec3f[1];
-							currentScale[2] = vec3f[2];
+						ImGui::Spacing();
+						ImGui::Text("Scaling");
+						float sX = selectedObject->m_Scale[0];
+						float sY = selectedObject->m_Scale[2];
+						float sZ = selectedObject->m_Scale[1];
+						glm::vec3 currentScale = glm::vec3(sX, sY, sZ);
+
+						if (ImGui::DragFloat("x##scale", &sX, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						{
+
+							currentScale[0] = sX;
 							selectedObject->setScale(currentScale);
-							vec3f[0] = 1.00f;
-							vec3f[1] = 1.00f;
-							vec3f[2] = 1.00f;
 						}
+						if (ImGui::DragFloat("z##scale", &sZ, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						{
+							currentScale[1] = sZ;
+							selectedObject->setScale(currentScale);
+						}
+						if (ImGui::DragFloat("y##scale", &sY, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						{
+							currentScale[2] = sY;
+							selectedObject->setScale(currentScale);
+						}
+
 					}
 
 					// Rotation
@@ -246,18 +256,18 @@ void GUI::drawList()
 						float rZ = selectedObject->m_Rotation[1];
 						glm::vec3 currentRotation = glm::vec3(rX, rY, rZ);
 
-						if (ImGui::DragFloat("x", &rX, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						if (ImGui::DragFloat("x##rotation", &rX, 1.0f, 0.0f, 360.0f, "%.2f", 0))
 						{
 							
 							currentRotation[0] = rX;
 							selectedObject->setRotation(currentRotation, glm::vec3(1.0f, 0.0f, 0.0f), 0);
 						}
-						if (ImGui::DragFloat("z", &rZ, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						if (ImGui::DragFloat("z##rotation", &rZ, 1.0f, 0.0f, 360.0f, "%.2f", 0))
 						{
 							currentRotation[1] = rZ;
 							selectedObject->setRotation(currentRotation, glm::vec3(0.0f, 1.0f, 0.0f), 1);
 						}
-						if (ImGui::DragFloat("y", &rY, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						if (ImGui::DragFloat("y##rotation", &rY, 1.0f, 0.0f, 360.0f, "%.2f", 0))
 						{
 							currentRotation[2] = rY;
 							selectedObject->setRotation(currentRotation, glm::vec3(0.0f, 0.0f, 1.0f), 2);
