@@ -1,15 +1,15 @@
 #version 330 core
 out vec4 FragColor;
+
 const int MAX_NR_POINT_LIGHTS = 8;
 const int MAX_NR_SPOT_LIGHTS = 8;
 const int MAX_NR_SHADOW_MAPS = 8;
-
-
 
 //Shadow Map
 uniform sampler2D shadowMap[MAX_NR_SHADOW_MAPS];
 
 
+//Used if a texture is present
 struct Material {
     float shininess;
     sampler2D ambient;
@@ -48,7 +48,7 @@ struct SpotLight {
     vec3 specular;       
 };
 
-//Object color properties
+//Object color properties (used if texture is not available or if you want to change tint of texture)
 struct Object
 {
     vec3 ambient;
@@ -56,6 +56,7 @@ struct Object
     vec3 specular;
 };
 
+//Properties sent to fragment shader from vertex shader
 in VS_OUT {
     vec3 FragPos;
     vec3 Normal;
@@ -63,28 +64,25 @@ in VS_OUT {
     vec4 FragPosLightSpace[MAX_NR_SHADOW_MAPS];
 } fs_in;
 
+//Player Position
 uniform vec3 viewPos;
 
+//Scene Light Objects
 uniform DirLight dirLight;
-
 uniform PointLight pointLights[MAX_NR_POINT_LIGHTS];
 uniform int numberOfPointLights;
-
 uniform SpotLight spotLights[MAX_NR_SPOT_LIGHTS];
 uniform int numberOfSpotLightsFRAG;
 
+//Fragment Properties
 uniform Material material;
 uniform Object object;
 uniform bool hasTexture;
-
 
 // function prototypes
 //vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int mapIndex);
-
-uniform float textureScale;  // Scaling factor for texture coordinates
-vec2 scaledTexCoords;
 
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition, int mapIndex)
 {
@@ -123,7 +121,6 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition, int mapIndex
     }
 
     return shadow / 9.0;
-
 }
 
 void main()
@@ -132,7 +129,6 @@ void main()
     // properties
     vec3 normal = normalize(fs_in.Normal);
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
-    scaledTexCoords = fs_in.TexCoords * 1;
     vec3 result;
 
     // phase 1: directional lights
@@ -155,17 +151,11 @@ void main()
 // calculates the color when using a spot light.
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
 {
-    //Diffuse (Blinn Phong)
-    vec3 lightDir = normalize(light.position - fs_in.FragPos);
-    float lambertian = max(dot(normal, lightDir), 0.0);
-    float spec = 0.0;
 
-    if(lambertian > 0.0f)
-    {
-        vec3 halfDir = normalize(lightDir + viewDir);
-        float specAngle = max(dot(halfDir, normal), 0.0);
-        spec = pow(specAngle, 32.0);
-    }
+    vec3 lightDir = normalize(light.position - fs_in.FragPos);
+    vec3 halfDir = normalize(lightDir + viewDir);
+    float specAngle = max(dot(halfDir, normal), 0.0);
+    float spec = pow(specAngle, 32.0);
 
     // Calculate the spotlight direction
     vec3 spotDir = normalize(light.direction);
@@ -175,17 +165,22 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
     float spotFactor = smoothstep(light.outerCutOff, light.cutOff, spotAngle);
 
     // Calculate the diffuse component
-    float diff = max(dot(normal, lightDir), 0.0);
+    //When Lambertian coefficient is close to 1, it means that the surface is facing the light source directly
+    //When Lambertian coefficient is close to 0, it means that the surface is nearly perpendicular to the direction of the light source 
+    float diff = max(dot(normal, lightDir), 0.0);  
+    
+    //Calculate shade factor of fragment
     float shadow = ShadowCalculation(fs_in.FragPosLightSpace[lightIndex], light.position, lightIndex);                      
 
+    //Apply colors
     vec3 diffuse;
     vec3 specular;
     vec3 ambient;
 
     if(hasTexture)
     {
-        ambient = vec3(texture(material.diffuse, fs_in.TexCoords))* spotFactor;
-        diffuse = vec3(texture(material.diffuse, fs_in.TexCoords))* spotFactor;
+        ambient = vec3(texture(material.diffuse, fs_in.TexCoords)) * spotFactor;
+        diffuse = vec3(texture(material.diffuse, fs_in.TexCoords)) * spotFactor;
         specular  = vec3(texture(material.diffuse, fs_in.TexCoords))* spotFactor;
     }
     else
@@ -196,10 +191,10 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
     }
 
     ambient *= light.ambient;
-    diffuse *= light.diffuse * lambertian ;
+    diffuse *= light.diffuse * diff ;
     specular *= light.specular * spec ;
         
-    // Calculate the attenuation factor
+    // Calculate the attenuation factor (light fall off)
     float distance = length(light.position - fs_in.FragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
@@ -227,6 +222,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
     // calculate specular
     vec3 reflectDir = reflect(-lightDir, normal);  
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+
     //Blinn-Phong halfway vector
     vec3 halfwayDir = normalize(lightDir + viewDir);  
     spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);

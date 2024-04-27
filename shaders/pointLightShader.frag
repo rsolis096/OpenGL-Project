@@ -1,5 +1,6 @@
 #version 330 core
 
+//Simple shader used to give a source to a light that is not affected by other lights
 
 //Object color properties
 struct Object

@@ -58,6 +58,12 @@
     <Filter Include="Source Files\Lighting">
       <UniqueIdentifier>{46602195-b54d-46f2-85e6-8dba1f1f4880}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Shaders\Fragment">
+      <UniqueIdentifier>{85b8473d-d087-4ffa-9910-eb081b3a1292}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shaders\Vertex">
+      <UniqueIdentifier>{fbe2929e-6638-4b51-869d-fc61d8e3c87c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -247,29 +253,29 @@
     <None Include="shaders\shadow_mapping_depth.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="shaders\pointLightShader.vert">
-      <Filter>Source Files\Shaders</Filter>
+    <None Include="shaders\SkyBoxShader.frag">
+      <Filter>Source Files\Shaders\Fragment</Filter>
     </None>
-    <None Include="shaders\pointLightShader.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="shaders\lightingShader.vert">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="shaders\lightingShader.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="shaders\debug_quad_depth.frag">
-      <Filter>Source Files\Shaders</Filter>
+    <None Include="shaders\SkyBoxShader.vert">
+      <Filter>Source Files\Shaders\Vertex</Filter>
     </None>
     <None Include="shaders\debug_quad.vert">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Source Files\Shaders\Vertex</Filter>
     </None>
-    <None Include="shaders\cubeMapShader.vert">
-      <Filter>Source Files\Shaders</Filter>
+    <None Include="shaders\debug_quad_depth.frag">
+      <Filter>Source Files\Shaders\Fragment</Filter>
     </None>
-    <None Include="shaders\cubeMapShader.frag">
-      <Filter>Source Files\Shaders</Filter>
+    <None Include="shaders\lightingShader.frag">
+      <Filter>Source Files\Shaders\Fragment</Filter>
+    </None>
+    <None Include="shaders\lightingShader.vert">
+      <Filter>Source Files\Shaders\Vertex</Filter>
+    </None>
+    <None Include="shaders\pointLightShader.frag">
+      <Filter>Source Files\Shaders\Fragment</Filter>
+    </None>
+    <None Include="shaders\pointLightShader.vert">
+      <Filter>Source Files\Shaders\Vertex</Filter>
     </None>
   </ItemGroup>
 </Project>

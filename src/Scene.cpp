@@ -8,7 +8,7 @@ Scene::Scene(Camera* mC)
 	fps = 0;
 	mainCamera = mC;
 
-	cubeMapShader = new Shader("shaders/cubeMapShader.vert", "shaders/cubeMapShader.frag");
+	cubeMapShader = new Shader("shaders/skyBoxShader.vert", "shaders/skyBoxShader.frag");
 	lightingShader = new Shader("shaders/lightingShader.vert", "shaders/lightingShader.frag");
 	pointLightShader = new Shader("shaders/pointLightShader.vert", "shaders/pointLightShader.frag");
 	m_PhysicsWorld = new PhysicsWorld();

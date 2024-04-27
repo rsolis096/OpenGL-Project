@@ -211,8 +211,8 @@
     <ClInclude Include="third party\includes\imgui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\cubeMapShader.frag" />
-    <None Include="shaders\cubeMapShader.vert" />
+    <None Include="shaders\SkyBoxShader.frag" />
+    <None Include="shaders\SkyBoxShader.vert" />
     <None Include="shaders\debug_quad.vert" />
     <None Include="shaders\debug_quad_depth.frag" />
     <None Include="shaders\lightingShader.frag" />
