@@ -29,7 +29,6 @@ Plane::Plane() : Object()
 
 void Plane::Draw(Shader& shader)
 {
-    glDisable(GL_CULL_FACE);
     shader.use();
     shader.setVec3("object.ambient", m_Ambient);
     shader.setVec3("object.diffuse", m_Diffuse);
@@ -68,29 +67,23 @@ void Plane::Draw(Shader& shader)
     // Unbind buffers and reset state
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
-    glEnable(GL_CULL_FACE);//Disable then re-enable to show both sides of plane
-    shader.use();
-    shader.setFloat("textureScale", 1.0f);
     glCheckError();
 }
 
 void Plane::ShadowMapDraw(Shader& shader)
 {
-    //glDisable(GL_CULL_FACE);
     shader.use();
     m_Model = glm::mat4(1.0f);
     shader.setMat4("model", m_Model);
     shader.setFloat("textureScale", (float)(50.0f));
     shader.setBool("hasTexture", false);
+
     //Bind Plane
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
-    //glEnable(GL_CULL_FACE);//Disable then re-enable to show both sides of plane
-    //shader.use();
-    //shader.setFloat("textureScale", 1.0f);
     glCheckError();
 }
 
@@ -100,13 +93,13 @@ void Plane::buildPlane()
     //Pre Defined cube vertices, normals, and TexCoords
     float planeVertices[] = {
         // positions            // normals         // texcoords
-         25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-        -25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-        -25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
-
-         25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-        -25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
-         25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,  25.0f, 25.0f
+         25.0f, -0.5f,  25.0f,  0.0f, -1.0f, 0.0f,  25.0f,  0.0f,
+        -25.0f, -0.5f,  25.0f,  0.0f, -1.0f, 0.0f,   0.0f,  0.0f,
+        -25.0f, -0.5f, -25.0f,  0.0f, -1.0f, 0.0f,   0.0f, 25.0f,
+                                      
+         25.0f, -0.5f,  25.0f,  0.0f, -1.0f, 0.0f,  25.0f,  0.0f,
+        -25.0f, -0.5f, -25.0f,  0.0f, -1.0f, 0.0f,   0.0f, 25.0f,
+         25.0f, -0.5f, -25.0f,  0.0f, -1.0f, 0.0f,  25.0f, 25.0f
     };
 
 

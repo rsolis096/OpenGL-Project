@@ -127,7 +127,7 @@ void main()
 {
     
     // properties
-    vec3 normal = normalize(fs_in.Normal);
+    vec3 normal = gl_FrontFacing ? normalize(fs_in.Normal) : normalize(fs_in.Normal);
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
     vec3 result;
 
@@ -167,14 +167,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
     // Calculate the diffuse component
     //When Lambertian coefficient is close to 1, it means that the surface is facing the light source directly
     //When Lambertian coefficient is close to 0, it means that the surface is nearly perpendicular to the direction of the light source 
-    float diff = dot(normal, lightDir);  
-
-    //This allows for inner faces to have shadows, good for making rooms out of cubes, change diff diff = max(dot(normal, lightDir). 0.0f); to revert this  
-    if(diff < 0.0f)
-    {
-        normal = -normal;
-        diff = -diff;
-    }
+    float diff = max(dot(normal, lightDir), 0.0f);  
     
     //Calculate shade factor of fragment
     float shadow = ShadowCalculation(fs_in.FragPosLightSpace[lightIndex], light.position, lightIndex);                      
@@ -225,12 +218,6 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
     // calculate diffuse 
     vec3 lightDir = normalize(light.position - fs_in.FragPos);
     float diff = dot(normal, lightDir);
-
-    if(diff < 0.0f)
-    {
-        normal = -normal;
-        diff = -diff;
-    }
 
     // calculate specular
     vec3 reflectDir = reflect(-lightDir, normal);  

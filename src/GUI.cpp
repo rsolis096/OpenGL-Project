@@ -224,8 +224,8 @@ void GUI::drawList()
 						ImGui::Spacing();
 						ImGui::Text("Scaling");
 						float sX = selectedObject->m_Scale[0];
-						float sY = selectedObject->m_Scale[2];
-						float sZ = selectedObject->m_Scale[1];
+						float sY = selectedObject->m_Scale[1];
+						float sZ = selectedObject->m_Scale[2];
 						glm::vec3 currentScale = glm::vec3(sX, sY, sZ);
 
 						if (ImGui::DragFloat("x##scale", &sX, 1.0f, 0.0f, 360.0f, "%.2f", 0))
@@ -234,16 +234,17 @@ void GUI::drawList()
 							currentScale[0] = sX;
 							selectedObject->setScale(currentScale);
 						}
-						if (ImGui::DragFloat("z##scale", &sZ, 1.0f, 0.0f, 360.0f, "%.2f", 0))
-						{
-							currentScale[1] = sZ;
-							selectedObject->setScale(currentScale);
-						}
 						if (ImGui::DragFloat("y##scale", &sY, 1.0f, 0.0f, 360.0f, "%.2f", 0))
 						{
-							currentScale[2] = sY;
+							currentScale[1] = sY;
 							selectedObject->setScale(currentScale);
 						}
+						if (ImGui::DragFloat("z##scale", &sZ, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						{
+							currentScale[2] = sZ;
+							selectedObject->setScale(currentScale);
+						}
+
 
 					}
 
