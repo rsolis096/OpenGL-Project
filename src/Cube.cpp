@@ -6,7 +6,7 @@ unsigned int Cube::cubeCount = 0;
 Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
     //Set some rendering properties
-    m_hasTexture = true;
+    m_HasTexture = true;
     //Open and load diffuse map and specular map, save their Cubes
     m_DiffuseMap = new Texture(texturePathDiffuse, false, "material.diffuse");
     m_SpecularMap = new Texture(texturePathSpecular, false, "material.diffuse");
@@ -20,7 +20,7 @@ Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Ob
 //Used for creating a primitive with no texture
 Cube::Cube() : Object()
 {
-    m_hasTexture = false;
+    m_HasTexture = false;
     m_DisplayName = "Cube" + std::to_string(cubeCount);
     m_ObjectID = cubeCount;
     buildCube();
@@ -34,9 +34,9 @@ void Cube::Draw(Shader& shader)
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
     shader.setMat4("model", m_Model);
-    shader.setBool("hasTexture", m_hasTexture);
+    shader.setBool("hasTexture", m_HasTexture);
     //Bind texture and send texture to fragment shader
-    if (m_hasTexture)
+    if (m_HasTexture)
     {
         glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
@@ -254,7 +254,7 @@ int Cube::updateTexture(std::vector<std::string> texturePaths)
     // 3. Updating the texture of a model object
 
     //Secenario 1
-    if (m_hasTexture == true)
+    if (m_HasTexture == true)
     {
         //Success flags
         int dSuccess = 1;
@@ -275,7 +275,7 @@ int Cube::updateTexture(std::vector<std::string> texturePaths)
             delete m_SpecularMap;
             m_DiffuseMap = nullptr;
             m_SpecularMap = nullptr;
-            m_hasTexture = false;
+            m_HasTexture = false;
             return 0;
         }
         else
@@ -283,7 +283,7 @@ int Cube::updateTexture(std::vector<std::string> texturePaths)
         return 1;
     }
     //Scenario 2
-    else if (m_hasTexture == false)
+    else if (m_HasTexture == false)
     {
         m_DiffuseMap = new Texture(texturePaths[0].c_str(), false, "texture_diffuse");
         m_SpecularMap = new Texture(texturePaths[1].c_str(), false, "texture_specular");
@@ -293,11 +293,11 @@ int Cube::updateTexture(std::vector<std::string> texturePaths)
             delete m_SpecularMap;
             m_DiffuseMap = nullptr;
             m_SpecularMap = nullptr;
-            m_hasTexture = false;
+            m_HasTexture = false;
             return 0;
         }
         else
-            m_hasTexture = true;
+            m_HasTexture = true;
         return 1;
     }
     return 0;

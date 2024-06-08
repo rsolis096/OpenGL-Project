@@ -6,7 +6,7 @@ unsigned int Sphere::sphereCount = 0;
 Sphere::Sphere(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
     //Set some rendering properties
-    m_hasTexture = true;
+    m_HasTexture = true;
     m_DisplayName = "Sphere" + std::to_string(sphereCount);
     m_ObjectID = sphereCount;
     //Open and load diffuse map and specular map, save their Spheres
@@ -21,7 +21,7 @@ Sphere::Sphere(const char* texturePathDiffuse, const char* texturePathSpecular) 
 //Used for creating a primitive with no texture
 Sphere::Sphere() : Object()
 {
-    m_hasTexture = false;
+    m_HasTexture = false;
     m_DisplayName = "Sphere" + std::to_string(sphereCount);
     m_ObjectID = sphereCount;
     sphereCount++;
@@ -36,10 +36,10 @@ void Sphere::Draw(Shader& shader)
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
     shader.setMat4("model", m_Model);
-    shader.setBool("hasTexture", m_hasTexture);
+    shader.setBool("hasTexture", m_HasTexture);
 
     //Bind texture and send texture to fragment shader
-    if (m_hasTexture)
+    if (m_HasTexture)
     {
         glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
@@ -221,7 +221,7 @@ int Sphere::updateTexture(std::vector<std::string> texturePaths)
     // 3. Updating the texture of a model object
 
     //Secenario 1
-    if (m_hasTexture == true)
+    if (m_HasTexture == true)
     {
         //Success flags
         int dSuccess = 1;
@@ -241,7 +241,7 @@ int Sphere::updateTexture(std::vector<std::string> texturePaths)
             delete m_SpecularMap;
             m_DiffuseMap = nullptr;
             m_SpecularMap = nullptr;
-            m_hasTexture = false;
+            m_HasTexture = false;
             return 0;
         }
         else
@@ -249,7 +249,7 @@ int Sphere::updateTexture(std::vector<std::string> texturePaths)
         return 1;
     }
     //Scenario 2
-    else if (m_hasTexture == false)
+    else if (m_HasTexture == false)
     {
         m_DiffuseMap = new Texture(texturePaths[0].c_str(), false, "texture_diffuse");
         m_SpecularMap = new Texture(texturePaths[1].c_str(), false, "texture_specular");
@@ -260,11 +260,11 @@ int Sphere::updateTexture(std::vector<std::string> texturePaths)
             delete m_SpecularMap;
             m_DiffuseMap = nullptr;
             m_SpecularMap = nullptr;
-            m_hasTexture = false;
+            m_HasTexture = false;
             return 0;
         }
         else
-            m_hasTexture = true;
+            m_HasTexture = true;
         return 1;
     }
     return 0;

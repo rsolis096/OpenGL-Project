@@ -1,11 +1,13 @@
 #include "Shader.h"
 
-Shader::Shader(const char* vertex_path, const char* fragment_path)
+Shader::Shader(const char* vertex_path, const char* fragment_path, const char* geometry_path)
 {
     //Create Shader Program
     m_ProgramId = glCreateProgram();
     //Compile given shaders
     compileShader(vertex_path, "VERTEX", m_ProgramId);
+    if(geometry_path != nullptr)
+        compileShader(geometry_path, "GEOMETRY", m_ProgramId);
     compileShader(fragment_path, "FRAGMENT", m_ProgramId);
 }
 

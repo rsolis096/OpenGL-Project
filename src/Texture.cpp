@@ -68,7 +68,7 @@ Texture::Texture(std::string path) : ID(0), m_Path(path), m_Type("CubeMap")
         {faceWidth, faceHeight}         //Front
     };
 
-    //Swapping right and left fixing alignment issuuse along the horizontal
+    //Swapping right and left fixing alignment issue along the horizontal
     unsigned int targets[] = {
         GL_TEXTURE_CUBE_MAP_POSITIVE_X, //Right
         GL_TEXTURE_CUBE_MAP_NEGATIVE_X, //Left

@@ -29,7 +29,7 @@ public:
         //Texture Properties
         Texture* m_DiffuseMap;
         Texture* m_SpecularMap;
-        bool m_hasTexture;
+        bool m_HasTexture;
 
         //Object World Attributes
         glm::vec3 m_Position;

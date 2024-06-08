@@ -303,9 +303,8 @@ void GUI::drawList()
 						static bool showSuccessText = false;
 
 						ImGui::Text("Texture Paths:");
-						if (selectedObject->m_hasTexture)
+						if (selectedObject->m_HasTexture)
 						{
-
 							//Set textbox default values
 							if (diffuseText == "")
 								strcpy_s(diffuseBuffer, selectedObject->m_DiffuseMap->m_Path.c_str());

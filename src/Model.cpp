@@ -9,7 +9,7 @@ Model::Model(string const& path, bool gamma) : Object(), gammaCorrection(gamma)
     m_DisplayName= "Model";
     m_ObjectID = modelCount;
     modelCount++;
-    m_hasTexture = false;
+    m_HasTexture = false;
     loadModel(path);
 }
 
@@ -17,16 +17,15 @@ void Model::Draw(Shader& shader)
 {
     shader.use();
     shader.setMat4("model", m_Model);
-    shader.setBool("hasTexture", m_hasTexture);
-    if (!m_hasTexture)
-    {
-        shader.setVec3("object.ambient", m_Ambient);
-        shader.setVec3("object.diffuse", m_Diffuse);
-        shader.setVec3("object.specular", m_Specular);
-    }
+    shader.setBool("hasTexture", !m_HasTexture);
+    shader.setVec3("object.ambient", m_Ambient);
+    shader.setVec3("object.diffuse", m_Diffuse);
+    shader.setVec3("object.specular", m_Specular);
 
+    //Used for textures, fix this!!!
     for (unsigned int i = 0; i < meshes.size(); i++)
-        meshes[i].Draw(shader, m_hasTexture);
+        meshes[i].Draw(shader, m_HasTexture);
+
     glCheckError();
 }
 
@@ -159,7 +158,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
     if (textures.size() > 0)
-        m_hasTexture = true;
+        m_HasTexture = true;
 
     // return a mesh object created from the extracted mesh data
     return Mesh(vertices, indices, textures);
@@ -174,24 +173,36 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType type
         mat->GetTexture(type, i, &str);
         // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
         bool skip = false;
-        //Iterate through lodaed textures and make sure there are no duplicates
+        //Iterate through loaded textures and make sure there are no duplicates
         for (unsigned int j = 0; j < textures_loaded.size(); j++)
         {
-            if (std::strcmp(textures[j].m_Path.data(), str.C_Str()) == 0)
+            std::string temp_string = directory + "/" + str.C_Str();
+            if (std::strcmp(textures_loaded[j].m_Path.data(), temp_string.c_str()) == 0)
             {
                 textures.push_back(textures_loaded[j]);
                 skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
                 break;
             }
         }
+
         if (!skip)
         {   // if texture hasn't been loaded already, load it
             string filename = string(str.C_Str());
+
             //concantenate director and path filename specified the type of map, ie. (diffuse, specular, normal, height)
             filename = this->directory + '/' + filename;
-            Texture texture (filename.c_str(), true, typeName);
-            textures.push_back(texture);
-            textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
+
+            if (typeName == "texture_diffuse") {
+                m_DiffuseMap = new Texture(filename.c_str(), true, typeName);
+                textures.push_back(*m_DiffuseMap);
+                textures_loaded.push_back(*m_DiffuseMap);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
+            }
+            else if(typeName == "texture_specular"){
+                m_SpecularMap = new Texture(filename.c_str(), true, typeName);
+                textures.push_back(*m_SpecularMap);
+                textures_loaded.push_back(*m_SpecularMap);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
+            }
+
         }
     }
     return textures;

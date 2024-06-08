@@ -18,29 +18,39 @@ void Mesh::Draw(Shader& shader, bool hasTexture)
     unsigned int specularNr = 1;
     unsigned int normalNr = 1;
     unsigned int heightNr = 1;
-    if (hasTexture)
+
+    /*
+	if (hasTexture)
     {
         for (unsigned int i = 0; i < textures.size(); i++)
         {
-            glActiveTexture(GL_TEXTURE0 +TextureManager::getNextUnit()); // active proper texture unit before binding
+            glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
             // retrieve texture number (the N in diffuse_textureN)
             string number;
             string name = textures[i].m_Type;
-            if (name == "texture_diffuse")
+            if (name == "texture_diffuse"){
                 number = std::to_string(diffuseNr++);
-            else if (name == "texture_specular")
+                glUniform1i(glGetUniformLocation(shader.m_ProgramId, "material.diffuse"), i);
+                glBindTexture(GL_TEXTURE_2D, textures[i].ID);
+            }
+            else if (name == "texture_specular"){
                 number = std::to_string(specularNr++); // transfer unsigned int to string
-            else if (name == "texture_normal")
+                glUniform1i(glGetUniformLocation(shader.m_ProgramId, "material.specular"), i);
+                glBindTexture(GL_TEXTURE_2D, textures[i].ID);
+            }
+            
+            else if (name == "texture_normal"){
                 number = std::to_string(normalNr++); // transfer unsigned int to string
-            else if (name == "texture_height")
+                glUniform1i(glGetUniformLocation(shader.m_ProgramId, (name + number).c_str()), i);
+            }
+            else if (name == "texture_height"){
                 number = std::to_string(heightNr++); // transfer unsigned int to string
+                glUniform1i(glGetUniformLocation(shader.m_ProgramId, (name + number).c_str()), i);
+            }
 
-            // now set the sampler to the correct texture unit
-            glUniform1i(glGetUniformLocation(shader.m_ProgramId, (name + number).c_str()), TextureManager::getCurrentUnit());
-            // and finally bind the texture
-            glBindTexture(GL_TEXTURE_2D, textures[i].ID);
         }
     }
+	*/
 
     // draw mesh
     glBindVertexArray(VAO);

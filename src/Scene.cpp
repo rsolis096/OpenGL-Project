@@ -10,7 +10,9 @@ Scene::Scene(Camera* mC)
 
 	cubeMapShader = new Shader("shaders/skyBoxShader.vert", "shaders/skyBoxShader.frag");
 	lightingShader = new Shader("shaders/lightingShader.vert", "shaders/lightingShader.frag");
+	//lightingShader = new Shader("shaders/visualizeNormals.vert", "shaders/visualizeNormals.frag", "shaders/visualizeNormals.gs");
 	pointLightShader = new Shader("shaders/pointLightShader.vert", "shaders/pointLightShader.frag");
+
 	m_PhysicsWorld = new PhysicsWorld();
 
 	m_LightController = new LightController(lightingShader, pointLightShader, mainCamera, this);

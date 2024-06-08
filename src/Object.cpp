@@ -18,7 +18,7 @@ Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
     m_Velocity = glm::vec3(0.0f);
     m_Mass = glm::vec3(1.0f);
 
-    m_hasTexture = false;
+    m_HasTexture = false;
     m_DiffuseMap = nullptr;
     m_SpecularMap = nullptr;
     enablePhysics = false;
