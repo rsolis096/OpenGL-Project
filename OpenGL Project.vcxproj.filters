@@ -64,6 +64,9 @@
     <Filter Include="Source Files\Shaders\Vertex">
       <UniqueIdentifier>{fbe2929e-6638-4b51-869d-fc61d8e3c87c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Shaders\Geometry">
+      <UniqueIdentifier>{573aa751-e10c-404f-b9a4-a8f68ef0778d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -247,12 +250,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\shadow_mapping_depth.vert">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="shaders\shadow_mapping_depth.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="shaders\SkyBoxShader.frag">
       <Filter>Source Files\Shaders\Fragment</Filter>
     </None>
@@ -275,6 +272,15 @@
       <Filter>Source Files\Shaders\Fragment</Filter>
     </None>
     <None Include="shaders\pointLightShader.vert">
+      <Filter>Source Files\Shaders\Vertex</Filter>
+    </None>
+    <None Include="shaders\visualizeNormals.gs">
+      <Filter>Source Files\Shaders\Geometry</Filter>
+    </None>
+    <None Include="shaders\shadow_mapping_depth.frag">
+      <Filter>Source Files\Shaders\Fragment</Filter>
+    </None>
+    <None Include="shaders\shadow_mapping_depth.vert">
       <Filter>Source Files\Shaders\Vertex</Filter>
     </None>
   </ItemGroup>

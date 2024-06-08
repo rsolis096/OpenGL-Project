@@ -41,13 +41,13 @@ void Plane::Draw(Shader& shader)
     {
         glActiveTexture(GL_TEXTURE0 +TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-        GLint diffuseLocation = glGetUniformLocation(shader.ID, "material.specular");
+        GLint diffuseLocation = glGetUniformLocation(shader.m_ProgramId, "material.specular");
         if (diffuseLocation != -1)
             glUniform1i(diffuseLocation, TextureManager::getCurrentUnit()); // 0 corresponds to GL_TEXTURE0
 
         glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-        GLint specularLocation = glGetUniformLocation(shader.ID, "material.specular");
+        GLint specularLocation = glGetUniformLocation(shader.m_ProgramId, "material.specular");
         if (diffuseLocation != -1)
             glUniform1i(diffuseLocation, TextureManager::getCurrentUnit()); // 0 corresponds to GL_TEXTURE0
 

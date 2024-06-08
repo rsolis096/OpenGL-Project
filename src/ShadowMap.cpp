@@ -99,7 +99,7 @@ void ShadowMap::ShadowPass()
 
             // Pass the light-space matrices to the shader
             glUniformMatrix4fv(
-                glGetUniformLocation(depthShader.ID, "lightSpaceMatrix"),
+                glGetUniformLocation(depthShader.m_ProgramId, "lightSpaceMatrix"),
                 1, // Pass 1 matrix
                 GL_FALSE,
                 glm::value_ptr(getLightSpaceMatrices()[i])

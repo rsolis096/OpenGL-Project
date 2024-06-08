@@ -92,7 +92,7 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 	if (m_ShadowMap->getLightSpaceMatrices().size() > 0)
 	{
 		glUniformMatrix4fv(
-			glGetUniformLocation(lightingShader->ID, "lightSpaceMatrices"),
+			glGetUniformLocation(lightingShader->m_ProgramId, "lightSpaceMatrices"),
 			m_ShadowMap->getLightSpaceMatrices().size(),
 			GL_FALSE,
 			glm::value_ptr(m_ShadowMap->getLightSpaceMatrices()[0])
@@ -100,7 +100,7 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 	}
 
 	//Activate the texture units and bind the correspoding depth map
-	m_ShadowMap->drawShadowMap(lightingShader->ID);
+	m_ShadowMap->drawShadowMap(lightingShader->m_ProgramId);
 
 	//Update physics
 	m_PhysicsWorld->step(glfwGetTime(), deltaTime);

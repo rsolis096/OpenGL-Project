@@ -35,17 +35,17 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_LightingShader->setInt("numberOfSpotLightsFRAG", m_SpotLightCount);
 
 	// Get the location of the uniform in the shader program
-	int numberOfShadowMapsLocation1 = glGetUniformLocation(m_LightingShader->ID, "numberOfShadowMapsFRAG");
+	int numberOfShadowMapsLocation1 = glGetUniformLocation(m_LightingShader->m_ProgramId, "numberOfShadowMapsFRAG");
 
 	// Set the value of the uniform
-	glUseProgram(m_LightingShader->ID);
+	glUseProgram(m_LightingShader->m_ProgramId);
 	glUniform1i(numberOfShadowMapsLocation1, m_SpotLightCount);
 
 	// Get the location of the uniform in the shader program
-	int numberOfShadowMapsLocation2 = glGetUniformLocation(m_LightingShader->ID, "numberOfShadowMapsVERT");
+	int numberOfShadowMapsLocation2 = glGetUniformLocation(m_LightingShader->m_ProgramId, "numberOfShadowMapsVERT");
 
 	// Set the value of the uniform
-	glUseProgram(m_LightingShader->ID);
+	glUseProgram(m_LightingShader->m_ProgramId);
 	glUniform1i(numberOfShadowMapsLocation2, m_SpotLightCount);
 
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].position", m_LightPos);
