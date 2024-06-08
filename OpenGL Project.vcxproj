@@ -223,7 +223,9 @@
     <None Include="shaders\pointLightShader.vert" />
     <None Include="shaders\shadow_mapping_depth.frag" />
     <None Include="shaders\shadow_mapping_depth.vert" />
+    <None Include="shaders\visualizeNormals.frag" />
     <None Include="shaders\visualizeNormals.gs" />
+    <None Include="shaders\visualizeNormals.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
