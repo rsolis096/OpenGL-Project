@@ -8,7 +8,6 @@ const int MAX_NR_SHADOW_MAPS = 8;
 //Shadow Map
 uniform sampler2D shadowMap[MAX_NR_SHADOW_MAPS];
 
-
 //Used if a texture is present
 struct Material {
     float shininess;
@@ -171,7 +170,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
 
     //If the light is not directed at fragment, return no color
     if(diff < 0.0f){
-        return vec3(0.0f);
+        return vec3(0.0f, 0.0f, 0.0f);
     }
 
     //Calculate shade factor of fragment

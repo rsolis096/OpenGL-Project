@@ -27,8 +27,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 // settings
-unsigned int SCR_WIDTH = 900;
-unsigned int SCR_HEIGHT = 560;
+unsigned int SCR_WIDTH = 1920;
+unsigned int SCR_HEIGHT = 1080;
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 bool firstMouse = true;
@@ -246,15 +246,15 @@ GLFWwindow* setupWindow()
 void demoScene(Scene& demoScene)
 {
     //GENERATE INITIAL SCENE (ALL OF THESE CAN BE CHANGED IN REAL TIME)
-    demoScene.addObject(new Model("Assets/models/dragon/dragon.obj"));
+    //demoScene.addObject(new Model("Assets/models/dragon/dragon.obj"));
     demoScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
     demoScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
-    //demoScene.addObject(new Cube());
     demoScene.addObject(new Plane());
+
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[1]);
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[2]);
-    demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[3]);
+    //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[3]);
 
     glm::vec3 spotLightPos1 = glm::vec3(4.0f, 3.0f, -17.0f);
     glm::vec3 spotLightDir1 = glm::vec3(-20.0f, -5.0f, 45.0f);
@@ -273,16 +273,16 @@ void demoScene(Scene& demoScene)
     demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
     demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
-    demoScene.m_LightController->addPointLight(glm::vec3(0.0f,10.0f,0.0f));
+    //demoScene.m_LightController->addPointLight(glm::vec3(0.0f,10.0f,0.0f));
 
     //Cube
-    demoScene.m_SceneObjects[1]->setPosition(glm::vec3(4.0f, 3.0f, 0.0));
-    demoScene.m_SceneObjects[1]->setScale(glm::vec3(1.0f, 1.0f, 11.0f));
+    demoScene.m_SceneObjects[0]->setPosition(glm::vec3(4.0f, 3.0f, 0.0));
+    demoScene.m_SceneObjects[0]->setScale(glm::vec3(1.0f, 1.0f, 1.0f));
     //Sphere
-    demoScene.m_SceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
+    demoScene.m_SceneObjects[1]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
     //Model
-    demoScene.m_SceneObjects[0]->setPosition(glm::vec3(-3.0f, 0.0f, 14.0f));
-    demoScene.m_SceneObjects[0]->setScale(glm::vec3(0.01f));
+    //demoScene.m_SceneObjects[0]->setPosition(glm::vec3(-3.0f, 0.0f, 14.0f));
+	//demoScene.m_SceneObjects[0]->setScale(glm::vec3(0.01f));
 }
 
 int main()
@@ -303,6 +303,7 @@ int main()
     glm::mat4 projection = glm::mat4(1.0f);;
 
     glCheckError();
+    float near_plane = 1.0f, far_plane = 7.5f;
 
     //Main loop
     while (!glfwWindowShouldClose(window))

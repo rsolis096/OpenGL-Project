@@ -10,7 +10,6 @@
 #include "ShadowMap.h"
 
 #include "TextureManager.h"
-
 #include <typeinfo>
 #include <string>
 

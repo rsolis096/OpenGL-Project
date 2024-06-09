@@ -5,8 +5,10 @@ ShadowMap::ShadowMap(std::vector<Object*>* objects, std::vector<SpotLight*>* spo
 {
     // Initialize shaders
 	depthShader = Shader("shaders/shadow_mapping_depth.vert", "shaders/shadow_mapping_depth.frag");
-    
+    debugDepthShader = Shader("shaders/debug_quad.vert", "shaders/debug_quad_depth.frag");
     m_ShadowCasters = 0;
+
+
 }
 
 //Called when adding a new light source (currently only spotlight)
@@ -69,12 +71,12 @@ void ShadowMap::ShadowPass()
             m_LightSpaceMatrices.resize(numberOfSpotLights, glm::mat4(1.0f));
 
         //Generate the light space matrices
-        for (int i = 0; i < (*m_SpotLights).size(); i++)
+        for (int i = 0; i < numberOfSpotLights; i++)
         {
             // Calculate light projection matrix
             glm::mat4 lightProjection = glm::perspective<float>(
                 glm::radians(45.0f),
-                (float)SHADOW_WIDTH / SHADOW_HEIGHT,
+                static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT),
                 (*m_SpotLights)[i]->getNearPlane(),
                 (*m_SpotLights)[i]->getFarPlane()
             );
@@ -92,7 +94,7 @@ void ShadowMap::ShadowPass()
         }
 
         // Render to each depth map (1 for each spotlight)
-        for (int i = 0; i < (*m_SpotLights).size(); i++)
+        for (int i = 0; i < numberOfSpotLights; i++)
         {
             // Use the depth shader for rendering
             depthShader.use();
@@ -127,11 +129,11 @@ void ShadowMap::ShadowPass()
 
 }
 
-void ShadowMap::drawShadowMap(GLuint& shaderID)
+void ShadowMap::drawShadowMap(GLuint& shaderID) const
 {
     // Loop through each shadow map (
     // this actually draws the shadow map to the screen, does not generate depth maps)
-    for (int i = 0; i < (*m_SpotLights).size(); i++)
+    for (int i = 0; i < m_SpotLights->size(); i++)
     {
         // Activate texture unit
         glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit());
@@ -144,34 +146,75 @@ void ShadowMap::drawShadowMap(GLuint& shaderID)
 
         // Get the uniform location for the shadow map in the shader
         GLint shadowMapLocation = glGetUniformLocation(shaderID, location.c_str());
-
+        if (shadowMapLocation != -1) {
+            glUniform1i(shadowMapLocation, i);
+        }
+        else {
+            std::cerr << "WARNING: Uniform location for " << location << " not found.\n";
+        }
         // Set the uniform value to the corresponding texture unit index
         glUniform1i(shadowMapLocation, TextureManager::getCurrentUnit());
+
     }
+    glCheckError();
 }
 
-glm::mat4& ShadowMap::getLightSpaceMatrix(int i)
-{
+glm::mat4& ShadowMap::getLightSpaceMatrix(int i){
     return m_LightSpaceMatrices[i];
 }
 
-std::vector<glm::mat4>& ShadowMap::getLightSpaceMatrices()
-{
+std::vector<glm::mat4>& ShadowMap::getLightSpaceMatrices(){
     return m_LightSpaceMatrices;
 }
 
-GLuint ShadowMap::getDepthMapID(int i)
-{
+GLuint ShadowMap::getDepthMapID(int i){
     return depthMap[i];
 }
 
-GLuint ShadowMap::getDepthMapFBOID(int i)
-{
+GLuint ShadowMap::getDepthMapFBOID(int i){
     return depthMapFBO[i];
-
 }
 
 void ShadowMap::setUpdateShadowMap()
 {
     m_UpdateShadowMap != m_UpdateShadowMap;
+}
+
+void ShadowMap::debugShadowMap()
+{
+    // render Depth map to quad for visual debugging
+	// ---------------------------------------------
+    float near_plane = 1.0f, far_plane = 17.5f; //intensity of quad
+    debugDepthShader.use();
+    debugDepthShader.setFloat("near_plane", near_plane);
+    debugDepthShader.setFloat("far_plane", far_plane);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, depthMap[0]);
+
+    //Render Quad
+    unsigned int quadVAO = 0;
+    unsigned int quadVBO;
+    if (quadVAO == 0)
+    {
+        float quadVertices[] = {
+            // positions        // texture Coords
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        };
+        // setup plane VAO
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    }
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
 }

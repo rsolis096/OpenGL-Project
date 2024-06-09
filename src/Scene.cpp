@@ -1,5 +1,6 @@
 #include "Scene.h"
 
+
 class PhysicsWorld;
 
 Scene::Scene(Camera* mC)
@@ -91,6 +92,7 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 	lightingShader->setVec3("viewPos", mainCamera->cameraPos);
 
 	//Update shadows only if there exists light matrices (proj matrices from light source)
+	
 	if (m_ShadowMap->getLightSpaceMatrices().size() > 0)
 	{
 		glUniformMatrix4fv(
@@ -101,7 +103,15 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 		);
 	}
 
-	//Activate the texture units and bind the correspoding depth map
+	//Activate the texture units and bind the corresponding depth map
+	/*
+	m_ShadowMap->debugDepthShader.use();
+	m_ShadowMap->debugDepthShader.setMat4("projection", proj);
+	m_ShadowMap->debugDepthShader.setMat4("view", view);
+	m_ShadowMap->debugDepthShader.setVec3("viewPos", mainCamera->cameraPos);
+	m_ShadowMap->debugShadowMap();
+	*/
+
 	m_ShadowMap->drawShadowMap(lightingShader->m_ProgramId);
 
 	//Update physics
@@ -117,6 +127,7 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 	}
 
 	m_SkyBox->draw(proj);
+	
 
 	//Reset current unit to zero for next render pass
 	TextureManager::m_CurrentUnit = 0;

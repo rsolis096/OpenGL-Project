@@ -6,7 +6,7 @@ in VS_OUT {
     vec3 normal;
 } gs_in[];
 
-const float MAGNITUDE = 0.002;
+const float MAGNITUDE = 0.5;
 
 uniform mat4 projection;
 

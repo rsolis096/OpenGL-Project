@@ -71,9 +71,8 @@ void Sphere::Draw(Shader& shader)
 void Sphere::ShadowMapDraw(Shader& shader)
 {
     shader.use();
-
+    m_Model = glm::mat4(1.0f);
     shader.setMat4("model", m_Model);
-    shader.setBool("hasTexture", false);
 
     //Bind Sphere
     glBindVertexArray(m_vao);
