@@ -211,6 +211,7 @@
     <ClInclude Include="third party\includes\imgui\imstb_rectpack.h" />
     <ClInclude Include="third party\includes\imgui\imstb_textedit.h" />
     <ClInclude Include="third party\includes\imgui\imstb_truetype.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\SkyBoxShader.frag" />

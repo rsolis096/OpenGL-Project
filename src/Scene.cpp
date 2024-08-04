@@ -127,8 +127,8 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 	}
 
 	m_SkyBox->draw(proj);
-	
 
+	//std::cout << "Texture Units used this frame: " << TextureManager::getCurrentUnit() << "\n";
 	//Reset current unit to zero for next render pass
-	TextureManager::m_CurrentUnit = 0;
+	TextureManager::reset();
 }

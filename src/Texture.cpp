@@ -6,7 +6,7 @@ Texture::Texture(const char* filePath, bool flipOnY, std::string type) : ID(0), 
     glGenTextures(1, &ID);
 
     //Ensure the texture applies
-    if (!updateTexture(filePath, flipOnY))
+    if (updateTexture(filePath, flipOnY) == 0)
     {
         //Failed to apply texture
         m_Type = "";
@@ -213,7 +213,7 @@ int Texture::updateTexture(const char* filePath, bool flipOnY)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         // set texture filtering parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         std::cout << "Successfully Loaded: " << filePath << std::endl;

@@ -133,6 +133,7 @@ void main()
     // phase 1: directional lights
 
     // phase 2: point lights
+    
     for(int i = 0; i < numberOfPointLights; i++)
     {
         result += CalcPointLight(pointLights[i], normal, viewDir);           
@@ -145,6 +146,8 @@ void main()
     }
 
     FragColor = vec4(result, 1.0);   
+
+
 }
 
 // calculates the color when using a spot light.

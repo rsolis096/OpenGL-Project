@@ -1,4 +1,6 @@
 #pragma once
+
+#include <iostream>
 struct TextureManager
 {
 	//Variables
@@ -9,6 +11,7 @@ struct TextureManager
 	//Functions
 	static unsigned int getNextUnit();
 	static unsigned int getCurrentUnit();
+	static void reset();
 
 };
 

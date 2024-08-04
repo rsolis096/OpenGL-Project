@@ -1,27 +1,50 @@
-#ifndef MESH_H
-#define MESH_H
+#pragma once
 
 #include "Shader.h"
 #include "Texture.h"
-#include "Vertex.h"
+#define MAX_BONE_INFLUENCE 4
 
 #include <string>
 #include <vector>
 using namespace std;
+
+struct ModelTexture {
+    unsigned int id;
+    std::string type;
+    std::string path;
+};
+
+struct Vertex {
+    // position
+    glm::vec3 Position;
+    // normal
+    glm::vec3 Normal;
+    // texCoords
+    glm::vec2 TexCoords;
+    // tangent
+    glm::vec3 Tangent;
+    // bitangent
+    glm::vec3 Bitangent;
+    //bone indexes which will influence this vertex
+    int m_BoneIDs[MAX_BONE_INFLUENCE];
+    //weights from each bone
+    float m_Weights[MAX_BONE_INFLUENCE];
+};
+
 
 class Mesh {
 public:
     // mesh Data
     vector<Vertex>       vertices;
     vector<unsigned int> indices;
-    vector<Texture>      textures;
+    vector<ModelTexture>      textures;
     unsigned int VAO;
 
     // constructor
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures);
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<ModelTexture> textures);
 
     // render the mesh
-    void Draw(Shader& shader, bool hasTexture);
+    void Draw(Shader& shader, bool hasTexture, GLuint textureUnitOffset);
 
 private:
     // render data 
@@ -30,4 +53,3 @@ private:
     // initializes all the buffer objects/arrays
     void setupMesh();
 };
-#endif

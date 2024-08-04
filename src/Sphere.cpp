@@ -79,7 +79,7 @@ void Sphere::ShadowMapDraw(Shader& shader)
 
     //Choose render type - indices list(EBO)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-    glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, nullptr);
 
     // Unbind buffers and reset state
     glBindVertexArray(0);

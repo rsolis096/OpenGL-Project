@@ -251,7 +251,7 @@ void demoScene(Scene& demoScene)
     demoScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
     demoScene.addObject(new Plane());
 
-    demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
+	demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[1]);
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[2]);
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[3]);
@@ -271,15 +271,14 @@ void demoScene(Scene& demoScene)
     demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
     demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
     demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
-    demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
     demoScene.m_LightController->addPointLight(glm::vec3(0.0f,10.0f,0.0f));
 
     //Cube
-    demoScene.m_SceneObjects[0]->setPosition(glm::vec3(4.0f, 3.0f, 0.0));
-    demoScene.m_SceneObjects[0]->setScale(glm::vec3(1.0f, 1.0f, 1.0f));
+    demoScene.m_SceneObjects[1]->setPosition(glm::vec3(4.0f, 3.0f, 0.0));
+    demoScene.m_SceneObjects[1]->setScale(glm::vec3(1.0f, 1.0f, 1.0f));
     //Sphere
-    demoScene.m_SceneObjects[1]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
+    demoScene.m_SceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
     //Model
     demoScene.m_SceneObjects[0]->setPosition(glm::vec3(-1.0f, 2.0f, 10.0f));
     demoScene.m_SceneObjects[0]->setScale(glm::vec3(1.0f));
