@@ -36,8 +36,8 @@ public:
         glm::vec3 m_Scale;
         glm::mat4 m_Model;
         glm::vec3 m_Rotation; //in degrees
-        glm::vec3 m_RotationAxis;
-        int m_RotationIndex;
+        //glm::vec3 m_RotationAxis;
+        //int m_RotationIndex;
 
 
         //Physics info (push to component later)
@@ -55,13 +55,12 @@ public:
         std::string m_DisplayName;
 
 
-
         //Teleport to specified location 
         void setPosition(glm::vec3 newPosition);                // Teleport object to a different position
         void setScale(glm::vec3 newScale);                      // Change scale of object in 3 dimensions
         void translatePosition(glm::vec3 newPosition);          // Translate by parameter (Used to move some diistance from current position)
         void updateObject();
-        void setRotation(glm::vec3&, glm::vec3, int);
+        void setRotation(glm::vec3);
 
         //Change these properties to set color of object
         void setAmbient(glm::vec3);

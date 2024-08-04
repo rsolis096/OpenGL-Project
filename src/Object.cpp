@@ -11,8 +11,6 @@ Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
     m_Scale = glm::vec3(1.0f);
     m_Model = glm::mat4(1.0f);
     m_ObjectID = 0;
-    m_RotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
-    m_RotationIndex = 0;
 
     m_Force = glm::vec3(0.0f);
     m_Velocity = glm::vec3(0.0f);
@@ -76,11 +74,12 @@ void Object::setPosition(glm::vec3 newPosition)
     updateObject();
 }
 
-void Object::setRotation(glm::vec3& newRotation, glm::vec3 axis, int index)
+//Takes a glm::vec3 of x, y, z rotations in degrees, the 
+void Object::setRotation(glm::vec3 newRotation)
 {
-    m_Rotation[index] = newRotation[index];
-    m_RotationAxis = axis;
-    m_RotationIndex = index;
+    m_Rotation = newRotation;
+    //m_RotationAxis = axis;
+    //m_RotationIndex = index;
     updateObject();
 }
 

@@ -252,27 +252,30 @@ void GUI::drawList()
 					{
 						ImGui::Spacing();
 						ImGui::Text("Rotation");
-						float rX = selectedObject->m_Rotation[0];
-						float rY = selectedObject->m_Rotation[2];
-						float rZ = selectedObject->m_Rotation[1];
+
+						float rX = selectedObject->m_Rotation.x;
+						float rY = selectedObject->m_Rotation.y;
+						float rZ = selectedObject->m_Rotation.z;
+
 						glm::vec3 currentRotation = glm::vec3(rX, rY, rZ);
 
 						if (ImGui::DragFloat("x##rotation", &rX, 1.0f, 0.0f, 360.0f, "%.2f", 0))
 						{
 							
-							currentRotation[0] = rX;
-							selectedObject->setRotation(currentRotation, glm::vec3(1.0f, 0.0f, 0.0f), 0);
-						}
-						if (ImGui::DragFloat("z##rotation", &rZ, 1.0f, 0.0f, 360.0f, "%.2f", 0))
-						{
-							currentRotation[1] = rZ;
-							selectedObject->setRotation(currentRotation, glm::vec3(0.0f, 1.0f, 0.0f), 1);
+							currentRotation.x = rX;
+							selectedObject->setRotation(currentRotation);
 						}
 						if (ImGui::DragFloat("y##rotation", &rY, 1.0f, 0.0f, 360.0f, "%.2f", 0))
 						{
-							currentRotation[2] = rY;
-							selectedObject->setRotation(currentRotation, glm::vec3(0.0f, 0.0f, 1.0f), 2);
+							currentRotation.y = rY;
+							selectedObject->setRotation(currentRotation);
 						}
+						if (ImGui::DragFloat("z##rotation", &rZ, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						{
+							currentRotation.z = rZ;
+							selectedObject->setRotation(currentRotation);
+						}
+
 
 					}
 
