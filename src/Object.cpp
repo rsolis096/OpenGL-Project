@@ -3,9 +3,9 @@
 Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
 {
     //Set default Cube properties
-    m_Ambient = glm::vec3(0.2f);
+    m_Ambient = glm::vec3(0.0f);
     m_Diffuse = glm::vec3(1.0f);
-    m_Specular = glm::vec3(0.1f);
+    m_Specular = glm::vec3(0.0f);
     m_Position = glm::vec3(0.0f);
     m_Rotation = glm::vec3(0.0f);
     m_Scale = glm::vec3(1.0f);
@@ -55,6 +55,23 @@ void Object::setSpecular(glm::vec3 newSpecular)
 {
     m_Specular = newSpecular;
 }
+
+
+glm::vec3 Object::getAmbient() const
+{
+    return m_Ambient;
+}
+
+glm::vec3 Object::getDiffuse() const
+{
+    return m_Diffuse;
+}
+
+glm::vec3 Object::getSpecular() const
+{
+    return m_Specular;
+}
+
 
 void Object::setPhysics()
 {

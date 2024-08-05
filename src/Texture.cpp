@@ -37,18 +37,22 @@ Texture::Texture(std::string path) : ID(0), m_Path(path), m_Type("CubeMap")
 {
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
-    glCheckError();
 
     int width, height, nrChannels;
+    unsigned char* data = nullptr;
 
-    unsigned char* data;
     std::cout << "Loading Texture: " << path << std::endl;
     data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
-    //Dimensions for each face
-    int faceWidth = width/4;
-    int faceHeight = height/3;
-    std::cout << width << ", " << height << std::endl;
-    std::cout << faceWidth << ", " << faceHeight << std::endl;
+
+    if (!data)
+    {
+        std::cerr << "Failed to load texture: " << path << std::endl;
+        return;
+    }
+
+    int faceWidth = width / 4;
+    int faceHeight = height / 3;
+
     GLenum format = GL_RED;
     if (nrChannels == 1)
         format = GL_RED;
@@ -57,67 +61,55 @@ Texture::Texture(std::string path) : ID(0), m_Path(path), m_Type("CubeMap")
     else if (nrChannels == 4)
         format = GL_RGBA;
     else
-        std::cout << "Invalid Format" << std::endl;
+    {
+        std::cerr << "Invalid Format" << std::endl;
+        stbi_image_free(data);
+        return;
+    }
 
     std::pair<int, int> positions[] = {
-        {0, faceHeight},                //Left
-        {2 * faceWidth, faceHeight},    //Right
-        {faceWidth, 0},                 //Top
-        {faceWidth, 2 * faceHeight},    //Bottom
-        {3 * faceWidth, faceHeight},    //Back
-        {faceWidth, faceHeight}         //Front
+        {0, faceHeight},                // Left
+        {2 * faceWidth, faceHeight},    // Right
+        {faceWidth, 0},                 // Top
+        {faceWidth, 2 * faceHeight},    // Bottom
+        {3 * faceWidth, faceHeight},    // Back
+        {faceWidth, faceHeight}         // Front
     };
 
-    //Swapping right and left fixing alignment issue along the horizontal
-    unsigned int targets[] = {
-        GL_TEXTURE_CUBE_MAP_POSITIVE_X, //Right
-        GL_TEXTURE_CUBE_MAP_NEGATIVE_X, //Left
-        GL_TEXTURE_CUBE_MAP_POSITIVE_Y,	//Top
-        GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, //Bottom
-        GL_TEXTURE_CUBE_MAP_POSITIVE_Z, //Back
-        GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, //Front
+    GLenum targets[] = {
+        GL_TEXTURE_CUBE_MAP_POSITIVE_X, // Right
+        GL_TEXTURE_CUBE_MAP_NEGATIVE_X, // Left
+        GL_TEXTURE_CUBE_MAP_POSITIVE_Y, // Top
+        GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, // Bottom
+        GL_TEXTURE_CUBE_MAP_POSITIVE_Z, // Back
+        GL_TEXTURE_CUBE_MAP_NEGATIVE_Z  // Front
     };
-    glCheckError();
 
-    if (data)
+    for (int i = 0; i < 6; ++i)
     {
-        for (int i = 0; i < 6; ++i)
-        {
-            int offsetX = positions[i].first;
-            int offsetY = positions[i].second;
+        int offsetX = positions[i].first;
+        int offsetY = positions[i].second;
 
-            glPixelStorei(GL_UNPACK_ROW_LENGTH, width);
-            glCheckError();
-            glPixelStorei(GL_UNPACK_SKIP_PIXELS, offsetX);
-            glCheckError();
-            glPixelStorei(GL_UNPACK_SKIP_ROWS, offsetY);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, width);
+        glPixelStorei(GL_UNPACK_SKIP_PIXELS, offsetX);
+        glPixelStorei(GL_UNPACK_SKIP_ROWS, offsetY);
 
-            glCheckError();
-            glTexImage2D(
-                targets[i], 
-                0, 
-                format, 
-                faceWidth, 
-                faceHeight, 
-                0, 
-                format, 
-                GL_UNSIGNED_BYTE, 
-                data
-            );
-
-            glCheckError();
-        }
-        // Reset pixel store parameters to their default values
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-        glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
-        glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
-        glCheckError();
+        glTexImage2D(
+            targets[i],
+            0,
+            format,
+            faceWidth,
+            faceHeight,
+            0,
+            format,
+            GL_UNSIGNED_BYTE,
+            data
+        );
     }
-    else
-    {
-        std::cout << "Failed to load texture: " << path << std::endl;
-    }
-    stbi_image_free(data);
+
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+    glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -125,15 +117,17 @@ Texture::Texture(std::string path) : ID(0), m_Path(path), m_Type("CubeMap")
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+    stbi_image_free(data);
+
     glCheckError();
 }
 
 //Load Cube map texture
-Texture::Texture(std::vector<std::string> paths) : ID(0), m_Type("CubeMap")
+Texture::Texture(std::vector<std::string> paths, bool flipOnY) : ID(0), m_Type("CubeMap")
 {
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
-
+    stbi_set_flip_vertically_on_load(flipOnY);
     int width, height, nrChannels;
     unsigned char* data;
     for (unsigned int i = 0; i < paths.size(); i++)
@@ -185,8 +179,7 @@ Texture::Texture(std::vector<std::string> paths) : ID(0), m_Type("CubeMap")
 //Allows for texture updates at runtime, also used by constructor
 int Texture::updateTexture(const char* filePath, bool flipOnY)
 {
-    if (flipOnY)
-        stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+    stbi_set_flip_vertically_on_load(flipOnY); // tell stb_image.h to flip loaded texture's on the y-axis.
     
     //TODO: Optimize such that textures already applied are not re applied (filepath = m_Path)
     //Note that constructor uses updateTextures already

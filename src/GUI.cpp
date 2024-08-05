@@ -82,7 +82,7 @@ void GUI::drawList()
 	//Object List
 	if (currentTab == 1) 
 	{
-		ImGui::BeginChild("object list", ImVec2(150, -ImGui::GetFrameHeightWithSpacing()), true);
+		ImGui::BeginChild("object list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
 		for (int i = 0; i < myScene.m_SceneObjects.size(); i++)
 		{
 			char label[128];
@@ -108,11 +108,12 @@ void GUI::drawList()
 			myScene.addObject(new Plane());
 		}
 	}
+
 	//Light List
 	else if (currentTab == 2)
 	{
 		//Fill the light source list
-		ImGui::BeginChild("light list", ImVec2(150, 150), true);
+		ImGui::BeginChild("light list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
 		//Fill Side Panel with spotlights
 		{
 			unsigned short numSpotLights = myScene.m_LightController->m_SpotLights.size();
@@ -178,6 +179,25 @@ void GUI::drawList()
 				std::cout << "Max PointLight Limit" << std::endl;
 		}
 
+	}
+
+	//Skybox list
+	else if (currentTab == 3)
+	{
+		ImGui::BeginChild("skybox list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
+		for (int i = 0; i < myScene.m_SkyBox->m_CubeMapNames.size(); i++)
+		{
+			char label[128];
+			bool isSelected = (skyBoxSelected == i);
+
+			sprintf_s(label, myScene.m_SkyBox->m_CubeMapNames[i].c_str(), i);
+			if (ImGui::Selectable(label, isSelected))
+			{
+				skyBoxSelected = i;
+				myScene.m_SkyBox->setCubeMapTexture(skyBoxSelected);
+			}
+		}
+		ImGui::EndChild();
 	}
 	ImGui::EndGroup();
 
@@ -281,21 +301,45 @@ void GUI::drawList()
 
 					// Color
 					{
-						static float col1[3] = { 1.0f, 0.0f, 0.2f };
+						glm::vec3 diffuse = selectedObject->getDiffuse();
+						glm::vec3 specular = selectedObject->getSpecular();
+						glm::vec3 ambient = selectedObject->getAmbient();
+
 						ImGui::Text("Object Color", "NULL");
-						if (ImGui::ColorEdit3("###color 1", col1))
+
+						//Only allow Diffuse changes if it does not have a diffuse map
+						if (selectedObject->m_DiffuseMap == nullptr) {
+							if (ImGui::ColorEdit3("Diffuse", &diffuse[0]))
+							{
+								selectedObject->setDiffuse(glm::vec3(diffuse));
+
+							}
+						}
+						//TODO: Models use a separate texture class so combine that together
+						//Only allow Specular changes if it does not have a specular map
+						if (selectedObject->m_SpecularMap == nullptr)
 						{
-							selectedObject->m_Diffuse = glm::vec3(col1[0], col1[1], col1[2]);
+							if (ImGui::ColorEdit3("Specular", &specular[0]))
+							{
+								selectedObject->setSpecular(glm::vec3(specular));
+							}
+						}
+
+						//Yet to see an Ambient map so, it should be always available
+						if (ImGui::ColorEdit3("Ambient", &ambient[0]))
+						{
+							selectedObject->setAmbient(glm::vec3(ambient));
 
 						}
-						ImGui::SameLine(); HelpMarker(
-							"Click on the color square to open a color picker.\n"
-							"Click and hold to use drag and drop.\n"
-							"Right-click on the color square to show options.\n"
-							"CTRL+click on individual component to input value.\n");
-						ImGui::Spacing();
 
 					}
+
+					ImGui::SameLine(); HelpMarker(
+						"Click on the color square to open a color picker.\n"
+						"Click and hold to use drag and drop.\n"
+						"Right-click on the color square to show options.\n"
+						"CTRL+click on individual component to input value.\n");
+					ImGui::Spacing();
 
 					// Texture
 					{
@@ -597,20 +641,22 @@ void GUI::drawList()
 			if (ImGui::BeginTabItem("SkyBox"))
 			{
 				currentTab = 3;
-				for (int i = 0; i < myScene.m_SkyBox->m_CubeMapNames.size(); i++)
+				bool check = myScene.m_SkyBox->m_InvertedTexture;
+				ImGui::Text(myScene.m_SkyBox->m_CubeMapNames[skyBoxSelected].c_str());
+				if(ImGui::Checkbox("Invert on Y ", &check))
 				{
-					char label[128];
-					bool isSelected = (skyBoxSelected == i);
-
-					sprintf_s(label, myScene.m_SkyBox->m_CubeMapNames[i].c_str(), i);
-					if (ImGui::Selectable(label, isSelected))
-					{
-						skyBoxSelected = i;
-						myScene.m_SkyBox->setCubeMapTexture(skyBoxSelected);
-					}
+					myScene.m_SkyBox->m_InvertedTexture = !myScene.m_SkyBox->m_InvertedTexture;
+					myScene.m_SkyBox->setCubeMapTexture(skyBoxSelected);
 				}
+
+				ImGui::SameLine(); HelpMarker(
+					"It's possible the skybox may be inverted when loaded.\n"
+					"If needed, invert the skybox texture.\n");
+				ImGui::Spacing();
+
 				ImGui::EndTabItem();
 			}
+
 
 			ImGui::EndTabBar();
 		}
@@ -619,6 +665,7 @@ void GUI::drawList()
 	ImGui::EndGroup();
 
 }
+
 
 
 

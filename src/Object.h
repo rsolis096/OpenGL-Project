@@ -21,11 +21,6 @@ public:
         Object();
         ~Object();
 
-        //Object color attributes
-        glm::vec3 m_Ambient;
-        glm::vec3 m_Diffuse;
-        glm::vec3 m_Specular;
-
         //Texture Properties
         Texture* m_DiffuseMap;
         Texture* m_SpecularMap;
@@ -67,6 +62,10 @@ public:
         void setDiffuse(glm::vec3);
         void setSpecular(glm::vec3);
 
+        glm::vec3 getAmbient() const;
+        glm::vec3 getDiffuse() const;
+        glm::vec3 getSpecular() const;
+
         //Draw the object. Each object type draws differently
         virtual void Draw(Shader& shader) = 0;
         virtual void ShadowMapDraw(Shader& shader) = 0;
@@ -74,6 +73,11 @@ public:
 
 
     protected:
+
+        //Object color attributes
+        glm::vec3 m_Ambient;
+        glm::vec3 m_Diffuse;
+        glm::vec3 m_Specular;
 
         //Mesh Data
         std::vector<float>m_Vertices;

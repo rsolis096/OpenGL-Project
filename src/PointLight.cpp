@@ -22,9 +22,9 @@ PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::
 	m_Specular = glm::vec3(0.7f, 0.7f, 0.7f); //"Shine" color
 
 	//Set the color for the light object
-	m_LightShape->m_Diffuse = m_Diffuse;
-	m_LightShape->m_Ambient = m_Ambient;
-	m_LightShape->m_Ambient = m_Ambient;
+	m_LightShape->setDiffuse(m_Diffuse);
+	m_LightShape->setAmbient(m_Ambient);
+	m_LightShape->setSpecular(m_Specular);
 
 	//For attenuation
 	m_Constant = 1.0f;
@@ -74,7 +74,7 @@ void PointLight::setLightPos(const glm::vec3 lightPos)
 void PointLight::setAmbient(const glm::vec3 ambient)
 {
 	m_Ambient = ambient;
-	m_LightShape->m_Ambient = ambient;
+	m_LightShape->setAmbient(ambient);
 	m_LightingShader->use();
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].ambient", m_Ambient);
 }
@@ -82,7 +82,7 @@ void PointLight::setAmbient(const glm::vec3 ambient)
 void PointLight::setDiffuse(const glm::vec3 diffuse)
 {
 	m_Diffuse = diffuse;	
-	m_LightShape->m_Diffuse = diffuse;
+	m_LightShape->setDiffuse(diffuse);
 	m_LightingShader->use();
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].diffuse", m_Diffuse);
 }
@@ -90,7 +90,7 @@ void PointLight::setDiffuse(const glm::vec3 diffuse)
 void PointLight::setSpecular(const glm::vec3 specular)
 {
 	m_Specular = specular;
-	m_LightShape->m_Specular = specular;
+	m_LightShape->setSpecular(specular);
 	m_LightingShader->use();
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].specular", m_Specular);
 }

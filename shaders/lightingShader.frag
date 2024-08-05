@@ -146,6 +146,7 @@ void main()
     }
 
     FragColor = vec4(result, 1.0);   
+    //FragColor = texture(material.diffuse, fs_in.TexCoords);
 
 }
 
@@ -185,9 +186,10 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
 
     if(hasTexture)
     {
-        ambient = vec3(texture(material.diffuse, fs_in.TexCoords)) * spotFactor;
-        diffuse = vec3(texture(material.diffuse, fs_in.TexCoords)) * spotFactor;
-        specular  = vec3(texture(material.diffuse, fs_in.TexCoords))* spotFactor;
+        //ambient = texture(material.diffuse, fs_in.TexCoords).rgb;
+        ambient = object.ambient;
+        diffuse = texture(material.diffuse, fs_in.TexCoords).rgb;
+        specular  = texture(material.specular, fs_in.TexCoords).rgb;
     }
     else
     {
@@ -196,9 +198,9 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
         specular = object.specular* spotFactor;
     }
 
-    ambient *= light.ambient;
-    diffuse *= light.diffuse * diff ;
-    specular *= light.specular * spec ;
+    ambient *= light.ambient * spotFactor;
+    diffuse *= light.diffuse * diff * spotFactor;
+    specular *= light.specular * spec * spotFactor;
         
     // Calculate the attenuation factor (light fall off)
     float distance = length(light.position - fs_in.FragPos);
@@ -208,7 +210,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
     diffuse *= attenuation;
     specular *= attenuation;
         
-    vec3 lighting = (ambient  + ((shadow) * (diffuse + specular)));
+    vec3 lighting = ambient + (shadow * (diffuse + specular));
 
     return lighting;
 
@@ -242,7 +244,8 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
     //Apply light
     if(hasTexture)
     {
-        ambient = texture(material.diffuse, fs_in.TexCoords).rgb;
+        //ambient = texture(material.diffuse, fs_in.TexCoords).rgb;
+        ambient = object.ambient;
         diffuse = texture(material.diffuse, fs_in.TexCoords).rgb;  
         specular = texture(material.specular, fs_in.TexCoords).rgb;  
     }

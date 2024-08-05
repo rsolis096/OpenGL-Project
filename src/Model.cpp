@@ -36,11 +36,11 @@ void Model::ShadowMapDraw(Shader& shader)
 {
     shader.use();
     shader.setMat4("model", m_Model);
-    shader.setBool("hasTexture", false);
+    shader.setBool("hasTexture", m_HasTexture);
 
     GLuint textureUnit = TextureManager::getNextUnit();
     for (unsigned int i = 0; i < meshes.size(); i++)
-        meshes[i].Draw(shader, false, textureUnit);
+        meshes[i].Draw(shader, m_HasTexture, textureUnit);
     glCheckError();
 }
 
@@ -193,6 +193,11 @@ vector<ModelTexture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
             texture.path = str.C_Str();
             textures.push_back(texture);
             textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
+        }
+
+        if (textures_loaded.size() == 0)
+        {
+            m_HasTexture = true;
         }
     }
     return textures;

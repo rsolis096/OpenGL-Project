@@ -19,4 +19,5 @@ public:
 	static std::vector<std::vector<std::string>> m_CubeMapPaths;
 	static std::vector<std::string> m_CubeMapNames;
 	int m_Current;
+	bool m_InvertedTexture;
 };

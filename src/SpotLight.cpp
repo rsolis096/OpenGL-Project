@@ -88,7 +88,7 @@ void SpotLight::Draw()
 void SpotLight::setAmbient(const glm::vec3 ambient)
 {
 	m_Ambient = ambient * m_Intensity;
-	m_LightShape->m_Ambient = m_Ambient;
+	m_LightShape->setAmbient(m_Ambient);
 	m_LightingShader->use();
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].ambient", m_Ambient);
 
@@ -97,7 +97,7 @@ void SpotLight::setAmbient(const glm::vec3 ambient)
 void SpotLight::setDiffuse(const glm::vec3 diffuse)
 {
 	m_Diffuse = diffuse * m_Intensity;
-	m_LightShape->m_Diffuse = m_Diffuse;
+	m_LightShape->setDiffuse(m_Diffuse);
 	m_LightingShader->use();
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].diffuse", m_Diffuse);
 }
@@ -105,7 +105,7 @@ void SpotLight::setDiffuse(const glm::vec3 diffuse)
 void SpotLight::setSpecular(const glm::vec3 specular)
 {
 	m_Specular = specular * m_Intensity;
-	m_LightShape->m_Specular = m_Specular;
+	m_LightShape->setSpecular(m_Specular);
 	m_LightingShader->use();
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].specular", m_Specular);
 }

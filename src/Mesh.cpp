@@ -16,34 +16,36 @@ void Mesh::Draw(Shader& shader, bool hasTexture, unsigned int textureUnitOffset)
     unsigned int normalNr = 1;
     unsigned int heightNr = 1;
 
-    
-    for (unsigned int i = 0; i < textures.size(); i++) {
+    if (hasTexture)
+    {
+        for (unsigned int i = 0; i < textures.size(); i++) {
 
-        glActiveTexture(GL_TEXTURE0 + textureUnitOffset + i);  // Correct usage with GL_TEXTURE0 as base
-        glBindTexture(GL_TEXTURE_2D, textures[i].id);
+            glActiveTexture(GL_TEXTURE0 + textureUnitOffset + i);  // Correct usage with GL_TEXTURE0 as base
+            glBindTexture(GL_TEXTURE_2D, textures[i].id);
 
-        std::string number;
-        std::string name = textures[i].type;
-        GLint location;
-        if (name == "texture_diffuse") {
-            location = glGetUniformLocation(shader.m_ProgramId, "material.diffuse");
-        }
-        else if (name == "texture_specular") {
-            location = glGetUniformLocation(shader.m_ProgramId, "material.specular");
-        }
-        else if (name == "texture_normal") {
-            number = std::to_string(normalNr++); // Convert unsigned int to string
-            location = glGetUniformLocation(shader.m_ProgramId, ("material." + name + number).c_str());
-        }
-        else if (name == "texture_height") {
-            number = std::to_string(heightNr++); // Convert unsigned int to string
-            location = glGetUniformLocation(shader.m_ProgramId, ("material." + name + number).c_str());
-        }
-        else {
-            continue;
-        }
+            std::string number;
+            std::string name = textures[i].type;
+            GLint location;
+            if (name == "texture_diffuse") {
+                location = glGetUniformLocation(shader.m_ProgramId, "material.diffuse");
+            }
+            else if (name == "texture_specular") {
+                location = glGetUniformLocation(shader.m_ProgramId, "material.specular");
+            }
+            else if (name == "texture_normal") {
+                number = std::to_string(normalNr++); // Convert unsigned int to string
+                location = glGetUniformLocation(shader.m_ProgramId, ("material." + name + number).c_str());
+            }
+            else if (name == "texture_height") {
+                number = std::to_string(heightNr++); // Convert unsigned int to string
+                location = glGetUniformLocation(shader.m_ProgramId, ("material." + name + number).c_str());
+            }
+            else {
+                continue;
+            }
 
-        glUniform1i(location,  textureUnitOffset + i);
+            glUniform1i(location, textureUnitOffset + i);
+        }
     }
 
     // draw mesh
