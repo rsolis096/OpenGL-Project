@@ -202,9 +202,12 @@ unsigned int TextureFromFile(const char* path, const string& directory, bool gam
 {
     string filename = string(path);
     filename = directory + '/' + filename;
-
     unsigned int textureID;
-    glGenTextures(1, &textureID);
+
+    //Needed for correctly oriented textures
+    stbi_set_flip_vertically_on_load(true);
+
+	glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
     unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);

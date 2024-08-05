@@ -147,7 +147,6 @@ void main()
 
     FragColor = vec4(result, 1.0);   
 
-
 }
 
 // calculates the color when using a spot light.
