@@ -110,60 +110,63 @@ void GUI::drawList()
 	}
 
 	//Light List
-	else if (currentTab == 2)
-	{
-		//Fill the light source list
+else if (currentTab == 2)
+{
+		// Start the child window for the light list
 		ImGui::BeginChild("light list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
-		//Fill Side Panel with spotlights
+
+		unsigned short numSpotLights = myScene.m_LightController->m_SpotLights.size();
+		unsigned short numPointLights = myScene.m_LightController->m_PointLights.size();
+		unsigned int totalLights = numSpotLights + numPointLights;
+
+		// Fill the list of lights
+		for (unsigned int i = 0; i < totalLights; ++i)
 		{
-			unsigned short numSpotLights = myScene.m_LightController->m_SpotLights.size();
-			unsigned short numPointLights = myScene.m_LightController->m_PointLights.size();
-			unsigned int totalLights = numSpotLights + numPointLights;
-			unsigned int lightCounter = 0;
+			char label[128];
+			bool isSelected = false;
 
-			//Fill list of lights
-			while (lightCounter < totalLights)
+			if (i < numSpotLights) // Spotlights
 			{
-				unsigned short s = 0;
-
-				char label[128];
-				bool isSelected = (lightingSelected == s);
-
-				//Fill list with spotlights
-				for (s; s < numSpotLights; s++, lightCounter++)
-				{
-					sprintf_s(label, myScene.m_LightController->m_SpotLights[s]->m_DisplayName.c_str());
-					if (ImGui::Selectable(label, isSelected))
-					{
-						lightingSelected = s;
-						selectedType = "spot";
-					}
+				sprintf_s(label, "%s", myScene.m_LightController->m_SpotLights[i]->m_DisplayName.c_str());
+				if (lightingSelected == i && selectedType == "spot") {
+					isSelected = true;
 				}
 
-				//Fill list with pointlights
-				for (s; s < totalLights; s++, lightCounter++)
+				if (ImGui::Selectable(label, isSelected))
 				{
-					sprintf_s(label, myScene.m_LightController->m_PointLights[s - numSpotLights]->m_DisplayName.c_str());
-					if (ImGui::Selectable(label, isSelected))
-					{
-						lightingSelected = s - numSpotLights;
-						selectedType = "point";
-					}
+					lightingSelected = i;  // Correct index for spotlight
+					selectedType = "spot";
+				}
+			}
+			else // Point lights
+			{
+				unsigned int pointIndex = i - numSpotLights;
+				sprintf_s(label, "%s", myScene.m_LightController->m_PointLights[pointIndex]->m_DisplayName.c_str());
+				if (lightingSelected == pointIndex && selectedType == "point") {
+					isSelected = true;
 				}
 
-			}		
+				if (ImGui::Selectable(label, isSelected))
+				{
+					lightingSelected = pointIndex;  // Correct index for point light
+					selectedType = "point";
+				}
+			}
 		}
+
 		ImGui::EndChild();
+
 
 		//Add light buttons
 		if (ImGui::Button("SpotLight +")) {
 
 			if (myScene.m_LightController->m_SpotLights.size() < 8)
 			{
-				glm::vec3 first = glm::vec3(10.0f, 3.0f, 0.0f);
-				glm::vec3 second = glm::vec3(-4.50f, -3.0f, 14.0f);
-				second = glm::normalize(first - second);
-				myScene.m_LightController->addSpotLight(first, second);
+				glm::vec3 pos = glm::vec3(0.0f, 3.0f, 0.0f);
+				glm::vec3 dir = glm::vec3(-4.50f, -3.0f, 14.0f);
+				dir = glm::normalize(dir);
+
+				myScene.m_LightController->addSpotLight(pos, dir);
 			}
 			else
 				std::cout << "Max SpotLight Limit" << std::endl;

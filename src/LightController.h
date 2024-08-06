@@ -7,6 +7,12 @@
 //Forward Declaration (both depend on eachother)
 class Scene;
 
+enum LightType {
+	SPOT_LIGHT,        // 0
+	POINT_LIGHT,       // 1
+	DIRECTIONAL_LIGHT  // 2
+};
+
 class LightController
 {
 public:

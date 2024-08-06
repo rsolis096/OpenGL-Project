@@ -19,16 +19,19 @@ void LightController::addPointLight(const glm::vec3& pos)
 
 void LightController::removePointLight()
 {
+	//TODO:  LightController::removePointLight()
 }
 
 void LightController::addSpotLight(glm::vec3 pos, glm::vec3 dir)
 {
-	m_SpotLights.emplace_back(new SpotLight(m_LightingShader, m_LightSourceShader, pos, dir));
-	m_Scene->m_ShadowMap->addShadowMap();	
+	m_SpotLights.push_back(new SpotLight(m_LightingShader, m_LightSourceShader, pos, dir));
+	m_Scene->m_ShadowMap->addShadowMap();
+
 }
 
 void LightController::removeSpotLight()
 {
+	//TODO:  LightController::removeSpotLight()
 }
 
 void LightController::drawLighting()

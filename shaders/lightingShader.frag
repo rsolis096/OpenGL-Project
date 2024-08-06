@@ -91,22 +91,19 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition, int mapIndex
     vec3 shadowCoords = projCoords * 0.5 + vec3(0.5);
 
     float diffuseFactor = dot(fs_in.Normal, -lightDirection);
-    float bias = mix(0.001, 0.0, diffuseFactor);
+    float bias = 0.005; // Adjust as necessary
 
-    float texelWidth = 1.0 / (1024*2);
-    float texelHeight = 1.0 / (1024*2);
-
-    vec2 texelSize = vec2(texelWidth, texelHeight);
+    vec2 texelSize = 1.0 / textureSize(shadowMap[mapIndex], 0); // Get the actual texel size
 
     float shadow = 0.0;
     
-    //Simple 3x3 filter
+    // Simple 3x3 filter
     for(int x = -1; x <= 1; x++)
     {
         for(int y = -1; y <= 1; y++)
         {
-            vec2 offset = vec2(y,x) * texelSize;
-            float depth = texture(shadowMap[mapIndex], shadowCoords.xy + offset).x;
+            vec2 offset = vec2(x, y) * texelSize;
+            float depth = texture(shadowMap[mapIndex], shadowCoords.xy + offset).r;
 
             if(depth + bias < shadowCoords.z)
             {

@@ -79,7 +79,7 @@ void Scene::removeLightController()
 }
 
 void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
-{	
+{
 	//Draw Point Light Lamp (light spheres)
 	pointLightShader->use();
 	pointLightShader->setMat4("projection", proj);
@@ -92,7 +92,7 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 	lightingShader->setVec3("viewPos", mainCamera->cameraPos);
 
 	//Update shadows only if there exists light matrices (proj matrices from light source)
-	
+
 	if (m_ShadowMap->getLightSpaceMatrices().size() > 0)
 	{
 		glUniformMatrix4fv(
@@ -104,30 +104,38 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 	}
 
 	//Activate the texture units and bind the corresponding depth map
+
 	/*
-	m_ShadowMap->debugDepthShader.use();
-	m_ShadowMap->debugDepthShader.setMat4("projection", proj);
-	m_ShadowMap->debugDepthShader.setMat4("view", view);
-	m_ShadowMap->debugDepthShader.setVec3("viewPos", mainCamera->cameraPos);
-	m_ShadowMap->debugShadowMap();
-	*/
+	{ // Uncomment this to render the debug quads for spotlights (cannot be rendered with the actual scene)
+		m_ShadowMap->debugDepthShader.use();
+		m_ShadowMap->debugDepthShader.setMat4("projection", proj);
+		m_ShadowMap->debugDepthShader.setMat4("view", view);
+		m_ShadowMap->debugDepthShader.setVec3("viewPos", mainCamera->cameraPos);
+		m_ShadowMap->debugShadowMap();
+	}*/
 
-	m_ShadowMap->drawShadowMap(lightingShader->m_ProgramId);
 
-	//Update physics
-	m_PhysicsWorld->step(glfwGetTime(), deltaTime);
+	
+	{ // Uncomment this to render the scene
 
-	//Draw Lights
-	m_LightController->drawLighting();
+		m_ShadowMap->drawShadowMap(lightingShader->m_ProgramId);
 
-	//Draw Objects
-	for (Object* element : m_SceneObjects)
-	{
-		element->Draw(*lightingShader);
+		//Update physics
+		m_PhysicsWorld->step(static_cast<float>(glfwGetTime()), deltaTime);
+
+		//Draw Lights
+		m_LightController->drawLighting();
+
+		//Draw Objects
+		for (Object* element : m_SceneObjects)
+		{
+			element->Draw(*lightingShader);
+		}
+
+		m_SkyBox->draw(proj);
 	}
 
-	m_SkyBox->draw(proj);
-
+	
 	//std::cout << "Texture Units used this frame: " << TextureManager::getCurrentUnit() << "\n";
 	//Reset current unit to zero for next render pass
 	TextureManager::reset();

@@ -8,7 +8,7 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_LightPos(pos), m_LightDirection(dir),
 	m_NearPlane(0.5f), m_FarPlane(70.0f)
 {
-	m_LightDirection = glm::normalize(dir - pos);
+	m_LightDirection = glm::normalize(dir);
 
 	m_SpotLightID = m_SpotLightCount;
 	m_DisplayName = "SpotLight" + std::to_string(m_SpotLightID);
@@ -34,19 +34,8 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_LightingShader->setInt("numberOfSpotLightsVERT", m_SpotLightCount);
 	m_LightingShader->setInt("numberOfSpotLightsFRAG", m_SpotLightCount);
 
-	// Get the location of the uniform in the shader program
-	int numberOfShadowMapsLocation1 = glGetUniformLocation(m_LightingShader->m_ProgramId, "numberOfShadowMapsFRAG");
-
-	// Set the value of the uniform
-	glUseProgram(m_LightingShader->m_ProgramId);
-	glUniform1i(numberOfShadowMapsLocation1, m_SpotLightCount);
-
-	// Get the location of the uniform in the shader program
-	int numberOfShadowMapsLocation2 = glGetUniformLocation(m_LightingShader->m_ProgramId, "numberOfShadowMapsVERT");
-
-	// Set the value of the uniform
-	glUseProgram(m_LightingShader->m_ProgramId);
-	glUniform1i(numberOfShadowMapsLocation2, m_SpotLightCount);
+	m_LightingShader->setInt("numberOfShadowMapsVERT", m_SpotLightCount);
+	m_LightingShader->setInt("numberOfShadowMapsFRAG", m_SpotLightCount);
 
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].position", m_LightPos);
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].direction", m_LightDirection);
@@ -166,42 +155,42 @@ void SpotLight::setIntensity(const float i)
 * ###     GETTER FUNCTIONS        ###
 ###################################*/
 
-glm::vec3 SpotLight::getLightPos()
+glm::vec3 SpotLight::getLightPos() const
 {
 	return m_LightPos;
 }
 
-glm::vec3 SpotLight::getLightDirection()
+glm::vec3 SpotLight::getLightDirection() const
 {
 	return 	m_LightDirection;
 }
 
-glm::vec3 SpotLight::getAmbient()
+glm::vec3 SpotLight::getAmbient() const
 {
 	return m_Ambient;
 }
 
-glm::vec3 SpotLight::getDiffuse()
+glm::vec3 SpotLight::getDiffuse() const
 {
 	return m_Diffuse;
 }
 
-glm::vec3 SpotLight::getSpecular()
+glm::vec3 SpotLight::getSpecular() const
 {
 	return m_Specular;
 }
 
-float SpotLight::getIntensity()
+float SpotLight::getIntensity() const
 {
 	return m_Intensity;
 }
 
-float SpotLight::getNearPlane()
+float SpotLight::getNearPlane() const
 {
 	return m_NearPlane;
 }
 
-float SpotLight::getFarPlane()
+float SpotLight::getFarPlane() const
 {
 	return m_FarPlane;
 }

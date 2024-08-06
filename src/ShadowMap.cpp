@@ -4,10 +4,15 @@ ShadowMap::ShadowMap(std::vector<Object*>* objects, std::vector<SpotLight*>* spo
     m_SceneObjects(objects), m_SpotLights(spotlights), m_UpdateShadowMap(true)
 {
     // Initialize shaders
-	depthShader = Shader("shaders/shadow_mapping_depth.vert", "shaders/shadow_mapping_depth.frag");
-    debugDepthShader = Shader("shaders/debug_quad.vert", "shaders/debug_quad_depth.frag");
-    m_ShadowCasters = 0;
 
+    //Drawn to to generate depth map
+	depthShader = Shader("shaders/shadow_mapping_depth.vert", "shaders/shadow_mapping_depth.frag");
+
+    //Drawn to to display a debug image of the depth map
+    debugDepthShader = Shader("shaders/debug_quad.vert", "shaders/debug_quad_depth.frag");
+
+
+    m_ShadowCasters = 0;
 
 }
 
@@ -17,22 +22,19 @@ void ShadowMap::addShadowMap()
     depthMapFBO.push_back(0);
     depthMap.push_back(0);
     m_UpdateShadowMap = true;
+
     // Generate framebuffer and depth map texture of the new item
     glGenFramebuffers(1, &depthMapFBO[m_ShadowCasters]);
     glGenTextures(1, &depthMap[m_ShadowCasters]);
 
     // Bind the depth map texture to the current texture unit
     glBindTexture(GL_TEXTURE_2D, depthMap[m_ShadowCasters]);
-    // Bind the depth map texture to the current texture unit
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     
-    // Set the minification filter to nearest neighbor
+    // Set texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    // Set the magnification filter to nearest neighbor
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    // Set the horizontal wrapping mode to clamp to border
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    // Set the vertical wrapping mode to clamp to border
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     
     // Define the border color as white
@@ -43,29 +45,34 @@ void ShadowMap::addShadowMap()
     // Attach depth texture as FBO's depth buffer
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO[m_ShadowCasters]);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap[m_ShadowCasters], 0);
+
     //No color data needs to be rendered
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
+
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << "Framebuffer not complete: " << status << std::endl;
+    }
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     m_ShadowCasters++;
+    glCheckError();
 }
 
 void ShadowMap::ShadowPass() 
 {
     //Shadow Pass (Generate depth maps)
-    
-    // 1. render depth of scene to texture (from light's perspective)
-    
-    //TODO: Efficiency Improvment Opportunity - Shadow Maps
-    //Clear lightSpaceMatrices vector (not very efficient for unchanging matrices)
-    //Currently, every spotlight calculates its corresponding depth map even if scene is unchanged
+    ////Currently only working on static scenes, further updates require manual overrides
 
     unsigned int numberOfSpotLights = m_SpotLights->size();
 
-    //Currently only working on static scenes, further updates require manual overrides
-    //m_UpdateShadowMap is set to true upon += 1 spotlight
-    if (m_UpdateShadowMap)
+    //Spotlights
+
+    //NEED TO FIND A WAY TO LIMIT CHANGE UNLESS SCENE MOVES
+    if (true)//(m_UpdateShadowMap)     //m_UpdateShadowMap is set to true upon += 1 spotlight
     {
+        //Re draw the depth maps, clear the light space matrices
         m_LightSpaceMatrices.clear();
         if (numberOfSpotLights > 0)
             m_LightSpaceMatrices.resize(numberOfSpotLights, glm::mat4(1.0f));
@@ -84,21 +91,21 @@ void ShadowMap::ShadowPass()
             // Calculate light view matrix
             glm::mat4 lightView = glm::lookAt(
                 (*m_SpotLights)[i]->getLightPos(),
-                (*m_SpotLights)[i]->getLightDirection(),
+                (*m_SpotLights)[i]->getLightPos() + (*m_SpotLights)[i]->getLightDirection(), // Adjusted for direction
                 glm::vec3(0.0, 1.0, 0.0)
             );
 
             // Combine projection and view matrices to get the light-space matrix
             m_LightSpaceMatrices[i] = lightProjection * lightView;
-            glCheckError();
-        }
 
-        // Render to each depth map (1 for each spotlight)
-        for (int i = 0; i < numberOfSpotLights; i++)
-        {
-            // Use the depth shader for rendering
+            // Set the viewport and bind the frame buffer
+            glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+
+            //Render to depth map
+            glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO[i]);
+            glClear(GL_DEPTH_BUFFER_BIT);
+
             depthShader.use();
-
             // Pass the light-space matrices to the shader
             glUniformMatrix4fv(
                 glGetUniformLocation(depthShader.m_ProgramId, "lightSpaceMatrix"),
@@ -107,56 +114,43 @@ void ShadowMap::ShadowPass()
                 glm::value_ptr(getLightSpaceMatrices()[i])
             );
 
-            // Set the viewport and bind the framebuffer
-            glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-
-            //Render to depth map
-            glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO[i]);
-            glClear(GL_DEPTH_BUFFER_BIT);
-
-            // Draw each object in the scene using the depth shader
-            for (Object* obj : *m_SceneObjects)
+        	for (Object* obj : *m_SceneObjects)
                 obj->Draw(depthShader);
 
-            // Unbind the framebuffer
+            //Render to depth map
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-            // Check for OpenGL errors
             glCheckError();
         }
     }
 
-
+    m_UpdateShadowMap = false;
 }
 
-void ShadowMap::drawShadowMap(GLuint& shaderID) const
+void ShadowMap::drawShadowMap(GLuint shaderID) const
 {
-    // Loop through each shadow map (
-    // this actually draws the shadow map to the screen, does not generate depth maps)
-    for (int i = 0; i < m_SpotLights->size(); i++)
-    {
-        // Activate texture unit
-        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit());
+    glUseProgram(shaderID);
 
-        // Bind the shadow map texture
+    for (size_t i = 0; i < depthMap.size(); ++i)
+    {
+        GLuint textureUnit = TextureManager::getNextUnit();
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
         glBindTexture(GL_TEXTURE_2D, depthMap[i]);
 
-        // Construct the uniform location string for the current shadow map
-        string location = "shadowMap[" + std::to_string(i) + "]";
-
-        // Get the uniform location for the shadow map in the shader
-        GLint shadowMapLocation = glGetUniformLocation(shaderID, location.c_str());
-        if (shadowMapLocation != -1) {
-            glUniform1i(shadowMapLocation, i);
+        std::string uniformName = "shadowMap[" + std::to_string(i) + "]";
+        GLint shadowMapUniformLocation = glGetUniformLocation(shaderID, uniformName.c_str());
+        if (shadowMapUniformLocation == -1) {
+            std::cerr << "ERROR: Uniform location for " << uniformName << " not found.\n";
+            return;
         }
-        else {
-            std::cerr << "WARNING: Uniform location for " << location << " not found.\n";
-        }
-        // Set the uniform value to the corresponding texture unit index
-        glUniform1i(shadowMapLocation, TextureManager::getCurrentUnit());
 
+        glUniform1i(shadowMapUniformLocation, textureUnit);
     }
-    glCheckError();
+
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        std::cerr << "OpenGL error in drawShadowMap: " << error << std::endl;
+    }
 }
 
 glm::mat4& ShadowMap::getLightSpaceMatrix(int i){
@@ -177,7 +171,7 @@ GLuint ShadowMap::getDepthMapFBOID(int i){
 
 void ShadowMap::setUpdateShadowMap()
 {
-    m_UpdateShadowMap != m_UpdateShadowMap;
+    m_UpdateShadowMap = !m_UpdateShadowMap;
 }
 
 void ShadowMap::debugShadowMap()
@@ -188,8 +182,6 @@ void ShadowMap::debugShadowMap()
     debugDepthShader.use();
     debugDepthShader.setFloat("near_plane", near_plane);
     debugDepthShader.setFloat("far_plane", far_plane);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, depthMap[0]);
 
     //Render Quad
     unsigned int quadVAO = 0;
@@ -214,7 +206,44 @@ void ShadowMap::debugShadowMap()
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     }
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
+
+    int numCols = 4; // Number of columns
+    int numRows = (m_SpotLights->size() + numCols - 1) / numCols; // Calculate rows needed
+
+    float quadSize = 2.0f / numCols; // Size of each quad, assuming [-1, 1] range for positions
+    float spacing = 0.05f; // Space between quads
+    float totalWidth = numCols * (quadSize + spacing) - spacing; // Total width considering spacing
+
+
+    for (size_t i = 0; i < m_SpotLights->size(); ++i)
+    {
+
+        int row = i / numCols;
+        int col = i % numCols;
+
+        // Calculate position offsets for each quad
+        float xOffset = (col * (quadSize + spacing)) - (totalWidth / 2.0f); // Center quads horizontally
+        float yOffset = (row * (quadSize + spacing)) - (quadSize / 2.0f); // Center quads vertically
+
+        // Update quad vertices with offset (if you choose to modify the vertices directly)
+        float quadVertices[] = {
+            // positions        // texture Coords
+            xOffset,  yOffset + quadSize, 0.0f, 0.0f, 1.0f,
+            xOffset,  yOffset,            0.0f, 0.0f, 0.0f,
+            xOffset + quadSize, yOffset + quadSize, 0.0f, 1.0f, 1.0f,
+            xOffset + quadSize, yOffset,            0.0f, 1.0f, 0.0f,
+        };
+
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(quadVertices), quadVertices);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, depthMap[i]); // Bind the depth map of the current spotlight
+        debugDepthShader.setInt("depthMap", 0); // Set the sampler to texture unit 0
+
+        glBindVertexArray(quadVAO);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindVertexArray(0);
+    }
+
 }

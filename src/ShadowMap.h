@@ -30,7 +30,7 @@ class ShadowMap
 		void addShadowMap();
 		glm::mat4& getLightSpaceMatrix(int);
 		std::vector<glm::mat4>& getLightSpaceMatrices();
-		void drawShadowMap(GLuint&) const;
+		void drawShadowMap(GLuint) const;
 		
 		GLuint getDepthMapID(int);
 		GLuint getDepthMapFBOID(int);

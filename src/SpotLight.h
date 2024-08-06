@@ -31,14 +31,14 @@ public:
 	void setFarPlane(const float&);
 
 	//Getters for light properties
-	glm::vec3 getLightPos();
-	glm::vec3 getLightDirection();
-	glm::vec3 getAmbient();
-	glm::vec3 getDiffuse();
-	glm::vec3 getSpecular();
-	float getIntensity();
-	float getNearPlane();
-	float getFarPlane();
+	glm::vec3 getLightPos() const;
+	glm::vec3 getLightDirection() const;
+	glm::vec3 getAmbient() const;
+	glm::vec3 getDiffuse() const;
+	glm::vec3 getSpecular() const;
+	float getIntensity() const;
+	float getNearPlane() const;
+	float getFarPlane() const;
 
 	//Private Variables
 	std::string m_DisplayName;
