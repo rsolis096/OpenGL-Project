@@ -119,10 +119,35 @@ void Object::updateObject()
     m_Model = glm::translate(m_Model, m_Position);
     // Apply scaling transformation
     m_Model = glm::scale(m_Model, m_Scale);
+
+
     // Apply Rotation
-    m_Model = glm::rotate(m_Model, glm::radians(m_Rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-    m_Model = glm::rotate(m_Model, glm::radians(m_Rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-    m_Model = glm::rotate(m_Model, glm::radians(m_Rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+    float theta_x = glm::radians(m_Rotation[0]);
+    float theta_y = glm::radians(m_Rotation[1]);
+    float theta_z = glm::radians(m_Rotation[2]);
+
+    //GLM Rotation
+    //m_Model = glm::rotate(m_Model, theta_x, glm::vec3(1.0f, 0.0f, 0.0f));
+    //m_Model = glm::rotate(m_Model, theta_y, glm::vec3(0.0f, 1.0f, 0.0f));
+    //m_Model = glm::rotate(m_Model, theta_z, glm::vec3(0.0f, 0.0f, 1.0f));
+
+    //Manual Rotation
+    glm::mat4 x_rotation = glm::mat4(1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, glm::cos(theta_x), glm::sin(theta_x), 0.0f,
+        0.0f, -glm::sin(theta_x), glm::cos(theta_x), 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f);
+
+    glm::mat4 y_rotation = glm::mat4(glm::cos(theta_y), 0.0f, -glm::sin(theta_y), 0.0f,
+        0.0f,1.0f, 0.0f, 0.0f,
+        glm::sin(theta_y), 0.0f, glm::cos(theta_y), 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f);
+
+    glm::mat4 z_rotation = glm::mat4(glm::cos(theta_z), glm::sin(theta_z), 0.0f, 0.0f,
+        -glm::sin(theta_z), glm::cos(theta_z), 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f);
+    m_Model *= x_rotation * y_rotation * z_rotation;
+
 }
 
 

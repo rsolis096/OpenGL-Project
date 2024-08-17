@@ -103,8 +103,6 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 		);
 	}
 
-	//Activate the texture units and bind the corresponding depth map
-
 	/*
 	{ // Uncomment this to render the debug quads for spotlights (cannot be rendered with the actual scene)
 		m_ShadowMap->debugDepthShader.use();
@@ -113,7 +111,7 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 		m_ShadowMap->debugDepthShader.setVec3("viewPos", mainCamera->cameraPos);
 		m_ShadowMap->debugShadowMap();
 	}*/
-
+	
 
 	
 	{ // Uncomment this to render the scene

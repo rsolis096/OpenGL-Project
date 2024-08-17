@@ -12,7 +12,7 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 
 	m_SpotLightID = m_SpotLightCount;
 	m_DisplayName = "SpotLight" + std::to_string(m_SpotLightID);
-	m_SpotLightCount++;
+	m_SpotLightCount+= 1;
 
 	//m_SpotLight takes the shape of a sphere
 	m_LightShape = new Sphere();
@@ -31,12 +31,9 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_Quadratic = 0.032f;
 	
 	m_LightingShader->use();
-	m_LightingShader->setInt("numberOfSpotLightsVERT", m_SpotLightCount);
 	m_LightingShader->setInt("numberOfSpotLightsFRAG", m_SpotLightCount);
-
 	m_LightingShader->setInt("numberOfShadowMapsVERT", m_SpotLightCount);
 	m_LightingShader->setInt("numberOfShadowMapsFRAG", m_SpotLightCount);
-
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].position", m_LightPos);
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].direction", m_LightDirection);
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].ambient", m_Ambient);
@@ -46,7 +43,7 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].linear", m_Linear);
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].quadratic", m_Quadratic);
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].cutOff", glm::cos(glm::radians(12.5f)));
-	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].outerCutOff", glm::cos(glm::radians(15.0f)));;
+	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].outerCutOff", glm::cos(glm::radians(15.0f)));
 }
 
 SpotLight::~SpotLight()
@@ -58,7 +55,7 @@ SpotLight::~SpotLight()
 	m_LightShape = nullptr;
 }
 
-void SpotLight::Draw()
+void SpotLight::Draw() const
 {
 	//These values change every frame since light is attached to camera
 	m_LightingShader->use();
@@ -125,7 +122,7 @@ void SpotLight::setNearPlane(const float& val)
 	m_NearPlane = val;
 }
 
-void SpotLight::setconstant(const float constant)
+void SpotLight::setConstant(const float constant)
 {
 	m_Constant = constant;
 	m_LightingShader->use();

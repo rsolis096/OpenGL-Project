@@ -39,6 +39,7 @@ void LightController::drawLighting()
 	for (PointLight* pointLight : m_PointLights) {
 		pointLight->Draw();
 	}
+	int counter = 0;
 	for (SpotLight* spotLights : m_SpotLights) {
 		spotLights->Draw();
 	}

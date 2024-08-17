@@ -19,7 +19,6 @@ class ShadowMap
 		const unsigned short SHADOW_WIDTH = 2048;
 		const unsigned short SHADOW_HEIGHT = 2048;
 		std::vector<glm::mat4> m_LightSpaceMatrices;
-		unsigned short m_ShadowCasters;
 		bool m_UpdateShadowMap;
 
 	public:

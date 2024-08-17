@@ -321,7 +321,6 @@ int main()
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //SHADOW PASS (Only update upon launch and press of "=" key, see func definition) 
         myScene.m_ShadowMap->ShadowPass();
         
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);

@@ -15,7 +15,7 @@ public:
 	SpotLight(Shader*, Shader* , glm::vec3 , glm::vec3 );
 	~SpotLight();
 
-	void Draw();
+	void Draw() const;
 	
 	//Setters for light properties
 	void setLightPos(const glm::vec3);
@@ -23,7 +23,7 @@ public:
 	void setAmbient(const glm::vec3 ambient);
 	void setDiffuse(const glm::vec3 diffuse);
 	void setSpecular(const glm::vec3 specular);
-	void setconstant(const float constant);
+	void setConstant(const float constant);
 	void setLinear(const float linear);
 	void setQuadratic(const float quadratic);
 	void setIntensity(const float i);
