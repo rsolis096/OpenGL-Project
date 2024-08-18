@@ -44,7 +44,8 @@ public:
     Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<ModelTexture> textures);
 
     // render the mesh
-    void Draw(Shader& shader, bool hasTexture, GLuint textureUnitOffset);
+    void Draw(Shader& shader, bool hasTexture, GLuint textureUnitOffset) const;
+    void ShadowPassDraw(Shader& shader) const;
 
 private:
     // render data 

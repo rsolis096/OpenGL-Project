@@ -28,7 +28,7 @@ public:
     Model(string const& path, bool gamma = false);
     // draws the model, and thus all its meshes
     void Draw(Shader& shader) override;
-    void ShadowMapDraw(Shader& shader) override;
+    void ShadowPassDraw(Shader& shader) override;
 
 
 private:

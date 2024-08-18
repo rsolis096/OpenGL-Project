@@ -142,7 +142,9 @@ void main()
         result += CalcSpotLight(spotLights[i], normal, viewDir, i);           
     }
 
+
     FragColor = vec4(result, 1.0);   
+   
     //FragColor = texture(material.diffuse, fs_in.TexCoords);
 
 }

@@ -8,7 +8,7 @@ ShadowMap::ShadowMap(std::vector<Object*>* objects, std::vector<SpotLight*>* spo
     //Drawn to to generate depth map
 	depthShader = Shader("shaders/shadow_mapping_depth.vert", "shaders/shadow_mapping_depth.frag");
 
-    //Drawn to to display a debug image of the depth map
+    //Drawn to display a debug image of the depth map
     debugDepthShader = Shader("shaders/debug_quad.vert", "shaders/debug_quad_depth.frag");
 
 }
@@ -101,20 +101,15 @@ void ShadowMap::ShadowPass()
 
         for (int i = 0; i < numberOfSpotLights; i++)
         {
-            // Pass the light-space matrix for the current spotlight
-            glUniformMatrix4fv(
-                glGetUniformLocation(depthShader.m_ProgramId, "shadowPassMatrix"),
-                1,
-                GL_FALSE,
-                glm::value_ptr(m_LightSpaceMatrices[i])
-            );
+
+            depthShader.setMat4("shadowPassMatrix", m_LightSpaceMatrices[i]);
 
             // Render to depth map
             glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO[i]);
             glClear(GL_DEPTH_BUFFER_BIT);
 
             for (Object* obj : *m_SceneObjects)
-                obj->Draw(depthShader);
+                obj->ShadowPassDraw(depthShader);
 
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glCheckError();
@@ -124,30 +119,34 @@ void ShadowMap::ShadowPass()
     m_UpdateShadowMap = false;
 }
 
-void ShadowMap::drawShadowMap(GLuint shaderID) const
+
+//Draws Shadow Map to scene
+void ShadowMap::drawShadowMap(Shader& shader) const
 {
-    glUseProgram(shaderID);
+	//Activate main lighting shader
+	shader.use();
 
-    for (size_t i = 0; i < depthMap.size(); ++i)
-    {
-        GLuint textureUnit = TextureManager::getNextUnit();
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
-        glBindTexture(GL_TEXTURE_2D, depthMap[i]);
+	//Send over the light space matrices generated during the shadow pass
+	shader.setMat4Array("lightSpaceMatrices", m_LightSpaceMatrices);
 
-        std::string uniformName = "shadowMap[" + std::to_string(i) + "]";
-        GLint shadowMapUniformLocation = glGetUniformLocation(shaderID, uniformName.c_str());
-        if (shadowMapUniformLocation == -1) {
-            std::cerr << "ERROR: Uniform location for " << uniformName << " not found.\n";
-            return;
-        }
+	//Apply Textures
+	for (int i = 0; i < depthMap.size(); i++)
+	{
+	    GLuint textureUnit = TextureManager::getNextUnit();
+	    glActiveTexture(GL_TEXTURE0 + textureUnit);
+	    glBindTexture(GL_TEXTURE_2D, depthMap[i]);
 
-        glUniform1i(shadowMapUniformLocation, textureUnit);
-    }
+	    std::string shadowMapLocation = "shadowMap[" + std::to_string(i) + "]";
+	    shader.setInt(shadowMapLocation, textureUnit);
+	}
 
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        std::cerr << "OpenGL error in drawShadowMap: " << error << std::endl;
-    }
+	// Set the number of shadow maps vert
+	shader.setInt("numberOfSpotLightsVERT", m_LightSpaceMatrices.size());
+
+	// Set the number of shadow maps frag
+	shader.setInt("numberOfSpotLightsFRAG", m_LightSpaceMatrices.size());
+
+	glCheckError();
 }
 
 glm::mat4& ShadowMap::getLightSpaceMatrix(int i){

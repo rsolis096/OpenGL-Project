@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+
+
 Shader::Shader(const char* vertex_path, const char* fragment_path, const char* geometry_path)
 {
     //Create Shader Program
@@ -9,6 +11,12 @@ Shader::Shader(const char* vertex_path, const char* fragment_path, const char* g
     if(geometry_path != nullptr)
         compileShader(geometry_path, "GEOMETRY", m_ProgramId);
     compileShader(fragment_path, "FRAGMENT", m_ProgramId);
+
+
+    //check if null
+    filePaths.push_back(vertex_path);
+    filePaths.push_back(fragment_path);
+
 }
 
 void Shader::compileShader(const char* shader_path, const char* type, unsigned int m_ProgramId)
@@ -107,32 +115,55 @@ void Shader::checkCompileErrors(const unsigned int id, const std::string& type, 
 
 void Shader::setBool(const std::string& name, const bool value) const
 {
-    glUniform1i(glGetUniformLocation(m_ProgramId, name.c_str()), static_cast<int>(value));
+    glUniform1i(checkUniformLocation(name), static_cast<int>(value));
 }
 
 void Shader::setInt(const std::string& name, const int value) const
 {
     // Set the value of the uniform
     glUseProgram(m_ProgramId);
-    glUniform1i(glGetUniformLocation(m_ProgramId, name.c_str()), value);
+    glUniform1i(checkUniformLocation(name), value);
+}
+
+void Shader::setUInt(const std::string& name, const unsigned int value) const
+{
+    // Set the value of the uniform
+    glUseProgram(m_ProgramId);
+    glUniform1i(checkUniformLocation(name), value);
 }
 
 void Shader::setFloat(const std::string& name, const float value) const
 {
-    glUniform1f(glGetUniformLocation(m_ProgramId, name.c_str()), value);
+    glUniform1f(checkUniformLocation(name), value);
 }
 
 void Shader::setMat4(const std::string& name, glm::mat4& value) const
 {
-    glUniformMatrix4fv(glGetUniformLocation(m_ProgramId, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+    glUniformMatrix4fv(checkUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
+}
+
+void Shader::setMat4Array(const std::string& name, const std::vector<glm::mat4>& value) const
+{
+    glUniformMatrix4fv(checkUniformLocation(name), value.size(), GL_FALSE, glm::value_ptr(value[0]));
 }
 
 void Shader::setVec3(const std::string& name, const glm::vec3& value) const
 {
-    glUniform3fv(glGetUniformLocation(m_ProgramId, name.c_str()), 1, &value[0]);
+    glUniform3fv(checkUniformLocation(name), 1, &value[0]);
 }
 
 void Shader::setVec3(const std::string& name, const float x, const float y, const float z) const
 {
-    glUniform3f(glGetUniformLocation(m_ProgramId, name.c_str()), x, y, z);
+    glUniform3f(checkUniformLocation(name), x, y, z);
+}
+
+GLint Shader::checkUniformLocation(const std::string& name) const
+{
+    GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
+    if (location == -1) {
+        std::string errorMsg = "ERROR: Uniform location for " + name + " not found in " + filePaths[0] +", " + filePaths[1];
+        std::cerr << errorMsg << "\n";
+        throw std::runtime_error(errorMsg);
+    }
+    return location;
 }

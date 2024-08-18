@@ -25,7 +25,16 @@ void main()
     vec3 ambientColor = object.ambient; 
     vec3 diffuseColor = object.diffuse;
     vec3 specularColor = object.specular;
+   
     vec3 result = ambientColor + diffuseColor + specularColor;
+
+    //Dummy operation to aviod no uniform location error
+    if (hasTexture) {
+        //Without this the variable will be optimized out
+        result += vec3(0.1f);
+    }
+
+
     FragColor = vec4(result, 1.0);
 }
 

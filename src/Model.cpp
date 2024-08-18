@@ -14,6 +14,17 @@ Model::Model(string const& path, bool gamma) : Object(), gammaCorrection(gamma)
     loadModel(path);
 }
 
+void Model::ShadowPassDraw(Shader& shader)
+{
+    shader.use();
+    shader.setMat4("model", m_Model);
+
+    for (unsigned int i = 0; i < meshes.size(); i++)
+        meshes[i].ShadowPassDraw(shader);
+
+    glCheckError();
+}
+
 void Model::Draw(Shader& shader)
 {
     shader.use();
@@ -32,17 +43,6 @@ void Model::Draw(Shader& shader)
     glCheckError();
 }
 
-void Model::ShadowMapDraw(Shader& shader)
-{
-    shader.use();
-    shader.setMat4("model", m_Model);
-    shader.setBool("hasTexture", m_HasTexture);
-
-    GLuint textureUnit = TextureManager::getNextUnit();
-    for (unsigned int i = 0; i < meshes.size(); i++)
-        meshes[i].Draw(shader, m_HasTexture, textureUnit);
-    glCheckError();
-}
 
 void Model::loadModel(string const& path)
 {
@@ -73,7 +73,7 @@ void Model::processNode(aiNode* node, const aiScene* scene)
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.push_back(processMesh(mesh, scene));
     }
-    // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
+    // after we've processed all the meshes (if any) we then recursively process each of the children nodes
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
         processNode(node->mChildren[i], scene);

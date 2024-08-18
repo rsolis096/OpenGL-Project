@@ -32,8 +32,7 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	
 	m_LightingShader->use();
 	m_LightingShader->setInt("numberOfSpotLightsFRAG", m_SpotLightCount);
-	m_LightingShader->setInt("numberOfShadowMapsVERT", m_SpotLightCount);
-	m_LightingShader->setInt("numberOfShadowMapsFRAG", m_SpotLightCount);
+	m_LightingShader->setInt("numberOfSpotLightsVERT", m_SpotLightCount);
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].position", m_LightPos);
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].direction", m_LightDirection);
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].ambient", m_Ambient);

@@ -259,7 +259,7 @@ void demoScene(Scene& demoScene)
     glm::vec3 spotLightPos1 = glm::vec3(4.0f, 3.0f, -17.0f);
     glm::vec3 spotLightDir1 = glm::normalize(glm::vec3(-2.0f, -3.0f, 20.0f));
 
-    glm::vec3 spotLightPos2 = glm::vec3(10.0f, 3.0f, 0.0f);
+    glm::vec3 spotLightPos2 = glm::vec3(4.0f, 3.0f, 0.0f);
     glm::vec3 spotLightDir2 = glm::normalize(glm::vec3(-1.50f, -1.0f, 5.0f));
 
     glm::vec3 spotLightPos3 = glm::vec3(-14.0f, 3.0f, -13.0f);

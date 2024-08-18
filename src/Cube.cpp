@@ -39,18 +39,14 @@ void Cube::Draw(Shader& shader)
     //Bind texture and send texture to fragment shader
     if (m_HasTexture)
     {
+
         glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-        GLint diffuseLocation = glGetUniformLocation(shader.m_ProgramId, "material.diffuse");
-        if (diffuseLocation != -1)
-            glUniform1i(diffuseLocation, TextureManager::getCurrentUnit()); // 0 corresponds to GL_TEXTURE0
-
+        shader.setUInt("material.diffuse", TextureManager::getCurrentUnit());
 
         glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-        GLint specularLocation = glGetUniformLocation(shader.m_ProgramId, "material.specular");
-        if (specularLocation != -1)
-            glUniform1i(specularLocation, TextureManager::getCurrentUnit()); // 1 corresponds to GL_TEXTURE1
+        shader.setUInt("material.specular", TextureManager::getCurrentUnit());
 
     }
     
@@ -65,7 +61,7 @@ void Cube::Draw(Shader& shader)
     glCheckError();
 }
 
-void Cube::ShadowMapDraw(Shader& shader)
+void Cube::ShadowPassDraw(Shader& shader)
 {
     shader.use();
     m_Model = glm::mat4(1.0f);

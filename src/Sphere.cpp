@@ -41,17 +41,17 @@ void Sphere::Draw(Shader& shader)
     //Bind texture and send texture to fragment shader
     if (m_HasTexture)
     {
-        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-        GLint diffuseLocation = glGetUniformLocation(shader.m_ProgramId, "material.diffuse");
-        if (diffuseLocation != -1)
-            glUniform1i(diffuseLocation, TextureManager::getCurrentUnit()); // 0 corresponds to GL_TEXTURE0
 
-        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
+        int diffuseUnit = TextureManager::getNextUnit();
+        glActiveTexture(GL_TEXTURE0 + diffuseUnit); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
+        shader.setUInt("material.diffuse", diffuseUnit);
+
+        int specularUnit = TextureManager::getNextUnit();
+        glActiveTexture(GL_TEXTURE0 + specularUnit); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-        GLint specularLocation = glGetUniformLocation(shader.m_ProgramId, "material.specular");
-        if (specularLocation != -1)
-            glUniform1i(specularLocation, TextureManager::getCurrentUnit()); // 1 corresponds to GL_TEXTURE1
+        shader.setUInt("material.specular", specularUnit);
+
     }
 
 
@@ -64,11 +64,12 @@ void Sphere::Draw(Shader& shader)
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glCheckError();
 
 }
 
-void Sphere::ShadowMapDraw(Shader& shader)
+void Sphere::ShadowPassDraw(Shader& shader)
 {
     shader.use();
     m_Model = glm::mat4(1.0f);

@@ -9,8 +9,20 @@ Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<ModelTe
     setupMesh();
 }
 
+void Mesh::ShadowPassDraw(Shader& shader) const
+{
+    // draw mesh
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(0);
+
+    // always good practice to set everything back to defaults once configured.
+    glActiveTexture(GL_TEXTURE0);
+    glCheckError();
+}
+
 // render the mesh
-void Mesh::Draw(Shader& shader, bool hasTexture, unsigned int textureUnitOffset)
+void Mesh::Draw(Shader& shader, bool hasTexture, unsigned int textureUnitOffset) const
 {
     // bind appropriate textures
     unsigned int normalNr = 1;

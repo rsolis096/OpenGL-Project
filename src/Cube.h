@@ -13,7 +13,7 @@ public:
 
     //Methods
     void Draw(Shader& shader) override;
-    void ShadowMapDraw(Shader& shader) override;
+    void ShadowPassDraw(Shader& shader) override;
 
 
 private:

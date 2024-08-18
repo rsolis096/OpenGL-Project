@@ -18,14 +18,14 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 lightSpaceMatrices[MAX_NR_SHADOW_MAPS];
-uniform int numberOfShadowMapsVERT;
+uniform int numberOfSpotLightsVERT;
 
 void main()
 {
     vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
     vs_out.Normal = transpose(inverse(mat3(model))) * aNormal;
     vs_out.TexCoords = aTexCoord;
-    for(int i = 0; i < numberOfShadowMapsVERT; i++)
+    for(int i = 0; i < numberOfSpotLightsVERT; i++)
     {
         vs_out.FragPosLightSpace[i] = lightSpaceMatrices[i] * vec4(vs_out.FragPos, 1.0);
     }

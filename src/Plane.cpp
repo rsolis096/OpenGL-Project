@@ -34,26 +34,21 @@ void Plane::Draw(Shader& shader)
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
     shader.setMat4("model", m_Model);
-    shader.setFloat("textureScale", (float)(50.0f));
     shader.setBool("hasTexture", m_HasTexture);
-
 
     //Bind texture and send texture to fragment shader
     if (m_HasTexture)
     {
-        glActiveTexture(GL_TEXTURE0 +TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
+        int diffuseUnit = TextureManager::getNextUnit();
+        glActiveTexture(GL_TEXTURE0 + diffuseUnit); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-        GLint diffuseLocation = glGetUniformLocation(shader.m_ProgramId, "material.specular");
-        if (diffuseLocation != -1)
-            glUniform1i(diffuseLocation, TextureManager::getCurrentUnit()); // 0 corresponds to GL_TEXTURE0
+        shader.setUInt("material.diffuse", diffuseUnit);
 
-        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
+        int specularUnit = TextureManager::getNextUnit();
+        glActiveTexture(GL_TEXTURE0 + specularUnit); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-        GLint specularLocation = glGetUniformLocation(shader.m_ProgramId, "material.specular");
-        if (specularLocation != -1)
-            glUniform1i(specularLocation, TextureManager::getCurrentUnit()); // 0 corresponds to GL_TEXTURE0
+        shader.setUInt("material.specular", specularUnit);
     }
-
 
     //Bind Plane
     glBindVertexArray(m_vao);
@@ -65,7 +60,7 @@ void Plane::Draw(Shader& shader)
     glCheckError();
 }
 
-void Plane::ShadowMapDraw(Shader& shader)
+void Plane::ShadowPassDraw(Shader& shader)
 {
     shader.use();
     m_Model = glm::mat4(1.0f);
