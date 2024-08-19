@@ -33,7 +33,7 @@ public:
 	void removePointLight();
 
 	//Spot Light methods
-	void addSpotLight(glm::vec3, glm::vec3);
+	void addSpotLight(const glm::vec3, const glm::vec3);
 	void removeSpotLight();
 
 	void drawLighting();

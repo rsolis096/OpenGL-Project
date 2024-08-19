@@ -28,7 +28,7 @@ int Scene::addObject(Object* obj)
 {
 	if (obj == nullptr)
 		return 1;
-
+	
 	std::vector<Object*>::iterator it = std::find(m_SceneObjects.begin(), m_SceneObjects.end(), obj);
 	if (it == m_SceneObjects.end())
 	{
@@ -90,36 +90,39 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 		m_ShadowMap->debugDepthShader.setMat4("view", view);
 		m_ShadowMap->debugShadowMap();
 	}*/
-
+	
 	
 	{ // Uncomment this to render the scene
 
 		//Draw Point Light Lamp (light spheres)
-		pointLightShader->use();
-		pointLightShader->setMat4("projection", proj);
-		pointLightShader->setMat4("view", view);
-
-		//Set Main Shader matrices
-		lightingShader->use();
-		lightingShader->setMat4("projection", proj);
-		lightingShader->setMat4("view", view);
-		lightingShader->setVec3("viewPos", mainCamera->cameraPos);
-
-		m_ShadowMap->drawShadowMap(*lightingShader);
-
-		//Update physics
-		m_PhysicsWorld->step(static_cast<float>(glfwGetTime()), deltaTime);
-
-		//Draw Lights
-		m_LightController->drawLighting();
-
-		//Draw Objects
-		for (Object* element : m_SceneObjects)
 		{
-			element->Draw(*lightingShader);
+			pointLightShader->use();
+			pointLightShader->setMat4("projection", proj);
+			pointLightShader->setMat4("view", view);
+
+			//Draw Lights (just the object, lighting is done in shader)
+			m_LightController->drawLighting();
 		}
 
-		m_SkyBox->draw(proj);
+		// Draw main scene and update physics
+		{
+			lightingShader->use();
+			lightingShader->setMat4("projection", proj);
+			lightingShader->setMat4("view", view);
+			lightingShader->setVec3("viewPos", mainCamera->cameraPos);
+
+			m_ShadowMap->drawShadowMap(*lightingShader);
+
+			//Update physics
+			m_PhysicsWorld->step(static_cast<float>(glfwGetTime()), deltaTime);
+
+			//Draw Objects
+			for (Object* element : m_SceneObjects){
+				element->Draw(*lightingShader);
+			}
+
+			m_SkyBox->draw(proj);
+		}
 	}
 
 	
