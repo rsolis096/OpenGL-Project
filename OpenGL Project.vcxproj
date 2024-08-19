@@ -214,6 +214,7 @@
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="depthShader.gs" />
     <None Include="shaders\SkyBoxShader.frag" />
     <None Include="shaders\SkyBoxShader.vert" />
     <None Include="shaders\debug_quad.vert" />
@@ -222,8 +223,10 @@
     <None Include="shaders\lightingShader.vert" />
     <None Include="shaders\pointLightShader.frag" />
     <None Include="shaders\pointLightShader.vert" />
-    <None Include="shaders\shadow_mapping_depth.frag" />
-    <None Include="shaders\shadow_mapping_depth.vert" />
+    <None Include="shaders\depthShader.frag" />
+    <None Include="shaders\depthShader.vert" />
+    <None Include="shaders\testShader.fs" />
+    <None Include="shaders\testShader.vs" />
     <None Include="shaders\visualizeNormals.frag" />
     <None Include="shaders\visualizeNormals.gs" />
     <None Include="shaders\visualizeNormals.vert" />

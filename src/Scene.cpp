@@ -10,14 +10,21 @@ Scene::Scene(Camera* mC)
 	mainCamera = mC;
 
 	cubeMapShader = new Shader("shaders/skyBoxShader.vert", "shaders/skyBoxShader.frag");
-	lightingShader = new Shader("shaders/lightingShader.vert", "shaders/lightingShader.frag");
-	//lightingShader = new Shader("shaders/visualizeNormals.vert", "shaders/visualizeNormals.frag", "shaders/visualizeNormals.gs");
-	pointLightShader = new Shader("shaders/pointLightShader.vert", "shaders/pointLightShader.frag");
 
+	//Enable this to use the main shader
+	//lightingShader = new Shader("shaders/lightingShader.vert", "shaders/lightingShader.frag");
+
+	//Enable this to view normals
+	//lightingShader = new Shader("shaders/visualizeNormals.vert", "shaders/visualizeNormals.frag", "shaders/visualizeNormals.gs");
+
+	//Enable this to render purely point light shadows (for implementing shadows to main shader)
+	lightingShader = new Shader("shaders/testShader.vs", "shaders/testShader.fs");
+
+	pointLightShader = new Shader("shaders/pointLightShader.vert", "shaders/pointLightShader.frag");
 	m_PhysicsWorld = new PhysicsWorld();
 
 	m_LightController = new LightController(lightingShader, pointLightShader, mainCamera, this);
-	m_ShadowMap = new ShadowMap(&m_SceneObjects, &m_LightController->m_SpotLights);
+	m_ShadowMap = new ShadowMap(&m_SceneObjects, m_LightController);
 	m_SkyBox = new SkyBox(*cubeMapShader, mainCamera);
 
 	glCheckError();
@@ -110,7 +117,9 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 			lightingShader->setMat4("projection", proj);
 			lightingShader->setMat4("view", view);
 			lightingShader->setVec3("viewPos", mainCamera->cameraPos);
+			lightingShader->setInt("depthMap", 1);
 
+			//Apply Textures to scene
 			m_ShadowMap->drawShadowMap(*lightingShader);
 
 			//Update physics

@@ -8,14 +8,18 @@ Shader::Shader(const char* vertex_path, const char* fragment_path, const char* g
     m_ProgramId = glCreateProgram();
     //Compile given shaders
     compileShader(vertex_path, "VERTEX", m_ProgramId);
-    if(geometry_path != nullptr)
-        compileShader(geometry_path, "GEOMETRY", m_ProgramId);
     compileShader(fragment_path, "FRAGMENT", m_ProgramId);
-
-
     //check if null
     filePaths.push_back(vertex_path);
     filePaths.push_back(fragment_path);
+
+    if (geometry_path != nullptr) {
+        compileShader(geometry_path, "GEOMETRY", m_ProgramId);
+        filePaths.push_back(geometry_path);
+    }
+
+
+
 
 }
 
@@ -161,9 +165,9 @@ GLint Shader::checkUniformLocation(const std::string& name) const
 {
     GLint location = glGetUniformLocation(m_ProgramId, name.c_str());
     if (location == -1) {
-        std::string errorMsg = "ERROR: Uniform location for " + name + " not found in " + filePaths[0] +", " + filePaths[1];
-        std::cerr << errorMsg << "\n";
-        throw std::runtime_error(errorMsg);
+        //std::string errorMsg = "ERROR: Uniform location for " + name + " not found in " + filePaths[0] +", " + filePaths[1];
+        //std::cerr << errorMsg << "\n";
+        //throw std::runtime_error(errorMsg);
     }
     return location;
 }

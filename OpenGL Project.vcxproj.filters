@@ -280,16 +280,25 @@
     <None Include="shaders\visualizeNormals.gs">
       <Filter>Source Files\Shaders\Geometry</Filter>
     </None>
-    <None Include="shaders\shadow_mapping_depth.frag">
+    <None Include="shaders\depthShader.frag">
       <Filter>Source Files\Shaders\Fragment</Filter>
     </None>
-    <None Include="shaders\shadow_mapping_depth.vert">
+    <None Include="shaders\depthShader.vert">
       <Filter>Source Files\Shaders\Vertex</Filter>
     </None>
     <None Include="shaders\visualizeNormals.frag">
       <Filter>Source Files\Shaders\Fragment</Filter>
     </None>
     <None Include="shaders\visualizeNormals.vert">
+      <Filter>Source Files\Shaders\Vertex</Filter>
+    </None>
+    <None Include="depthShader.gs">
+      <Filter>Source Files\Shaders\Geometry</Filter>
+    </None>
+    <None Include="shaders\testShader.fs">
+      <Filter>Source Files\Shaders\Fragment</Filter>
+    </None>
+    <None Include="shaders\testShader.vs">
       <Filter>Source Files\Shaders\Vertex</Filter>
     </None>
   </ItemGroup>

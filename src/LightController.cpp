@@ -14,6 +14,7 @@ LightController::LightController
 void LightController::addPointLight(const glm::vec3& pos)
 {
 	m_PointLights.push_back(new PointLight(m_LightingShader, m_LightSourceShader, pos));
+	m_Scene->m_ShadowMap->addCubeMap();
 	glCheckError();
 }
 

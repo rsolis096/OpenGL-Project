@@ -63,7 +63,6 @@ void Plane::Draw(Shader& shader)
 void Plane::ShadowPassDraw(Shader& shader)
 {
     shader.use();
-    m_Model = glm::mat4(1.0f);
     shader.setMat4("model", m_Model);
 
     //Bind Plane and render
@@ -81,13 +80,13 @@ void Plane::buildPlane()
     //Pre Defined cube vertices, normals, and TexCoords
     float planeVertices[] = {
         // positions            // normals         // texcoords
-         25.0f, -0.5f,  25.0f,  0.0f, -1.0f, 0.0f,  25.0f,  0.0f,
-        -25.0f, -0.5f,  25.0f,  0.0f, -1.0f, 0.0f,   0.0f,  0.0f,
-        -25.0f, -0.5f, -25.0f,  0.0f, -1.0f, 0.0f,   0.0f, 25.0f,
-                                      
-         25.0f, -0.5f,  25.0f,  0.0f, -1.0f, 0.0f,  25.0f,  0.0f,
-        -25.0f, -0.5f, -25.0f,  0.0f, -1.0f, 0.0f,   0.0f, 25.0f,
-         25.0f, -0.5f, -25.0f,  0.0f, -1.0f, 0.0f,  25.0f, 25.0f
+         25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
+        -25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+        -25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+
+         25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
+        -25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+         25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,  25.0f, 25.0f
     };
 
 
