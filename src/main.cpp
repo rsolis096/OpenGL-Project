@@ -251,26 +251,28 @@ void demoScene(Scene& demoScene)
     demoScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
     demoScene.addObject(new Plane());
 
-	demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
+    demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[1]);
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[2]);
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[3]);
 
     glm::vec3 spotLightPos1 = glm::vec3(4.0f, 3.0f, -17.0f);
-    glm::vec3 spotLightDir1 = glm::normalize(glm::vec3(-2.0f, -3.0f, 20.0f));
+    glm::vec3 spotLightDir1 = glm::vec3(-20.0f, -5.0f, 45.0f);
+    spotLightDir1 = glm::normalize(spotLightDir1 - spotLightPos1);
 
-    glm::vec3 spotLightPos2 = glm::vec3(4.0f, 3.0f, 0.0f);
-    glm::vec3 spotLightDir2 = glm::normalize(glm::vec3(-1.50f, -1.0f, 5.0f));
+    glm::vec3 spotLightPos2 = glm::vec3(10.0f, 3.0f, 0.0f);
+    glm::vec3 spotLightDir2 = glm::vec3(-4.50f, -3.0f, 14.0f);
+    spotLightDir2 = glm::normalize(spotLightDir2 - spotLightPos2);
 
     glm::vec3 spotLightPos3 = glm::vec3(-14.0f, 3.0f, -13.0f);
-    glm::vec3 spotLightDir3 = glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::vec3 spotLightDir3 = glm::vec3(0.0f, 0.0f, 1.0f);
+    spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
 
     demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
     demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
-    //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
-    //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
+    demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
-    demoScene.m_LightController->addPointLight(glm::vec3(0.0f,10.0f,0.0f));
+    demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 10.0f, 0.0f));
 
     //Cube
     demoScene.m_SceneObjects[1]->setPosition(glm::vec3(4.0f, 3.0f, 0.0));

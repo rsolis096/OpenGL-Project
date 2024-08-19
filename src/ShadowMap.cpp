@@ -13,7 +13,8 @@ ShadowMap::ShadowMap(std::vector<Object*>* objects, std::vector<SpotLight*>* spo
 
 }
 
-//Called when adding a new light source (currently only spotlight)
+// This function adds a new shadow map for a spotlight in the scene.
+// It generates a frame buffer object (FBO) and a depth map texture for the new spotlight.
 void ShadowMap::addShadowMap()
 {
     depthMapFBO.push_back(0);

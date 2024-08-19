@@ -1,5 +1,7 @@
 #include "Cube.h"
 
+#include <glm/gtx/string_cast.hpp>
+
 unsigned int Cube::cubeCount = 0;
 
 //Used for creating a Primtive with texture information
@@ -30,10 +32,10 @@ Cube::Cube() : Object()
 void Cube::Draw(Shader& shader)
 {
     shader.use();
+    shader.setMat4("model", m_Model);
     shader.setVec3("object.ambient", m_Ambient);
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
-    shader.setMat4("model", m_Model);
     shader.setBool("hasTexture", m_HasTexture);
 
     //Bind texture and send texture to fragment shader
@@ -64,7 +66,6 @@ void Cube::Draw(Shader& shader)
 void Cube::ShadowPassDraw(Shader& shader)
 {
     shader.use();
-    m_Model = glm::mat4(1.0f);
     shader.setMat4("model", m_Model);
 
     //Bind Cube and render

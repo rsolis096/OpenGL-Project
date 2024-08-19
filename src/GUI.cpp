@@ -233,12 +233,31 @@ else if (currentTab == 2)
 						glm::vec3 pos = selectedObject->m_Position;
 						float vec4f[3] = { pos[0], pos[1], pos[2] };
 						ImGui::Text("Current Object Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
-						if (ImGui::InputFloat3("##Position", vec4f))
-						 {			
+
+						if (ImGui::DragFloat("x##position", &vec4f[0], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+						{
+
 							selectedObject->setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
 							selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
 							selectedObject->startFall = glfwGetTime();
 						}
+
+						if (ImGui::DragFloat("y##position", &vec4f[1], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+						{
+
+							selectedObject->setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+							selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
+							selectedObject->startFall = glfwGetTime();
+						}
+
+						if (ImGui::DragFloat("z##position", &vec4f[2], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+						{
+
+							selectedObject->setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+							selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
+							selectedObject->startFall = glfwGetTime();
+						}
+
 					}
 					
 					// Scaling
@@ -251,18 +270,18 @@ else if (currentTab == 2)
 						float sZ = selectedObject->m_Scale[2];
 						glm::vec3 currentScale = glm::vec3(sX, sY, sZ);
 
-						if (ImGui::DragFloat("x##scale", &sX, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						if (ImGui::DragFloat("x##scale", &sX, 0.1f, 0.0f, 360.0f, "%.2f", 0))
 						{
 
 							currentScale[0] = sX;
 							selectedObject->setScale(currentScale);
 						}
-						if (ImGui::DragFloat("y##scale", &sY, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						if (ImGui::DragFloat("y##scale", &sY, 0.1f, 0.0f, 360.0f, "%.2f", 0))
 						{
 							currentScale[1] = sY;
 							selectedObject->setScale(currentScale);
 						}
-						if (ImGui::DragFloat("z##scale", &sZ, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						if (ImGui::DragFloat("z##scale", &sZ, 0.1f, 0.0f, 360.0f, "%.2f", 0))
 						{
 							currentScale[2] = sZ;
 							selectedObject->setScale(currentScale);
@@ -282,18 +301,18 @@ else if (currentTab == 2)
 
 						glm::vec3 currentRotation = glm::vec3(rX, rY, rZ);
 
-						if (ImGui::DragFloat("x##rotation", &rX, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						if (ImGui::DragFloat("x##rotation", &rX, 0.5f, 0.0f, 360.0f, "%.2f", 0))
 						{
 							
 							currentRotation.x = rX;
 							selectedObject->setRotation(currentRotation);
 						}
-						if (ImGui::DragFloat("y##rotation", &rY, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						if (ImGui::DragFloat("y##rotation", &rY, 0.5f, 0.0f, 360.0f, "%.2f", 0))
 						{
 							currentRotation.y = rY;
 							selectedObject->setRotation(currentRotation);
 						}
-						if (ImGui::DragFloat("z##rotation", &rZ, 1.0f, 0.0f, 360.0f, "%.2f", 0))
+						if (ImGui::DragFloat("z##rotation", &rZ, 0.5f, 0.0f, 360.0f, "%.2f", 0))
 						{
 							currentRotation.z = rZ;
 							selectedObject->setRotation(currentRotation);
@@ -449,8 +468,8 @@ else if (currentTab == 2)
 							ImGui::Text("SpotLight");
 							if (ImGui::DragFloat("Intensity", &intensity, 0.5f, 1.0f, 100.0f, "%.2f", 0))
 							{
-								if (intensity <= 0)
-									intensity = 1;
+								if (intensity < 0)
+									intensity = 0;
 								selectedSpotLight->setIntensity(intensity);
 								selectedSpotLight->setDiffuse(diffuse);
 								selectedSpotLight->setDiffuse(ambient);

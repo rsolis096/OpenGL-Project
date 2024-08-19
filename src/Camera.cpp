@@ -10,7 +10,7 @@ const float FOV = 80.0f;
 Camera::Camera() : m_Yaw(YAW), m_Pitch(PITCH),
     m_MovementSpeed(SPEED), m_MouseSensitivity(SENSITIVITY), m_FOV(FOV)
 {
-    cameraPos = glm::vec3(0.0f, 2.0f, 0.0f);
+    cameraPos = glm::vec3(-1.0f, 0.0f, 2.0f);
     worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
     cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
     cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);

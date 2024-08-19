@@ -42,15 +42,13 @@ void Sphere::Draw(Shader& shader)
     if (m_HasTexture)
     {
 
-        int diffuseUnit = TextureManager::getNextUnit();
-        glActiveTexture(GL_TEXTURE0 + diffuseUnit); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-        shader.setUInt("material.diffuse", diffuseUnit);
+        shader.setUInt("material.diffuse", TextureManager::getCurrentUnit());
 
-        int specularUnit = TextureManager::getNextUnit();
-        glActiveTexture(GL_TEXTURE0 + specularUnit); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-        shader.setUInt("material.specular", specularUnit);
+        shader.setUInt("material.specular", TextureManager::getCurrentUnit());
 
     }
 
@@ -72,7 +70,6 @@ void Sphere::Draw(Shader& shader)
 void Sphere::ShadowPassDraw(Shader& shader)
 {
     shader.use();
-    m_Model = glm::mat4(1.0f);
     shader.setMat4("model", m_Model);
 
     //Bind Sphere
