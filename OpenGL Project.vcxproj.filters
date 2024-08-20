@@ -292,14 +292,14 @@
     <None Include="shaders\visualizeNormals.vert">
       <Filter>Source Files\Shaders\Vertex</Filter>
     </None>
-    <None Include="depthShader.gs">
-      <Filter>Source Files\Shaders\Geometry</Filter>
-    </None>
     <None Include="shaders\testShader.fs">
       <Filter>Source Files\Shaders\Fragment</Filter>
     </None>
     <None Include="shaders\testShader.vs">
       <Filter>Source Files\Shaders\Vertex</Filter>
+    </None>
+    <None Include="shaders\depthShader.gs">
+      <Filter>Source Files\Shaders\Geometry</Filter>
     </None>
   </ItemGroup>
 </Project>

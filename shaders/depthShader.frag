@@ -16,6 +16,10 @@ void main()
     
         // write this as modified depth
         gl_FragDepth = lightDistance;
+    }    
+    else if (lightType == 1)
+    {
+        gl_FragDepth = gl_FragCoord.z; // For spotlights, use the default depth value
     }
 
 }

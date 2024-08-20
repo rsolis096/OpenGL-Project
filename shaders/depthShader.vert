@@ -14,6 +14,6 @@ void main()
 	}
 	else if (lightType == 1)
 	{
-		gl_Position = shadowPassMatrix * model * vec4(aPos, 1.0);
+		gl_Position = shadowPassMatrix  * model * vec4(aPos, 1.0);
 	}
 }

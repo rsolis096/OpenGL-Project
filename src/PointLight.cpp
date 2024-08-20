@@ -55,6 +55,8 @@ PointLight::~PointLight()
 void PointLight::Draw()
 {
 	//Render the light Object
+	m_LightingShader->use();
+	m_LightingShader->setInt("lightType", 0);
 	m_LightShape->Draw(*m_LightSourceShader);
 }
 

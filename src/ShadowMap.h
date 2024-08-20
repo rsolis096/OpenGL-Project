@@ -13,11 +13,16 @@ class ShadowMap
 	private:
 
 		std::vector<Object*>* m_SceneObjects;
+
+		std::vector<SpotLight*>* m_SpotLights;
+
+
+
 		LightController* m_LightController;
 
 		//Spot Lights
-		std::vector<GLuint> depthMapFBO;
-		std::vector<GLuint> depthMap;
+		std::vector<GLuint> depthMapFBOSpotLights;
+		std::vector<GLuint> depthMapSpotLights;
 
 
 
@@ -36,13 +41,13 @@ class ShadowMap
 
 		Shader depthShader;
 		Shader debugDepthShader;
-		ShadowMap(std::vector<Object*>*, LightController*);
+		ShadowMap(std::vector<Object*>*, LightController*, std::vector<SpotLight*>*);
 		void ShadowPass();
 		void addShadowMap();
 		void addCubeMap();
 		glm::mat4& getLightSpaceMatrix(int);
 		std::vector<glm::mat4>& getLightSpaceMatrices();
-		void drawShadowMap(Shader&) const;
+		void updateShaderUniforms(Shader&) const;
 		
 		GLuint getDepthMapID(int);
 		GLuint getDepthMapFBOID(int);

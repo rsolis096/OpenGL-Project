@@ -268,11 +268,11 @@ void demoScene(Scene& demoScene)
     glm::vec3 spotLightDir3 = glm::vec3(0.0f, 0.0f, 1.0f);
     spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
 
-    //demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
-    //demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
+    demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
+    demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
     //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
-    demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 10.0f, 0.0f));
+    //demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 10.0f, 0.0f));
 
     //Cube
     demoScene.m_SceneObjects[1]->setPosition(glm::vec3(4.0f, 3.0f, 0.0));
@@ -303,7 +303,6 @@ int main()
     glm::mat4 projection = glm::mat4(1.0f);;
 
     glCheckError();
-    float near_plane = 1.0f, far_plane = 7.5f;
     
     //Main loop
     while (!glfwWindowShouldClose(window))

@@ -63,13 +63,18 @@ in VS_OUT {
     vec4 FragPosLightSpace[MAX_NR_SHADOW_MAPS];
 } fs_in;
 
+
+uniform samplerCube depthMap;
+uniform float far_plane;
+
+
 //Player Position
 uniform vec3 viewPos;
 
 //Scene Light Objects
 uniform DirLight dirLight;
 uniform PointLight pointLights[MAX_NR_POINT_LIGHTS];
-uniform int numberOfPointLights;
+uniform int numberOfPointLightsFRAG;
 uniform SpotLight spotLights[MAX_NR_SPOT_LIGHTS];
 uniform int numberOfSpotLightsFRAG;
 
@@ -83,7 +88,7 @@ uniform bool hasTexture;
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int mapIndex);
 
-float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition, int mapIndex)
+float SpotLightShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition, int mapIndex)
 {
     vec3 lightDirection = normalize(lightPosition - fragPosLightSpace.xyz);
 
@@ -119,11 +124,57 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition, int mapIndex
     return shadow / 9.0;
 }
 
+// array of offset direction for sampling
+vec3 gridSamplingDisk[20] = vec3[]
+(
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
+
+float PointLightShadowCalculation(vec3 fragPos, vec3 lightPos)
+{
+    vec3 fragToLight = fragPos - lightPos;
+
+    float currentDepth = length(fragToLight);
+
+    // PCF
+    float shadow = 0.0;
+    float bias = 0.5; 
+    float samples = 4.0;
+    float offset = 0.1;
+    for(float x = -offset; x < offset; x += offset / (samples * 0.5))
+    {
+        for(float y = -offset; y < offset; y += offset / (samples * 0.5))
+        {
+            for(float z = -offset; z < offset; z += offset / (samples * 0.5))
+            {
+                float closestDepth = texture(depthMap, fragToLight + vec3(x, y, z)).r; // use lightdir to lookup cubemap
+                closestDepth *= far_plane;   // Undo mapping [0;1]
+                if(currentDepth - bias > closestDepth)
+                    shadow += 1.0;
+            }
+        }
+    }
+    shadow /= (samples * samples * samples);
+
+    
+
+    
+        
+    // display closestDepth as debug (to visualize depth cubemap)
+    // FragColor = vec4(vec3(closestDepth / far_plane), 1.0);    
+        
+    return shadow;
+}
+
 void main()
 {
     
     // properties
-    vec3 normal = gl_FrontFacing ? normalize(fs_in.Normal) : -normalize(fs_in.Normal);
+    vec3 normal = normalize(fs_in.Normal);
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
     vec3 result;
 
@@ -131,7 +182,7 @@ void main()
 
     // phase 2: point lights
     
-    for(int i = 0; i < numberOfPointLights; i++)
+    for(int i = 0; i < numberOfPointLightsFRAG; i++)
     {
         result += CalcPointLight(pointLights[i], normal, viewDir);           
     }
@@ -176,7 +227,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
     }
 
     //Calculate shade factor of fragment
-    float shadow = ShadowCalculation(fs_in.FragPosLightSpace[lightIndex], light.position, lightIndex);                      
+    float shadow = SpotLightShadowCalculation(fs_in.FragPosLightSpace[lightIndex], light.position, lightIndex);                      
 
     //Apply colors
     vec3 diffuse;
@@ -224,22 +275,16 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
 	
     // calculate diffuse 
     vec3 lightDir = normalize(light.position - fs_in.FragPos);
-    float diff = dot(normal, lightDir);
+    float diff = max(dot(lightDir, normal), 0.0f);
     
-    //If the light is not directed at fragment, return no color
-    if(diff < 0.0f){
-        return vec3(0.0f);
-    }
-
-
     // calculate specular
     vec3 reflectDir = reflect(-lightDir, normal);  
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
     //Blinn-Phong halfway vector
     vec3 halfwayDir = normalize(lightDir + viewDir);  
-    spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
-    
+
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
+
     //Apply light
     if(hasTexture)
     {
@@ -267,7 +312,10 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
     diffuse   *= attenuation;
     specular *= attenuation;   
         
-    vec3 result = ambient + diffuse + specular;
+    //Calculate shade factor of fragment
+    float shadow = PointLightShadowCalculation(fs_in.FragPos, light.position);                      
+
+    vec3 result = (ambient + (1.0 - shadow) * (diffuse + specular));    
 
     return result;
 }

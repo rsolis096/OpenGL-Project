@@ -56,6 +56,8 @@ SpotLight::~SpotLight()
 
 void SpotLight::Draw() const
 {
+	m_LightingShader->use();
+	m_LightingShader->setInt("lightType", 1);
 	if(m_LightShape != nullptr)
 		m_LightShape->Draw(*m_LightSourceShader);
 }

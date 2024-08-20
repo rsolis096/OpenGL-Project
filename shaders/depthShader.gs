@@ -1,4 +1,5 @@
 #version 330 core
+
 layout (triangles) in;
 layout (triangle_strip, max_vertices=18) out;
 
@@ -23,5 +24,17 @@ void main()
             }    
             EndPrimitive();
         }
+    }    
+
+    //Immitate default behavour of the depth shader (spot light)
+    else if (lightType == 1) // Spot Light
+    {
+        for (int i = 0; i < 3; ++i) // for each triangle's vertices
+        {
+            FragPos = gl_in[i].gl_Position;
+            gl_Position = FragPos;
+            EmitVertex();
+        }
+        EndPrimitive();
     }
 } 
