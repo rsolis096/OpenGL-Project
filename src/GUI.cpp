@@ -512,30 +512,20 @@ else if (currentTab == 2)
 
 						// Position
 						{
+
 							//For transformation
 							glm::vec3 pos = selectedSpotLight->getLightPos();
 							float vec4f[3] = { pos[0], pos[1], pos[2] };
 							ImGui::Text("Current Light Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
 
 							if (ImGui::DragFloat("x##spotlight_position", &vec4f[0], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
-							{
-
 								selectedSpotLight->setLightPos(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
-							}
 
 							if (ImGui::DragFloat("y##spotlight_position", &vec4f[1], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
-							{
-
 								selectedSpotLight->setLightPos(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
-
-							}
 
 							if (ImGui::DragFloat("z##spotlight_position", &vec4f[2], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
-							{
-
 								selectedSpotLight->setLightPos(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
-
-							}
 
 						}
 
@@ -659,16 +649,23 @@ else if (currentTab == 2)
 							ImGui::Spacing();
 						}
 
-						// Light Position
+						// Position
 						{
-							ImGui::Spacing();
-							glm::vec3 lightPosition = selectedPointLight->getLightPos();
-							float pos[3] = { lightPosition[0], lightPosition[1], lightPosition[2] };
-							ImGui::Text("Position");
-							if (ImGui::InputFloat3("##Position", pos, "%.3f", 0))
-							{
-								selectedPointLight->setLightPos(glm::vec3(pos[0], pos[1], pos[2]));
-							}
+
+							//For transformation
+							glm::vec3 pos = selectedPointLight->getLightPos();
+							float vec4f[3] = { pos[0], pos[1], pos[2] };
+							ImGui::Text("Current Light Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
+
+							if (ImGui::DragFloat("x##spotlight_position", &vec4f[0], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+								selectedPointLight->setLightPos(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+
+							if (ImGui::DragFloat("y##spotlight_position", &vec4f[1], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+								selectedPointLight->setLightPos(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+
+							if (ImGui::DragFloat("z##spotlight_position", &vec4f[2], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+								selectedPointLight->setLightPos(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+
 						}
 
 					}

@@ -29,13 +29,13 @@ void main()
     vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
     vs_out.Normal = transpose(inverse(mat3(model))) * aNormal;
     vs_out.TexCoords = aTexCoords;
+    gl_Position = projection * view * vec4(vs_out.FragPos, 1.0);
 
-    //Calculate the light space position of the fragment for SpotLights
-
+    if(lightType == 1)
+    {
         for(int i = 0; i < numberOfSpotLightsVERT; i++)
         {
             vs_out.FragPosLightSpace[i] = lightSpaceMatrices[i] * vec4(vs_out.FragPos, 1.0);
         }
-    
-    gl_Position = projection * view * vec4(vs_out.FragPos, 1.0);
+    }
 };

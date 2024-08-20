@@ -24,7 +24,7 @@ Scene::Scene(Camera* mC)
 	m_PhysicsWorld = new PhysicsWorld();
 
 	m_LightController = new LightController(lightingShader, pointLightShader, mainCamera, this);
-	m_ShadowMap = new ShadowMap(&m_SceneObjects, m_LightController, &m_LightController->m_SpotLights);
+	m_ShadowMap = new ShadowMap(&m_SceneObjects, m_LightController);
 	m_SkyBox = new SkyBox(*cubeMapShader, mainCamera);
 
 	glCheckError();

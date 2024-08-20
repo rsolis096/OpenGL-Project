@@ -5,9 +5,6 @@ const int MAX_NR_POINT_LIGHTS = 8;
 const int MAX_NR_SPOT_LIGHTS = 8;
 const int MAX_NR_SHADOW_MAPS = 8;
 
-//Shadow Map
-uniform sampler2D shadowMap[MAX_NR_SHADOW_MAPS];
-
 //Used if a texture is present
 struct Material {
     float shininess;
@@ -32,7 +29,9 @@ struct PointLight {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    samplerCube shadowMap;
 };
+
 
 struct SpotLight {
     vec3 position;
@@ -45,6 +44,7 @@ struct SpotLight {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;       
+    sampler2D shadowMap;
 };
 
 //Object color properties (used if texture is not available or if you want to change tint of texture)
@@ -64,7 +64,6 @@ in VS_OUT {
 } fs_in;
 
 
-uniform samplerCube depthMap;
 uniform float far_plane;
 
 
@@ -86,11 +85,11 @@ uniform bool hasTexture;
 // function prototypes
 //vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir);
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int mapIndex);
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex);
 
-float SpotLightShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition, int mapIndex)
+float SpotLightShadowCalculation(vec4 fragPosLightSpace, SpotLight light)
 {
-    vec3 lightDirection = normalize(lightPosition - fragPosLightSpace.xyz);
+    vec3 lightDirection = normalize(light.position - fragPosLightSpace.xyz);
 
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     vec3 shadowCoords = projCoords * 0.5 + vec3(0.5);
@@ -98,7 +97,7 @@ float SpotLightShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition, int
     float diffuseFactor = dot(fs_in.Normal, -lightDirection);
     float bias = 0.005; // Adjust as necessary
 
-    vec2 texelSize = 1.0 / textureSize(shadowMap[mapIndex], 0); // Get the actual texel size
+    vec2 texelSize = 1.0 / textureSize(light.shadowMap, 0); // Get the actual texel size
 
     float shadow = 0.0;
     
@@ -108,7 +107,7 @@ float SpotLightShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition, int
         for(int y = -1; y <= 1; y++)
         {
             vec2 offset = vec2(x, y) * texelSize;
-            float depth = texture(shadowMap[mapIndex], shadowCoords.xy + offset).r;
+            float depth = texture(light.shadowMap, shadowCoords.xy + offset).r;
 
             if(depth + bias < shadowCoords.z)
             {
@@ -134,9 +133,9 @@ vec3 gridSamplingDisk[20] = vec3[]
    vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
 );
 
-float PointLightShadowCalculation(vec3 fragPos, vec3 lightPos)
+float PointLightShadowCalculation(vec3 fragPos, PointLight light)
 {
-    vec3 fragToLight = fragPos - lightPos;
+    vec3 fragToLight = fragPos - light.position;
 
     float currentDepth = length(fragToLight);
 
@@ -151,7 +150,7 @@ float PointLightShadowCalculation(vec3 fragPos, vec3 lightPos)
         {
             for(float z = -offset; z < offset; z += offset / (samples * 0.5))
             {
-                float closestDepth = texture(depthMap, fragToLight + vec3(x, y, z)).r; // use lightdir to lookup cubemap
+                float closestDepth = texture(light.shadowMap, fragToLight + vec3(x, y, z)).r; // use lightdir to lookup cubemap
                 closestDepth *= far_plane;   // Undo mapping [0;1]
                 if(currentDepth - bias > closestDepth)
                     shadow += 1.0;
@@ -227,7 +226,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
     }
 
     //Calculate shade factor of fragment
-    float shadow = SpotLightShadowCalculation(fs_in.FragPosLightSpace[lightIndex], light.position, lightIndex);                      
+    float shadow = SpotLightShadowCalculation(fs_in.FragPosLightSpace[lightIndex], light);                      
 
     //Apply colors
     vec3 diffuse;
@@ -313,7 +312,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
     specular *= attenuation;   
         
     //Calculate shade factor of fragment
-    float shadow = PointLightShadowCalculation(fs_in.FragPos, light.position);                      
+    float shadow = PointLightShadowCalculation(fs_in.FragPos, light);                      
 
     vec3 result = (ambient + (1.0 - shadow) * (diffuse + specular));    
 
