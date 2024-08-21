@@ -4,30 +4,30 @@
 std::vector<std::vector<std::string>> SkyBox::m_CubeMapPaths = {
 
     {
-        "Assets/skybox/city/right.jpg",
-        "Assets/skybox/city/left.jpg",
-        "Assets/skybox/city/top.jpg",
-        "Assets/skybox/city/bottom.jpg",
-        "Assets/skybox/city/front.jpg",
-        "Assets/skybox/city/back.jpg"
+        "assets/skybox/city/right.jpg",
+        "assets/skybox/city/left.jpg",
+        "assets/skybox/city/top.jpg",
+        "assets/skybox/city/bottom.jpg",
+        "assets/skybox/city/front.jpg",
+        "assets/skybox/city/back.jpg"
     }
     ,
     {
-        "Assets/skybox/water/right.jpg",
-        "Assets/skybox/water/left.jpg",
-        "Assets/skybox/water/top.jpg",
-        "Assets/skybox/water/bottom.jpg",
-        "Assets/skybox/water/front.jpg",
-        "Assets/skybox/water/back.jpg"
+        "assets/skybox/water/right.jpg",
+        "assets/skybox/water/left.jpg",
+        "assets/skybox/water/top.jpg",
+        "assets/skybox/water/bottom.jpg",
+        "assets/skybox/water/front.jpg",
+        "assets/skybox/water/back.jpg"
     }
     ,
     {
-        "Assets/skybox/mountain/right.jpg",
-        "Assets/skybox/mountain/left.jpg",
-        "Assets/skybox/mountain/top.jpg",
-        "Assets/skybox/mountain/bottom.jpg",
-        "Assets/skybox/mountain/front.jpg",
-        "Assets/skybox/mountain/back.jpg"
+        "assets/skybox/mountain/right.jpg",
+        "assets/skybox/mountain/left.jpg",
+        "assets/skybox/mountain/top.jpg",
+        "assets/skybox/mountain/bottom.jpg",
+        "assets/skybox/mountain/front.jpg",
+        "assets/skybox/mountain/back.jpg"
     }
 };
 

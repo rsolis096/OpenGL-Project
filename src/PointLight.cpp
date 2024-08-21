@@ -33,7 +33,7 @@ PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::
 
 	//Set these properties in the lightingShader.frag for the corresponding lightsource at index m_LightID
 	m_LightingShader->use();
-	m_LightingShader->setInt("numberOfPointLights", m_PointLightCount);
+	m_LightingShader->setInt("numberOfPointLightsFRAG", m_PointLightCount);
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].ambient", m_Ambient);
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].diffuse", m_Diffuse);
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].specular", m_Specular);

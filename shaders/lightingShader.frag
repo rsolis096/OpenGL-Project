@@ -83,7 +83,7 @@ uniform Object object;
 uniform bool hasTexture;
 
 // function prototypes
-//vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
+vec3 CalcDirLight(vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex);
 
@@ -178,7 +178,7 @@ void main()
     vec3 result;
 
     // phase 1: directional lights
-
+    result += CalcDirLight(normal, viewDir);
     // phase 2: point lights
     
     for(int i = 0; i < numberOfPointLightsFRAG; i++)
@@ -317,4 +317,8 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
     vec3 result = (ambient + (1.0 - shadow) * (diffuse + specular));    
 
     return result;
+}
+
+vec3 CalcDirLight(vec3 normal, vec3 viewDir){
+    return vec3(0.0f);
 }

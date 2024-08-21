@@ -246,9 +246,10 @@ GLFWwindow* setupWindow()
 void demoScene(Scene& demoScene)
 {
     //GENERATE INITIAL SCENE (ALL OF THESE CAN BE CHANGED IN REAL TIME)
-    demoScene.addObject(new Model("Assets/models/backpack/backpack.obj"));
-    demoScene.addObject(new Cube("Assets/container2.png", "Assets/container2_specular.png"));
-    demoScene.addObject(new Sphere("Assets/globe.jpg", "Assets/globe.jpg"));
+    //demoScene.addObject(new Model("assets/models/backpack/backpack.obj"));
+    demoScene.addObject(new Model("assets/models/sponza_gltf/scene.gltf"));
+    demoScene.addObject(new Cube("assets/container2.png", "assets/container2_specular.png"));
+    demoScene.addObject(new Sphere("assets/globe.jpg", "assets/globe.jpg"));
     demoScene.addObject(new Plane());
 
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
@@ -260,19 +261,22 @@ void demoScene(Scene& demoScene)
     glm::vec3 spotLightDir1 = glm::vec3(-20.0f, -5.0f, 45.0f);
     spotLightDir1 = glm::normalize(spotLightDir1 - spotLightPos1);
 
-    glm::vec3 spotLightPos2 = glm::vec3(10.0f, 3.0f, 0.0f);
-    glm::vec3 spotLightDir2 = glm::vec3(-4.50f, -3.0f, 14.0f);
+    glm::vec3 spotLightPos2 = glm::vec3(10.0f, 7.0f, 0.0f);
+    glm::vec3 spotLightDir2 = glm::vec3(-14.0f, 0.0f, 0.0f);
     spotLightDir2 = glm::normalize(spotLightDir2 - spotLightPos2);
 
     glm::vec3 spotLightPos3 = glm::vec3(-14.0f, 3.0f, -13.0f);
     glm::vec3 spotLightDir3 = glm::vec3(0.0f, 0.0f, 1.0f);
     spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
 
-    demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
-    demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
+    //demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
+    //demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
     //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
-    //demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 10.0f, 0.0f));
+    demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 20.0f, 0.0f));
+    demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 5.0f, 0.0f));
+    demoScene.m_LightController->addPointLight(glm::vec3(10.0f, 5.0f, 10.0f));
+
 
     //Cube
     demoScene.m_SceneObjects[1]->setPosition(glm::vec3(4.0f, 3.0f, 0.0));
@@ -280,8 +284,8 @@ void demoScene(Scene& demoScene)
     //Sphere
     demoScene.m_SceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
     //Model
-    demoScene.m_SceneObjects[0]->setPosition(glm::vec3(-1.0f, 2.0f, 10.0f));
-    demoScene.m_SceneObjects[0]->setScale(glm::vec3(1.0f));
+    demoScene.m_SceneObjects[0]->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    demoScene.m_SceneObjects[0]->setScale(glm::vec3(0.01f));
     demoScene.m_SceneObjects[0]->setRotation(glm::vec3(0.0f, 180.0f, 0.0f));
 }
 

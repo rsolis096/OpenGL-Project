@@ -657,13 +657,13 @@ else if (currentTab == 2)
 							float vec4f[3] = { pos[0], pos[1], pos[2] };
 							ImGui::Text("Current Light Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
 
-							if (ImGui::DragFloat("x##spotlight_position", &vec4f[0], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+							if (ImGui::DragFloat("x##pointlight_position", &vec4f[0], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
 								selectedPointLight->setLightPos(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
 
-							if (ImGui::DragFloat("y##spotlight_position", &vec4f[1], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+							if (ImGui::DragFloat("y##pointlight_position", &vec4f[1], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
 								selectedPointLight->setLightPos(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
 
-							if (ImGui::DragFloat("z##spotlight_position", &vec4f[2], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+							if (ImGui::DragFloat("z##pointlight_position", &vec4f[2], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
 								selectedPointLight->setLightPos(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
 
 						}
