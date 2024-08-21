@@ -23,7 +23,16 @@
 
 ## How To Run
 
-View the releases tab to download an executable of the program. Running the project in Visual Studio requires building your own assimp-vc143-mt.dll (Release), assimp-vc143-mtd.dll (Debug) via https://github.com/assimp/assimp
+- View the releases tab to download an executable of the program. 
+- Running the project in Visual Studio requires building your own assimp-vc143-mt.dll (Release), assimp-vc143-mtd.dll (Debug) via https://github.com/assimp/assimp
+## 
+
+### Point Light Shadows
+![sponza-demo](https://github.com/user-attachments/assets/ceccfcf2-3ba8-48a2-954a-fca7fdb37943)
+
+#### Spot Light Shadows
 ![image](https://github.com/rsolis096/OpenGL-Project/assets/63280140/824838b2-cafa-46a1-b358-2600c045b7c2)
+
+
 
 
