@@ -248,8 +248,8 @@ void demoScene(Scene& demoScene)
     //GENERATE INITIAL SCENE (ALL OF THESE CAN BE CHANGED IN REAL TIME)
     //demoScene.addObject(new Model("assets/models/backpack/backpack.obj"));
     demoScene.addObject(new Model("assets/models/sponza_gltf/scene.gltf"));
-    demoScene.addObject(new Cube("assets/container2.png", "assets/container2_specular.png"));
-    demoScene.addObject(new Sphere("assets/globe.jpg", "assets/globe.jpg"));
+    demoScene.addObject(new Cube("assets/textures/container2.png", "assets/textures/container2_specular.png"));
+    demoScene.addObject(new Sphere("assets/textures/globe.jpg", "assets/textures/globe.jpg"));
     demoScene.addObject(new Plane());
 
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
@@ -257,8 +257,8 @@ void demoScene(Scene& demoScene)
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[2]);
     demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[3]);
 
-    glm::vec3 spotLightPos1 = glm::vec3(4.0f, 3.0f, -17.0f);
-    glm::vec3 spotLightDir1 = glm::vec3(-20.0f, -5.0f, 45.0f);
+    glm::vec3 spotLightPos1 = glm::vec3(3.0f, 3.0f, -1.0f);
+    glm::vec3 spotLightDir1 = glm::vec3(-7.0f, 0.0f, -1.0f);
     spotLightDir1 = glm::normalize(spotLightDir1 - spotLightPos1);
 
     glm::vec3 spotLightPos2 = glm::vec3(10.0f, 7.0f, 0.0f);
@@ -269,7 +269,7 @@ void demoScene(Scene& demoScene)
     glm::vec3 spotLightDir3 = glm::vec3(0.0f, 0.0f, 1.0f);
     spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
 
-    //demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
+    demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
     //demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
     //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 

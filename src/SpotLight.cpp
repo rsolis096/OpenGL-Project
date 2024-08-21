@@ -20,10 +20,10 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_LightShape->setScale(glm::vec3(0.2f));
 
 	//Light color properties
-	m_Intensity = 15.0f;
-	m_Ambient = glm::vec3(1.0f, 1.0f, 1.0f) * m_Intensity;
-	m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f) * m_Intensity;
-	m_Specular = glm::vec3(1.0f, 1.0f, 1.0f) * m_Intensity;
+	m_Intensity = 1.0f;
+	m_Ambient = glm::vec3(1.0f, 1.0f, 1.0f) ;
+	m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f) ;
+	m_Specular = glm::vec3(1.0f, 1.0f, 1.0f) ;
 
 	//For Attenuation
 	m_Constant = 1.0f;
