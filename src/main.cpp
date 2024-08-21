@@ -274,7 +274,7 @@ void demoScene(Scene& demoScene)
     //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
     demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 20.0f, 0.0f));
-    demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 5.0f, 0.0f));
+    demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 9.0f, 0.0f));
     demoScene.m_LightController->addPointLight(glm::vec3(10.0f, 5.0f, 10.0f));
 
 
@@ -307,10 +307,24 @@ int main()
     glm::mat4 projection = glm::mat4(1.0f);;
 
     glCheckError();
-    
+
+    float position = 0;
+    short direction = 1;
     //Main loop
     while (!glfwWindowShouldClose(window))
     {
+        //Move light in scene
+        myScene.m_LightController->m_PointLights[1]->setLightPos(glm::vec3(position, 9.0f, 0.0f));
+        position += (0.05f * direction);
+        if(position >= 7.5)
+        {
+            direction *= -1;
+        }
+        else if (position <= -7.5)
+        {
+            direction *= -1;
+        }
+
         processInput(window);
 
         //Update Camera

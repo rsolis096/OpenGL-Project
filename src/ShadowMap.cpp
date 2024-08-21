@@ -101,6 +101,8 @@ void ShadowMap::ShadowPass()
     unsigned int numberOfSpotLights = m_LightController->m_SpotLights.size();
     unsigned int numberOfPointLights = m_LightController->m_PointLights.size();
 
+    float near_plane = 1.0f;
+    float far_plane = 25.0f;
 
     //Type 0 - Point Lights
     if (numberOfPointLights > 0)
@@ -110,8 +112,7 @@ void ShadowMap::ShadowPass()
         // 0. create depth cubemap transformation matrices
         // -----------------------------------------------
 
-        float near_plane = 1.0f;
-        float far_plane = 25.0f;
+
 
         depthShader.use();
         depthShader.setInt("lightType", 0);
@@ -249,8 +250,7 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
             glActiveTexture(GL_TEXTURE0 + textureUnit);
             glBindTexture(GL_TEXTURE_2D, depthMapSpotLights[i]);
 
-            std::string shadowMapLocation = "spotLights[" + std::to_string(i) + "].shadowMap";
-            shader.setInt(shadowMapLocation, textureUnit);
+            shader.setInt("spotLights[" + std::to_string(i) + "].shadowMap", textureUnit);
         }
     }
 

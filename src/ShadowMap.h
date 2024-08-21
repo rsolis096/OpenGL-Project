@@ -25,8 +25,8 @@ class ShadowMap
 		std::vector<GLuint> depthCubeMaps;
 
 
-		const unsigned short SHADOW_WIDTH = 2048;
-		const unsigned short SHADOW_HEIGHT = 2048;
+		const unsigned short SHADOW_WIDTH = 1024;
+		const unsigned short SHADOW_HEIGHT = 1024;
 		std::vector<glm::mat4> m_LightSpaceMatrices;
 		bool m_UpdateShadowMap;
 
