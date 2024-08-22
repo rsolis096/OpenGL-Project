@@ -113,7 +113,7 @@ void GUI::drawList()
 		}
 		//Add Cube object to scene
 		
-		if (ImGui::Button(showModel ? "Add Model" : "Cancel")) {
+		if (ImGui::Button(showModel ? "Cancel" : "Add Model")) {
 			showModel = !showModel;
 			
 			//myScene.addObject(new Model());
