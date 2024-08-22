@@ -33,6 +33,7 @@ Scene::Scene(Camera* mC)
 //Add an object to the scene (only objects part of a scene are rendered)
 int Scene::addObject(Object* obj)
 {
+	
 	if (obj == nullptr)
 		return 1;
 	

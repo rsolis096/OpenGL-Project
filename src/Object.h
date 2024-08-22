@@ -17,6 +17,15 @@
 class Object
 {
 public:
+	    enum class ObjectType
+	    {
+	        Cube,
+	        Model,
+	        Sphere,
+	        Plane,
+            Object,
+	    };
+
         //Initializes the basic attributes for all objects
         Object();
         virtual ~Object();
@@ -70,7 +79,7 @@ public:
         virtual void Draw(Shader& shader) = 0;
         virtual void ShadowPassDraw(Shader& shader) = 0;
         virtual int updateTexture(std::vector<std::string> texturePaths) = 0;
-
+        virtual ObjectType GetType() const { return ObjectType::Object; }
 
     protected:
 

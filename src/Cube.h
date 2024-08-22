@@ -15,6 +15,7 @@ public:
     //Methods
     void Draw(Shader& shader) override;
     void ShadowPassDraw(Shader& shader) override;
+    ObjectType GetType() const override;
 
 
 private:

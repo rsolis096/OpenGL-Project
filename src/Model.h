@@ -26,10 +26,13 @@ public:
 
     // constructor, expects a filepath to a 3D model.
     Model(string const& path, bool gamma = false);
+    ~Model() override;
     // draws the model, and thus all its meshes
     void Draw(Shader& shader) override;
     void ShadowPassDraw(Shader& shader) override;
 
+    static const aiScene* CheckPath(std::string const& path);
+    ObjectType GetType() const override;
 
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
@@ -45,4 +48,7 @@ private:
     vector<ModelTexture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
     int updateTexture(std::vector<std::string> texturePaths) override { return 1; }
     static unsigned int modelCount;
+
+    static Assimp::Importer importer;
+
 };

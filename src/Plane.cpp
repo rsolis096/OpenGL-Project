@@ -2,6 +2,7 @@
 
 unsigned int Plane::planeCount = 0;
 
+Plane ::ObjectType Plane::GetType() const { return ObjectType::Plane; }
 
 Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {

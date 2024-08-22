@@ -2,60 +2,39 @@
 #include "Model.h"
 
 unsigned int Model::modelCount = 0;
+Assimp::Importer Model::importer;
 
 unsigned int TextureFromFile(const char* path, const string& directory, bool gamma = false);
 
+Model::ObjectType Model::GetType() const {return ObjectType::Model;}
+
 Model::Model(string const& path, bool gamma) : Object(), gammaCorrection(gamma)
 {
-    m_DisplayName= "Model";
+    m_DisplayName= "Model" + to_string(modelCount);
     m_ObjectID = modelCount;
     modelCount++;
     m_HasTexture = false;
     loadModel(path);
 }
 
-void Model::ShadowPassDraw(Shader& shader)
+Model::~Model()
 {
-    shader.use();
-    shader.setMat4("model", m_Model);
+    std::cout << "Model Destructor called\n";
+    // Clear textures
+    textures_loaded.clear();
+    textures_loaded.shrink_to_fit();
 
-    for (unsigned int i = 0; i < meshes.size(); i++)
-        meshes[i].ShadowPassDraw(shader);
-
-    glCheckError();
+    meshes.clear();
+    meshes.shrink_to_fit();
 }
-
-void Model::Draw(Shader& shader)
-{
-    shader.use();
-    shader.setMat4("model", m_Model);
-    shader.setBool("hasTexture", true);
-    shader.setVec3("object.ambient", m_Ambient);
-    shader.setVec3("object.diffuse", m_Diffuse);
-    shader.setVec3("object.specular", m_Specular);
-
-    //Used for textures, fix this!!!
-    //std::cout << "Meshes Size: " << meshes.size() << "\n";
-    GLuint textureUnit = TextureManager::getNextUnit();
-    for (unsigned int i = 0; i < meshes.size(); i++)
-        meshes[i].Draw(shader, true, textureUnit);
-
-    glCheckError();
-}
-
 
 void Model::loadModel(string const& path)
 {
-    // read file via ASSIMP
-    Assimp::Importer importer;
-    //Scene Object, contains all data of the model in a tree format
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
-    // check for errors
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
-    {
-        cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
-        return;
+    const aiScene* scene = Model::CheckPath(path);
+    if (scene == nullptr){
+        throw std::runtime_error("Failed to load model: scene is nullptr");
     }
+
     // retrieve the directory path of the filepath (where the model is stored with respect to solution
     directory = path.substr(0, path.find_last_of('/'));
 
@@ -63,8 +42,36 @@ void Model::loadModel(string const& path)
     processNode(scene->mRootNode, scene);
 }
 
-void Model::processNode(aiNode* node, const aiScene* scene)
+//Helper function used to verify paths before instantiating a new object. 
+const aiScene* Model::CheckPath(std::string const& path)
 {
+    // read file via ASSIMP
+    //Scene Object, contains all data of the model in a tree format
+    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+    // check for errors
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
+    {
+        cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
+        return nullptr;
+    }
+    return scene;
+}
+
+
+void Model::processNode(aiNode* node, const aiScene* scene)
+
+{
+    if (node == nullptr)
+    {
+        std::cout << "Error: Node is nullptr" << std::endl;
+        throw std::runtime_error("Node is nullptr");
+    }
+    if (scene == nullptr)
+    {
+        std::cout << "Error: Scene is nullptr" << std::endl;
+        throw std::runtime_error("Scene is nullptr");
+    }
+
     // process each mesh located at the current node
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
@@ -83,6 +90,20 @@ void Model::processNode(aiNode* node, const aiScene* scene)
 
 Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
+
+    if (mesh == nullptr)
+    {
+        std::cout << "Error: Mesh is nullptr" << std::endl;
+        throw std::runtime_error("Mesh is nullptr");
+    }
+
+    // Check mesh indices
+    if (mesh->mNumVertices == 0 || mesh->mVertices == nullptr)
+    {
+        std::cout << "Error: Mesh has no vertices" << std::endl;
+        throw std::runtime_error("Mesh has no vertices");
+    }
+
     // data to fill
     vector<Vertex> vertices;
     vector<unsigned int> indices;
@@ -161,6 +182,10 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     std::vector<ModelTexture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
+    if(diffuseMaps.size() > 0 || specularMaps.size() > 0){
+        m_HasTexture = true;
+    }
+
     // return a mesh object created from the extracted mesh data
     return Mesh(vertices, indices, textures);
 }
@@ -201,6 +226,35 @@ vector<ModelTexture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
         }
     }
     return textures;
+}
+
+void Model::ShadowPassDraw(Shader& shader)
+{
+    shader.use();
+    shader.setMat4("model", m_Model);
+
+    for (unsigned int i = 0; i < meshes.size(); i++)
+        meshes[i].ShadowPassDraw(shader);
+
+    glCheckError();
+}
+
+void Model::Draw(Shader& shader)
+{
+    shader.use();
+    shader.setMat4("model", m_Model);
+    shader.setBool("hasTexture", m_HasTexture);
+    shader.setVec3("object.ambient", m_Ambient);
+    shader.setVec3("object.diffuse", m_Diffuse);
+    shader.setVec3("object.specular", m_Specular);
+
+    //Used for textures, fix this!!!
+    //std::cout << "Meshes Size: " << meshes.size() << "\n";
+    GLuint textureUnit = TextureManager::getNextUnit();
+    for (unsigned int i = 0; i < meshes.size(); i++)
+        meshes[i].Draw(shader, m_HasTexture, textureUnit);
+
+    glCheckError();
 }
 
 unsigned int TextureFromFile(const char* path, const string& directory, bool gamma)

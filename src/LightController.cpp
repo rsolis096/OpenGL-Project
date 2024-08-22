@@ -36,9 +36,6 @@ void LightController::removeSpotLight()
 	//TODO:  LightController::removeSpotLight()
 }
 
-
-
-
 void LightController::addDirectionalLight(const glm::vec3& pos)
 {
 

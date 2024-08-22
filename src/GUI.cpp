@@ -63,6 +63,8 @@ void GUI::displayWindow()
 static int propertiesSelected = 0; //Default selected object is first object in scene
 static int lightingSelected = 0; //Default selected object is first object in scene
 static int skyBoxSelected = 0; //Default selected object is first object in scene
+static bool showModel = false;
+static bool modelSucceed = true;
 
 void GUI::drawList()
 {
@@ -108,6 +110,46 @@ void GUI::drawList()
 		//Add Cube object to scene
 		if (ImGui::Button("Add Plane")) {
 			myScene.addObject(new Plane());
+		}
+		//Add Cube object to scene
+		
+		if (ImGui::Button(showModel ? "Add Model" : "Cancel")) {
+			showModel = !showModel;
+			
+			//myScene.addObject(new Model());
+		}
+		if (showModel)
+		{
+			static char modelPathBuffer[128] = {0};
+
+			ImGui::Text("Model Path:\n", "NULL");
+			ImGui::InputText("##ModelPath", modelPathBuffer, sizeof(modelPathBuffer));
+
+
+			if (ImGui::Button("Load Model")) {
+				std::string path(modelPathBuffer);
+				//Verify the path is valid for assimp (may still not load)
+				ImGui::Text("Loading model...");
+
+				if(!Model::CheckPath(path))
+				{
+					modelSucceed = false;
+				}
+				else
+				{
+					myScene.addObject(new Model(path));
+					modelSucceed = true;
+					showModel = false;
+				}
+
+				if(!modelSucceed)
+					ImGui::Text("Model failed to be created, check file path.");
+
+			}
+
+			ImGui::SameLine(); HelpMarker(
+				"The application will briefly pause when a model is loading.\n"
+				"If the model fails to load, nothing will happen.\n");
 		}
 	}
 
@@ -342,7 +384,6 @@ void GUI::drawList()
 
 								}
 							}
-							//TODO: Models use a separate texture class so combine that together
 							//Only allow Specular changes if it does not have a specular map
 							if (selectedObject->m_SpecularMap == nullptr)
 							{
@@ -351,7 +392,6 @@ void GUI::drawList()
 									selectedObject->setSpecular(glm::vec3(specular));
 								}
 							}
-
 							//Yet to see an Ambient map so, it should be always available
 							if (ImGui::ColorEdit3("Ambient", &ambient[0]))
 							{
@@ -377,13 +417,13 @@ void GUI::drawList()
 							static bool showSuccessText = false;
 
 							ImGui::Text("Texture Paths:");
-							if (selectedObject->m_HasTexture)
+							if (selectedObject->m_HasTexture && selectedObject->GetType() != Object::ObjectType::Model)
 							{
 								//Set textbox default values
 								if (diffuseText == "")
 									strcpy_s(diffuseBuffer, selectedObject->m_DiffuseMap->m_Path.c_str());
 								else
-									strcpy_s(diffuseBuffer, diffuseText.c_str());
+									strcpy_s(diffuseBuffer, diffuseText.c_str()); //dest, src
 
 								if (specularText == "")
 									strcpy_s(specularBuffer, selectedObject->m_SpecularMap->m_Path.c_str());

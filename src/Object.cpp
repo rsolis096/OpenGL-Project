@@ -40,6 +40,18 @@ Object::~Object()
     m_DiffuseMap = nullptr;
     delete m_SpecularMap;
     m_SpecularMap = nullptr;
+
+    // Clear vectors
+    m_Vertices.clear();
+    m_Vertices.shrink_to_fit();
+    m_TexCoords.clear();
+    m_TexCoords.shrink_to_fit();
+    m_Normals.clear();
+    m_Normals.shrink_to_fit();
+    m_Indices.clear();
+    m_Indices.shrink_to_fit();
+    m_InterleavedVertices.clear();
+    m_InterleavedVertices.shrink_to_fit();
 }
 
 void Object::setAmbient(glm::vec3 newAmbient)

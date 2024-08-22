@@ -2,6 +2,8 @@
 #define PI 3.141592653589793238462643383279502884197
 unsigned int Sphere::sphereCount = 0;
 
+Sphere::ObjectType Sphere::GetType() const { return ObjectType::Sphere; }
+
 //Used for creating a Primtive with texture information
 Sphere::Sphere(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {

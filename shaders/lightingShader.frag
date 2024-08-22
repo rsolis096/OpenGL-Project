@@ -32,7 +32,6 @@ struct PointLight {
     samplerCube shadowMap;
 };
 
-
 struct SpotLight {
     vec3 position;
     vec3 direction;
@@ -248,7 +247,6 @@ void main()
     FragColor = vec4(result, 1.0);   
    
     //FragColor = texture(material.diffuse, fs_in.TexCoords);
-
 }
 
 // Calculates the color when using a spot light.

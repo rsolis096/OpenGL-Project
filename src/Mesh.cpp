@@ -9,6 +9,56 @@ Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<ModelTe
     setupMesh();
 }
 
+// Move constructor
+Mesh::Mesh(Mesh&& other) noexcept
+    : vertices(std::move(other.vertices)),
+    indices(std::move(other.indices)),
+    textures(std::move(other.textures)),
+    VAO(other.VAO),
+    VBO(other.VBO),
+    EBO(other.EBO)
+{
+    other.VAO = 0;
+    other.VBO = 0;
+    other.EBO = 0;
+}
+
+
+// Move assignment operator
+Mesh& Mesh::operator=(Mesh&& other) noexcept
+{
+    std::cout << "Move assignment operator called\n";
+    if (this != &other)
+    {
+        vertices = std::move(other.vertices);
+        indices = std::move(other.indices);
+        textures = std::move(other.textures);
+        VAO = other.VAO;
+        VBO = other.VBO;
+        EBO = other.EBO;
+
+        other.VAO = 0;
+        other.VBO = 0;
+        other.EBO = 0;
+    }
+    return *this;
+}
+
+Mesh::~Mesh()
+{
+    //std::cout << "Mesh Destructor called\n";
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+
+    vertices.clear();
+    vertices.shrink_to_fit();
+    indices.clear();
+    indices.shrink_to_fit();
+    textures.clear();
+    textures.shrink_to_fit();
+}
+
 void Mesh::ShadowPassDraw(Shader& shader) const
 {
     // draw mesh
@@ -53,6 +103,7 @@ void Mesh::Draw(Shader& shader, bool hasTexture, unsigned int textureUnitOffset)
                 location = glGetUniformLocation(shader.m_ProgramId, ("material." + name + number).c_str());
             }
             else {
+                std::cout << "continued \n";
                 continue;
             }
 

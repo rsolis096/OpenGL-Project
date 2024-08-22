@@ -38,19 +38,17 @@ public:
     vector<Vertex>       vertices;
     vector<unsigned int> indices;
     vector<ModelTexture>      textures;
-    unsigned int VAO;
 
-    // constructor
     Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<ModelTexture> textures);
-
+    Mesh(Mesh&& other) noexcept;
+    Mesh& operator=(Mesh&& other) noexcept;
+    ~Mesh();
     // render the mesh
     void Draw(Shader& shader, bool hasTexture, GLuint textureUnitOffset) const;
     void ShadowPassDraw(Shader& shader) const;
-
 private:
     // render data 
-    unsigned int VBO, EBO;
-
+    unsigned int VAO, VBO, EBO;
     // initializes all the buffer objects/arrays
     void setupMesh();
 };

@@ -4,6 +4,8 @@
 
 unsigned int Cube::cubeCount = 0;
 
+Cube::ObjectType Cube::GetType() const { return ObjectType::Cube; }
+
 //Used for creating a Primtive with texture information
 Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
