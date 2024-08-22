@@ -24,7 +24,7 @@ public:
 	Camera* m_PlayerCamera;
 	Scene* m_Scene;
 
-	DirectionalLight* m_WordLight;
+	DirectionalLight* m_DirectionalLight;
 	std::vector<PointLight*> m_PointLights;
 	std::vector<SpotLight*> m_SpotLights;
 
@@ -32,9 +32,13 @@ public:
 	void addPointLight(const glm::vec3&);
 	void removePointLight();
 
-	//Spot Light methods
+	//SpotLight methods
 	void addSpotLight(const glm::vec3, const glm::vec3);
 	void removeSpotLight();
+
+	//SpotLight methods
+	void addDirectionalLight(const glm::vec3&);
+	void removeDirectionalLight();
 
 	void drawLighting();
 };

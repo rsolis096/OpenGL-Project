@@ -38,6 +38,7 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].ambient", m_Ambient);
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].diffuse", m_Diffuse);
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].specular", m_Specular);
+	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].far_plane", m_FarPlane);
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].constant", m_Constant);
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].linear", m_Linear);
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].quadratic", m_Quadratic);

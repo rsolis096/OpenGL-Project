@@ -37,7 +37,9 @@ Object::~Object()
     m_ebo = 0;
     //Texture Properties
     delete m_DiffuseMap;
+    m_DiffuseMap = nullptr;
     delete m_SpecularMap;
+    m_SpecularMap = nullptr;
 }
 
 void Object::setAmbient(glm::vec3 newAmbient)

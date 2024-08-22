@@ -8,6 +8,7 @@ public:
 
     //Generate an Cube with no mesh data, default color data, no texture data, default world attributes
     Cube();
+    ~Cube() override;
     //Build a primitive of type eg. type = "sphere", "cube", "pyramid"
     Cube(const char* texturePathDiffuse, const char* texturePathSpecular);
 

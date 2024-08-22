@@ -60,9 +60,9 @@ void GUI::displayWindow()
 }
 
 //Left Side of window
-static int propertiesSelected; //Default selected object is first object in scene
-static int lightingSelected; //Default selected object is first object in scene
-static int skyBoxSelected; //Default selected object is first object in scene
+static int propertiesSelected = 0; //Default selected object is first object in scene
+static int lightingSelected = 0; //Default selected object is first object in scene
+static int skyBoxSelected = 0; //Default selected object is first object in scene
 
 void GUI::drawList()
 {
@@ -82,7 +82,7 @@ void GUI::drawList()
 	//Object List
 	if (currentTab == 1) 
 	{
-		ImGui::BeginChild("object list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
+		ImGui::BeginChild("object_list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
 		for (int i = 0; i < myScene.m_SceneObjects.size(); i++)
 		{
 			char label[128];
@@ -93,7 +93,9 @@ void GUI::drawList()
 			{
 				propertiesSelected = i;
 			}
+
 		}
+
 		ImGui::EndChild();
 		//Add Cube object to scene
 		if (ImGui::Button("Add Cube")) {
@@ -110,10 +112,10 @@ void GUI::drawList()
 	}
 
 	//Light List
-else if (currentTab == 2)
+	else if (currentTab == 2)
 {
 		// Start the child window for the light list
-		ImGui::BeginChild("light list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
+		ImGui::BeginChild("light_list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
 
 		unsigned short numSpotLights = myScene.m_LightController->m_SpotLights.size();
 		unsigned short numPointLights = myScene.m_LightController->m_PointLights.size();
@@ -187,7 +189,7 @@ else if (currentTab == 2)
 	//Skybox list
 	else if (currentTab == 3)
 	{
-		ImGui::BeginChild("skybox list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
+		ImGui::BeginChild("skybox_list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
 		for (int i = 0; i < myScene.m_SkyBox->m_CubeMapNames.size(); i++)
 		{
 			char label[128];
@@ -206,244 +208,260 @@ else if (currentTab == 2)
 
 	ImGui::SameLine();
 
-	// Right side of window (light/Object properties)
+	// Right side of window 
 	ImGui::BeginGroup();
 	{
 		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us	
 		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
 		{
-			//Properties Tab
-			if (ImGui::BeginTabItem("Properties"))
+			//Objects Tab
+			if (ImGui::BeginTabItem("Objects"))
 			{
-				//Update the selected item (default selected item is the 0th object)
-				Object* selectedObject = myScene.m_SceneObjects[propertiesSelected];
 				currentTab = 1;
-				//Display the Current selected object name
-				if (selectedObject != nullptr)
-					ImGui::Text("Selected Item: %s", selectedObject->m_DisplayName.c_str());
-				else
-					ImGui::Text("Selected Item: %s", "NULL");
 
-				ImGui::Spacing();
-				if (selectedObject != nullptr)
+				if (myScene.m_SceneObjects.size() > 0)
 				{
-					// Position
-					{
-						//For transformation
-						glm::vec3 pos = selectedObject->m_Position;
-						float vec4f[3] = { pos[0], pos[1], pos[2] };
-						ImGui::Text("Current Object Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
+					//Update the selected item (default selected item is the 0th object)
+					Object* selectedObject = myScene.m_SceneObjects[propertiesSelected];
+					//Display the Current selected object name
+					if (selectedObject != nullptr)
+						ImGui::Text("Selected Item: %s", selectedObject->m_DisplayName.c_str());
+					else
+						ImGui::Text("Selected Item: %s", "NULL");
 
-						if (ImGui::DragFloat("x##position", &vec4f[0], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
-						{
-
-							selectedObject->setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
-							selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
-							selectedObject->startFall = glfwGetTime();
-						}
-
-						if (ImGui::DragFloat("y##position", &vec4f[1], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
-						{
-
-							selectedObject->setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
-							selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
-							selectedObject->startFall = glfwGetTime();
-						}
-
-						if (ImGui::DragFloat("z##position", &vec4f[2], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
-						{
-
-							selectedObject->setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
-							selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
-							selectedObject->startFall = glfwGetTime();
-						}
-
-					}
-					
-					// Scaling
-					{
-						//For Scale
-						ImGui::Spacing();
-						ImGui::Text("Scaling");
-						float sX = selectedObject->m_Scale[0];
-						float sY = selectedObject->m_Scale[1];
-						float sZ = selectedObject->m_Scale[2];
-						glm::vec3 currentScale = glm::vec3(sX, sY, sZ);
-
-						if (ImGui::DragFloat("x##scale", &sX, 0.1f, 0.0f, 360.0f, "%.2f", 0))
-						{
-
-							currentScale[0] = sX;
-							selectedObject->setScale(currentScale);
-						}
-						if (ImGui::DragFloat("y##scale", &sY, 0.1f, 0.0f, 360.0f, "%.2f", 0))
-						{
-							currentScale[1] = sY;
-							selectedObject->setScale(currentScale);
-						}
-						if (ImGui::DragFloat("z##scale", &sZ, 0.1f, 0.0f, 360.0f, "%.2f", 0))
-						{
-							currentScale[2] = sZ;
-							selectedObject->setScale(currentScale);
-						}
-
-
-					}
-
-					// Rotation
-					{
-						ImGui::Spacing();
-						ImGui::Text("Rotation");
-
-						float rX = selectedObject->m_Rotation.x;
-						float rY = selectedObject->m_Rotation.y;
-						float rZ = selectedObject->m_Rotation.z;
-
-						glm::vec3 currentRotation = glm::vec3(rX, rY, rZ);
-
-						if (ImGui::DragFloat("x##rotation", &rX, 0.5f, 0.0f, 360.0f, "%.2f", 0))
-						{
-							
-							currentRotation.x = rX;
-							selectedObject->setRotation(currentRotation);
-						}
-						if (ImGui::DragFloat("y##rotation", &rY, 0.5f, 0.0f, 360.0f, "%.2f", 0))
-						{
-							currentRotation.y = rY;
-							selectedObject->setRotation(currentRotation);
-						}
-						if (ImGui::DragFloat("z##rotation", &rZ, 0.5f, 0.0f, 360.0f, "%.2f", 0))
-						{
-							currentRotation.z = rZ;
-							selectedObject->setRotation(currentRotation);
-						}
-
-
-					}
-
-					// Color
-					{
-						glm::vec3 diffuse = selectedObject->getDiffuse();
-						glm::vec3 specular = selectedObject->getSpecular();
-						glm::vec3 ambient = selectedObject->getAmbient();
-
-						ImGui::Text("Object Color", "NULL");
-
-						//Only allow Diffuse changes if it does not have a diffuse map
-						if (selectedObject->m_DiffuseMap == nullptr) {
-							if (ImGui::ColorEdit3("Diffuse", &diffuse[0]))
-							{
-								selectedObject->setDiffuse(glm::vec3(diffuse));
-
-							}
-						}
-						//TODO: Models use a separate texture class so combine that together
-						//Only allow Specular changes if it does not have a specular map
-						if (selectedObject->m_SpecularMap == nullptr)
-						{
-							if (ImGui::ColorEdit3("Specular", &specular[0]))
-							{
-								selectedObject->setSpecular(glm::vec3(specular));
-							}
-						}
-
-						//Yet to see an Ambient map so, it should be always available
-						if (ImGui::ColorEdit3("Ambient", &ambient[0]))
-						{
-							selectedObject->setAmbient(glm::vec3(ambient));
-
-						}
-
-					}
-
-					ImGui::SameLine(); HelpMarker(
-						"Click on the color square to open a color picker.\n"
-						"Click and hold to use drag and drop.\n"
-						"Right-click on the color square to show options.\n"
-						"CTRL+click on individual component to input value.\n");
 					ImGui::Spacing();
-
-					// Texture
+					if (selectedObject != nullptr)
 					{
-						static std::string diffuseText = "";
-						static std::string specularText = "";
-						static char diffuseBuffer[256]; // This is where the text will be stored
-						static char specularBuffer[256]; // This is where the text will be stored
-						static bool showSuccessText = false;
-
-						ImGui::Text("Texture Paths:");
-						if (selectedObject->m_HasTexture)
+						// Position
 						{
-							//Set textbox default values
-							if (diffuseText == "")
-								strcpy_s(diffuseBuffer, selectedObject->m_DiffuseMap->m_Path.c_str());
-							else
-								strcpy_s(diffuseBuffer, diffuseText.c_str());
+							//For transformation
+							glm::vec3 pos = selectedObject->m_Position;
+							float vec4f[3] = { pos[0], pos[1], pos[2] };
+							ImGui::Text("Current Object Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
 
-							if (specularText == "")
-								strcpy_s(specularBuffer, selectedObject->m_SpecularMap->m_Path.c_str());
-							else
-								strcpy_s(specularBuffer, specularText.c_str());
-						}
-						else
-						{
-							//Set textbox default values
-							if (diffuseText != "")
-								strcpy_s(diffuseBuffer, diffuseText.c_str());
-							else
-								strcpy_s(diffuseBuffer, "");
+							if (ImGui::DragFloat("x##position", &vec4f[0], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+							{
 
-							if (specularText != "")
-								strcpy_s(specularBuffer, specularText.c_str());
-							else
-								strcpy_s(specularBuffer, "");
-						}
+								selectedObject->setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+								selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
+								selectedObject->startFall = glfwGetTime();
+							}
 
-						ImGui::Spacing();
-						//Get changes from textboxes
-						ImGui::Text("Diffuse Path:\n", "NULL");
-						if (ImGui::InputText("##DiffusePath", diffuseBuffer, sizeof(diffuseBuffer)))
-						{
-							diffuseText = diffuseBuffer;
-							showSuccessText = false;
+							if (ImGui::DragFloat("y##position", &vec4f[1], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+							{
+
+								selectedObject->setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+								selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
+								selectedObject->startFall = glfwGetTime();
+							}
+
+							if (ImGui::DragFloat("z##position", &vec4f[2], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+							{
+
+								selectedObject->setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+								selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
+								selectedObject->startFall = glfwGetTime();
+							}
+
 						}
 
-						ImGui::Spacing();
-						ImGui::Text("Specular Path:\n", "NULL");
-						if (ImGui::InputText("##SpecularPath", specularBuffer, sizeof(specularBuffer)))
+						// Scaling
 						{
-							specularText = specularBuffer;
-							showSuccessText = false;
+							//For Scale
+							ImGui::Spacing();
+							ImGui::Text("Scaling");
+							float sX = selectedObject->m_Scale[0];
+							float sY = selectedObject->m_Scale[1];
+							float sZ = selectedObject->m_Scale[2];
+							glm::vec3 currentScale = glm::vec3(sX, sY, sZ);
+
+							if (ImGui::DragFloat("x##scale", &sX, 0.1f, 0.0f, 360.0f, "%.2f", 0))
+							{
+
+								currentScale[0] = sX;
+								selectedObject->setScale(currentScale);
+							}
+							if (ImGui::DragFloat("y##scale", &sY, 0.1f, 0.0f, 360.0f, "%.2f", 0))
+							{
+								currentScale[1] = sY;
+								selectedObject->setScale(currentScale);
+							}
+							if (ImGui::DragFloat("z##scale", &sZ, 0.1f, 0.0f, 360.0f, "%.2f", 0))
+							{
+								currentScale[2] = sZ;
+								selectedObject->setScale(currentScale);
+							}
+
+
 						}
 
-						if (ImGui::Button("Set Texture##hasTextureTrue")) {
+						// Rotation
+						{
+							ImGui::Spacing();
+							ImGui::Text("Rotation");
 
-							std::vector<std::string> newPaths = {
-								string(diffuseBuffer, 256),
-								string(specularBuffer, 256)
-							};
-							cout << newPaths[0] << endl;
-							cout << newPaths[1] << endl;
-							selectedObject->updateTexture(newPaths);
-						}	
+							float rX = selectedObject->m_Rotation.x;
+							float rY = selectedObject->m_Rotation.y;
+							float rZ = selectedObject->m_Rotation.z;
+
+							glm::vec3 currentRotation = glm::vec3(rX, rY, rZ);
+
+							if (ImGui::DragFloat("x##rotation", &rX, 0.5f, 0.0f, 360.0f, "%.2f", 0))
+							{
+
+								currentRotation.x = rX;
+								selectedObject->setRotation(currentRotation);
+							}
+							if (ImGui::DragFloat("y##rotation", &rY, 0.5f, 0.0f, 360.0f, "%.2f", 0))
+							{
+								currentRotation.y = rY;
+								selectedObject->setRotation(currentRotation);
+							}
+							if (ImGui::DragFloat("z##rotation", &rZ, 0.5f, 0.0f, 360.0f, "%.2f", 0))
+							{
+								currentRotation.z = rZ;
+								selectedObject->setRotation(currentRotation);
+							}
+
+
+						}
+
+						// Color
+						{
+							glm::vec3 diffuse = selectedObject->getDiffuse();
+							glm::vec3 specular = selectedObject->getSpecular();
+							glm::vec3 ambient = selectedObject->getAmbient();
+
+							ImGui::Text("Object Color", "NULL");
+
+							//Only allow Diffuse changes if it does not have a diffuse map
+							if (selectedObject->m_DiffuseMap == nullptr) {
+								if (ImGui::ColorEdit3("Diffuse", &diffuse[0]))
+								{
+									selectedObject->setDiffuse(glm::vec3(diffuse));
+
+								}
+							}
+							//TODO: Models use a separate texture class so combine that together
+							//Only allow Specular changes if it does not have a specular map
+							if (selectedObject->m_SpecularMap == nullptr)
+							{
+								if (ImGui::ColorEdit3("Specular", &specular[0]))
+								{
+									selectedObject->setSpecular(glm::vec3(specular));
+								}
+							}
+
+							//Yet to see an Ambient map so, it should be always available
+							if (ImGui::ColorEdit3("Ambient", &ambient[0]))
+							{
+								selectedObject->setAmbient(glm::vec3(ambient));
+
+							}
+
+						}
 
 						ImGui::SameLine(); HelpMarker(
-							"If only one texture is desired, insert the\n"
-							"the same file path in both input boxes.\n");
-
-					}
-
-					// Physics
-					{
+							"Click on the color square to open a color picker.\n"
+							"Click and hold to use drag and drop.\n"
+							"Right-click on the color square to show options.\n"
+							"CTRL+click on individual component to input value.\n");
 						ImGui::Spacing();
-						if (ImGui::Checkbox("Allow Physics ", &selectedObject->enablePhysics))
+
+						// Texture
 						{
-							if(selectedObject->isPhysicsObject == false)
-								myScene.m_PhysicsWorld->addObject(selectedObject);
-							selectedObject->setPhysics();
+							static std::string diffuseText = "";
+							static std::string specularText = "";
+							static char diffuseBuffer[256]; // This is where the text will be stored
+							static char specularBuffer[256]; // This is where the text will be stored
+							static bool showSuccessText = false;
+
+							ImGui::Text("Texture Paths:");
+							if (selectedObject->m_HasTexture)
+							{
+								//Set textbox default values
+								if (diffuseText == "")
+									strcpy_s(diffuseBuffer, selectedObject->m_DiffuseMap->m_Path.c_str());
+								else
+									strcpy_s(diffuseBuffer, diffuseText.c_str());
+
+								if (specularText == "")
+									strcpy_s(specularBuffer, selectedObject->m_SpecularMap->m_Path.c_str());
+								else
+									strcpy_s(specularBuffer, specularText.c_str());
+							}
+							else
+							{
+								//Set textbox default values
+								if (diffuseText != "")
+									strcpy_s(diffuseBuffer, diffuseText.c_str());
+								else
+									strcpy_s(diffuseBuffer, "");
+
+								if (specularText != "")
+									strcpy_s(specularBuffer, specularText.c_str());
+								else
+									strcpy_s(specularBuffer, "");
+							}
+
+							ImGui::Spacing();
+							//Get changes from textboxes
+							ImGui::Text("Diffuse Path:\n", "NULL");
+							if (ImGui::InputText("##DiffusePath", diffuseBuffer, sizeof(diffuseBuffer)))
+							{
+								diffuseText = diffuseBuffer;
+								showSuccessText = false;
+							}
+
+							ImGui::Spacing();
+							ImGui::Text("Specular Path:\n", "NULL");
+							if (ImGui::InputText("##SpecularPath", specularBuffer, sizeof(specularBuffer)))
+							{
+								specularText = specularBuffer;
+								showSuccessText = false;
+							}
+
+							if (ImGui::Button("Set Texture##hasTextureTrue")) {
+
+								std::vector<std::string> newPaths = {
+									string(diffuseBuffer, 256),
+									string(specularBuffer, 256)
+								};
+								cout << newPaths[0] << endl;
+								cout << newPaths[1] << endl;
+								selectedObject->updateTexture(newPaths);
+							}
+
+							ImGui::SameLine(); HelpMarker(
+								"If only one texture is desired, insert the\n"
+								"the same file path in both input boxes.\n");
+
+						}
+
+						// Physics
+						{
+							ImGui::Spacing();
+							if (ImGui::Checkbox("Allow Physics ", &selectedObject->enablePhysics))
+							{
+								if (selectedObject->isPhysicsObject == false)
+									myScene.m_PhysicsWorld->addObject(selectedObject);
+								selectedObject->setPhysics();
+							}
+						}
+
+						// Delete Item
+						if (ImGui::Button("Delete Object"))
+						{
+							std::cout << "Selected To Delete " << selectedObject->m_DisplayName << "\n";
+							myScene.removeObject(selectedObject);
+							propertiesSelected -= 1;
+							if(propertiesSelected < 0)
+							{
+								propertiesSelected = 0;
+							}
 						}
 					}
-				}	
+				}
 				ImGui::EndTabItem();
 			}
 

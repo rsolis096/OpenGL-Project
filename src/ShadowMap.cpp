@@ -141,8 +141,24 @@ void ShadowMap::ShadowPass()
                 depthShader.setMat4("shadowMatrices[" + std::to_string(j) + "]", shadowTransforms[j]);
 
             //Render Scene
-            for (Object* obj : *m_SceneObjects)
-                obj->ShadowPassDraw(depthShader);
+            for(int i = 0; i < m_SceneObjects->size(); i++)
+            {
+                if((*m_SceneObjects)[i] != nullptr)
+                {
+                    if (m_SceneObjects && (*m_SceneObjects)[i]) {
+                        (*m_SceneObjects)[i]->ShadowPassDraw(depthShader);
+                    }
+                    else {
+                        std::cerr << "Scene object is null at index " << i << "\n";
+                    }
+                }else
+                {
+                    std::cerr << "Scene object is null at index " << i << "\n";
+
+                }
+            }
+            
+
 
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
@@ -175,7 +191,7 @@ void ShadowMap::ShadowPass()
             // Calculate light view matrix
             glm::mat4 lightView = glm::lookAt(
             m_LightController->m_SpotLights[i]->getLightPos(),
-				m_LightController->m_SpotLights[i]->getLightDirection(), // Adjusted for direction
+                m_LightController->m_SpotLights[i]->getLightDirection(), // Adjusted for direction
                 glm::vec3(0.0, 1.0, 0.0)
             );
 
@@ -187,14 +203,32 @@ void ShadowMap::ShadowPass()
             glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBOSpotLights[i]);
             glClear(GL_DEPTH_BUFFER_BIT);
 
-            for (Object* obj : *m_SceneObjects)
-                obj->ShadowPassDraw(depthShader);
+            for (int i = 0; i < m_SceneObjects->size(); i++)
+            {
+                if ((*m_SceneObjects)[i] != nullptr)
+                {
+                    if (m_SceneObjects && (*m_SceneObjects)[i]) {
+                        (*m_SceneObjects)[i]->ShadowPassDraw(depthShader);
+                    }
+                    else {
+                        std::cerr << "Scene object is null at index " << i << "\n";
+                    }
+                }
+                else
+                {
+                    std::cerr << "Scene object is null at index " << i << "\n";
+
+                }
+            }
 
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         }
 
     }
+
+    //Type 2 - Directional Lights (Only one)
+    
 
     m_UpdateShadowMap = false;
 }
@@ -251,6 +285,8 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
             glBindTexture(GL_TEXTURE_2D, depthMapSpotLights[i]);
 
             shader.setInt("spotLights[" + std::to_string(i) + "].shadowMap", textureUnit);
+            shader.setFloat("spotLights[" + std::to_string(i) + "].far_plane", m_LightController->m_SpotLights[i]->getFarPlane());
+
         }
     }
 

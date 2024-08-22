@@ -28,6 +28,12 @@ Sphere::Sphere() : Object()
     buildSphere();
 }
 
+Sphere::~Sphere()
+{
+    std::cout << "Sphere Deleted\n";
+    sphereCount -= 1;
+}
+
 
 void Sphere::Draw(Shader& shader)
 {

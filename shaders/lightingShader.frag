@@ -40,6 +40,7 @@ struct SpotLight {
     float outerCutOff;  
     float constant;
     float linear;
+    float far_plane;
     float quadratic;  
     vec3 ambient;
     vec3 diffuse;
@@ -89,12 +90,17 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex);
 
 float SpotLightShadowCalculation(vec4 fragPosLightSpace, SpotLight light)
 {
+    
     // Calculate the direction from the fragment to the light position
     vec3 lightDirection = normalize(light.position - fragPosLightSpace.xyz);
 
     //Get fragment to light distance
     vec3 fragToLight = fragPosLightSpace.xyz - light.position;
     float lightToFragmentDistance = length(fragToLight); // Distance from light to fragment
+
+    if (lightToFragmentDistance > light.far_plane) {
+        return 1.0; // Fragment is outside the light's range, fully lit, no shadow
+    }
 
     // Convert fragment position from light space to normalized device coordinates
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -115,10 +121,12 @@ float SpotLightShadowCalculation(vec4 fragPosLightSpace, SpotLight light)
 
     // Simple 3x3 PCF (Percentage Closer Filtering) filter
     int n = 2; // 1 = 3x3, 2 = 5x5, 3 = 7x7, etc.
-    //Worse shadows when far away from light source
-    if (lightToFragmentDistance > 5.0){
-        n = 1;
-    } 
+
+    // Adjust PCF filter size based on distance from the light
+    if (lightToFragmentDistance > light.far_plane * 0.8) {
+        n = 1; // Use smaller filter size for distant fragments
+    }
+
     for(int x = -n; x <= n; x++)
     {
         for(int y = -n; y <= n; y++)
@@ -132,16 +140,17 @@ float SpotLightShadowCalculation(vec4 fragPosLightSpace, SpotLight light)
             // Compare the sampled depth to the current fragment's depth
             if(depth + bias < shadowCoords.z)
             {
-                shadow += 0.0; // In shadow
+                shadow += 1.0; // In shadow
             }
             else
             {
-                shadow += 1.0; // Not in shadow
+                shadow += 0.0; // Not in shadow
             }
         }
     }
 
     // Normalize shadow value by the number of samples (9 for a 3x3 filter)
+    // 0.0 = not in shadow, 1.0 = in shadow
     return shadow / 9.0;
 }
 
@@ -158,6 +167,7 @@ vec3 gridSamplingDisk[20] = vec3[]
 
 float PointLightShadowCalculation(vec3 fragPos, PointLight light)
 {
+
     // Compute the vector from the fragment position to the light source
     vec3 fragToLight = fragPos - light.position;
 
@@ -207,6 +217,7 @@ float PointLightShadowCalculation(vec3 fragPos, PointLight light)
     // Optionally, display closestDepth for debugging purposes
     // FragColor = vec4(vec3(closestDepth / far_plane), 1.0);    
         
+    // 1.0 = fully in shadow, 0.0 = fully lit
     return shadow;
 }
 
@@ -251,9 +262,8 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
     float diff = max(dot(normal, lightDir), 0.0);
 
     // Calculate Blinn-Phong specular
-    vec3 halfDir = normalize(lightDir + viewDir);  
-    float specAngle = max(dot(halfDir, normal), 0.0);
-    float spec = pow(specAngle, 32.0);
+    vec3 halfwayDir = normalize(lightDir + viewDir);  
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
 
     // Calculate spotlight factor (cone angles)
     float spotAngle = dot(-lightDir, spotDir);
@@ -295,7 +305,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir, int lightIndex)
     specular *= attenuation;
 
     // Combine lighting components
-    vec3 result = ambient + shadow * (diffuse + specular);
+    vec3 result = ambient + (1.0 - shadow) * (diffuse + specular);
 
     return result;
 }

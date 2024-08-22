@@ -2,14 +2,15 @@
 #include "Scene.h"
 
 LightController::LightController
-(Shader* lightingShader, Shader* objectShader, Camera* cam, Scene* s)
-	:m_WordLight(new DirectionalLight(lightingShader)), m_Scene(s)
+(Shader* lightingShader, Shader* objectShader, Camera* cam, Scene* s): m_Scene(s)
 {
 	m_LightingShader = lightingShader;
 	m_LightSourceShader = objectShader;
 	m_PlayerCamera = cam;
 	glCheckError();
 }
+
+
 
 void LightController::addPointLight(const glm::vec3& pos)
 {
@@ -33,6 +34,18 @@ void LightController::addSpotLight(const glm::vec3 pos, const glm::vec3 dir)
 void LightController::removeSpotLight()
 {
 	//TODO:  LightController::removeSpotLight()
+}
+
+
+
+
+void LightController::addDirectionalLight(const glm::vec3& pos)
+{
+
+}
+
+void LightController::removeDirectionalLight()
+{
 }
 
 void LightController::drawLighting()

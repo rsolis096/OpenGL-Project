@@ -11,6 +11,7 @@ public:
     bool changed;
     //Build a primitive Cube with no texture data
     Sphere();
+    ~Sphere() override;
     //Build a primitive of type eg. type = "sphere", "cube", "pyramid"
     Sphere(const char* texturePathDiffuse, const char* texturePathSpecular);
 

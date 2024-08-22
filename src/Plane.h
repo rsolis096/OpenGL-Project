@@ -8,7 +8,8 @@ public:
 
     //Generate an Plane with no mesh data, default color data, no texture data, default world attributes
     Plane();
-    Plane(const char* texturePathDiffuse, const char* texturePathSpecular);
+    ~Plane() override;
+	Plane(const char* texturePathDiffuse, const char* texturePathSpecular);
 
 
     void Draw(Shader& shader) override;

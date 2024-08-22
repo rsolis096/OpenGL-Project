@@ -19,7 +19,7 @@ class Object
 public:
         //Initializes the basic attributes for all objects
         Object();
-        ~Object();
+        virtual ~Object();
 
         //Texture Properties
         Texture* m_DiffuseMap;

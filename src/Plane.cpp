@@ -27,6 +27,12 @@ Plane::Plane() : Object()
     buildPlane();
 }
 
+Plane::~Plane()
+{
+    std::cout << "Plane Deleted\n";
+    planeCount -= 1;
+}
+
 void Plane::Draw(Shader& shader)
 {
     shader.use();

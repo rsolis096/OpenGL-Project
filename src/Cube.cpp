@@ -29,6 +29,12 @@ Cube::Cube() : Object()
     cubeCount++;
 }
 
+Cube::~Cube()
+{
+    std::cout << "Cube Deleted\n";
+    cubeCount -= 1;
+}
+
 void Cube::Draw(Shader& shader)
 {
     shader.use();

@@ -49,19 +49,29 @@ int Scene::addObject(Object* obj)
 //Remove an object from the scene
 int Scene::removeObject(Object* obj)
 {
-	//Remove all instances of obj
-	std::vector<Object*>::iterator removeIterator = std::remove(m_SceneObjects.begin(), m_SceneObjects.end(), obj);
-	if (removeIterator == m_SceneObjects.end())
-	{
-		std::cout << "Scene: " << obj->m_ObjectID << " is not part of the scene!" << std::endl;
+	if (obj == nullptr) {
+		std::cout << "Invalid object pointer!" << std::endl;
 		return 1;
 	}
-	else
-	{
-		m_SceneObjects.erase(removeIterator, m_SceneObjects.end());
-		std::cout << "Scene: Removed " << obj->m_ObjectID << std::endl;
+
+	// Print debug information before removal
+	std::cout << "Removing object: " << obj->m_DisplayName << std::endl;
+	std::cout << "Vector size before removal: " << m_SceneObjects.size() << std::endl;
+
+	auto removeIterator = std::find(m_SceneObjects.begin(), m_SceneObjects.end(), obj);
+
+	if (removeIterator != m_SceneObjects.end()) {
+		std::cout << "Object found in vector, deleting it." << std::endl;
+		delete* removeIterator; // Delete the object
+		m_SceneObjects.erase(removeIterator); // Erase the element from the vector
+
+		// Verify removal
+		std::cout << "Vector size after removal: " << m_SceneObjects.size() << std::endl;
 		return 0;
 	}
+
+	std::cout << "Scene: " << obj->m_ObjectID << " is not part of the scene!" << std::endl;
+	return 1;
 }
 
 //Remove all objects from the scene
