@@ -1,6 +1,9 @@
 #include "Scene.h"
 
-
+//Static members
+unsigned int Scene::SCREEN_HEIGHT = 1080;
+unsigned int Scene::SCREEN_WIDTH = 1920;
+//Forward Declarations
 class PhysicsWorld;
 
 Scene::Scene(Camera* mC)
@@ -99,7 +102,7 @@ void Scene::removeLightController()
 void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 {
 
-	/*
+	/* //This currently breaks the ImGui display, fix would be to use separate quadVAO and VBO
 	{ // Uncomment this to render the debug quads for spotlights (cannot be rendered with the actual scene)
 		//You may not be aligned with the debug quads.
 		//Use regular controls to move
@@ -111,6 +114,11 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 	
 	
 	{ // Uncomment this to render the scene
+
+		m_ShadowMap->ShadowPass();
+
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Draw Point Light Lamp (light spheres)
 		{
@@ -134,6 +142,7 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 
 			//Update physics
 			m_PhysicsWorld->step(static_cast<float>(glfwGetTime()), deltaTime);
+
 
 			//Draw Objects
 			for (Object* element : m_SceneObjects){

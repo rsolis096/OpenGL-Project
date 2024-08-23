@@ -16,7 +16,8 @@
 class Scene
 {
 public:
-
+	static unsigned int SCREEN_WIDTH;
+	static unsigned int SCREEN_HEIGHT;
 	//Total Objects in scene
 	unsigned short m_SceneObjectCount;
 	float fps;

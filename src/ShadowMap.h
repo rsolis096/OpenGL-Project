@@ -1,52 +1,61 @@
 #pragma once
 
+// Include necessary headers
 #include "Shader.h"
-#include "Texture.h"
 #include "Object.h"
-#include "Model.h"
 #include "LightController.h"
-
-#include <glm/gtx/string_cast.hpp>
+#include <vector>
 
 class ShadowMap
 {
-	private:
+private:
 
-		std::vector<Object*>* m_SceneObjects;
+    // Private member variables
+    GLuint framebuffer;
+    GLuint colorTexture;
 
-		LightController* m_LightController;
+    // Shaders
+    Shader shadowPassShader;
+    Shader debugDepthShader;
 
-		//Spot Lights
-		std::vector<GLuint> depthMapFBOSpotLights;
-		std::vector<GLuint> depthMapSpotLights;
+    // Scene objects and light controller
+    std::vector<Object*>* m_SceneObjects;
+    LightController* m_LightController;
 
-		//Point Lights
-		std::vector<GLuint> depthMapFBOPointLights;
-		std::vector<GLuint> depthCubeMaps;
+    // Point Lights
+    std::vector<GLuint> depthMapFBOPointLights;
+    std::vector<GLuint> depthCubeMaps;
+
+    // Light space matrices for spotlights
+    std::vector<glm::mat4> m_LightSpaceMatrices;
+
+    // Static variables for quad VAO and VBO
+    static unsigned int quadVAO;
+    static unsigned int quadVBO;
+    static bool quadInitialized;
+
+    // Generic Size
+    static const unsigned short SHADOW_WIDTH = 1024;
+    static const unsigned short SHADOW_HEIGHT = 1024;
+
+    // Private helper methods
+    void InitializeQuadBuffers(unsigned int& quadVAO, unsigned int& quadVBO, bool invertQuad);
+    void GenerateGUIShadowMap();
 
 
-		const unsigned short SHADOW_WIDTH = 1024;
-		const unsigned short SHADOW_HEIGHT = 1024;
-		std::vector<glm::mat4> m_LightSpaceMatrices;
-		bool m_UpdateShadowMap;
+public:
+    // Constructor
+    ShadowMap(std::vector<Object*>* objects, LightController* lightController);
 
-	public:
+    // Spot Lights
+    std::vector<GLuint> depthMapFBOSpotLights;
+    std::vector<GLuint> depthMapSpotLights;
 
-
-
-		Shader depthShader;
-		Shader debugDepthShader;
-		ShadowMap(std::vector<Object*>*, LightController*);
-		void ShadowPass();
-		void addShadowMap();
-		void addCubeMap();
-		glm::mat4& getLightSpaceMatrix(int);
-		std::vector<glm::mat4>& getLightSpaceMatrices();
-		void updateShaderUniforms(Shader&) const;
-		
-		GLuint getDepthMapID(int);
-		GLuint getDepthMapFBOID(int);
-		void setUpdateShadowMap();
-		void debugShadowMap();
-		
+    // Public methods
+    void ShadowPass();
+    void addShadowMap();
+    void addCubeMap();
+    void updateShaderUniforms(Shader& shader) const;
+    GLuint RenderToGUIWindow(unsigned short);
+    void debugShadowMap();
 };

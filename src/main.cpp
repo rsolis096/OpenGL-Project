@@ -285,8 +285,8 @@ void demoScene(Scene& demoScene)
     //Sphere
     //demoScene.m_SceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
     //Model
-    demoScene.m_SceneObjects[0]->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    demoScene.m_SceneObjects[0]->setScale(glm::vec3(0.01f));
+    demoScene.m_SceneObjects[0]->setPosition(glm::vec3(-7.0f, -4.0f, 0.0f));
+    demoScene.m_SceneObjects[0]->setScale(glm::vec3(1.0f));
     demoScene.m_SceneObjects[0]->setRotation(glm::vec3(0.0f, 180.0f, 0.0f));
 }
 
@@ -341,10 +341,6 @@ int main()
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        myScene.m_ShadowMap->ShadowPass();
-        
-        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         myScene.drawScene(deltaTime, projection, view);
 
         glCheckError();

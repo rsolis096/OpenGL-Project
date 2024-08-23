@@ -663,6 +663,13 @@ void GUI::drawList()
 							if (ImGui::InputFloat("Far Plane", &far_plane, 0.1f, 1.0f, "%.3f", 0))
 								selectedSpotLight->setFarPlane(far_plane);
 						}
+
+						// Display the depth map for spotlights
+						if (!myScene.m_ShadowMap->depthMapSpotLights.empty()) {
+							ImGui::Text("Spotlight Depth Map:");
+							GLuint colorTexture = myScene.m_ShadowMap->RenderToGUIWindow(selectedSpotLight->m_SpotLightID);
+							ImGui::Image((void*)colorTexture, ImVec2(256, 256));
+						}
 					}
 				}
 				if (selectedType == "point")
