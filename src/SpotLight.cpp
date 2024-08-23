@@ -1,18 +1,21 @@
 #include "SpotLight.h"
 
+#include <glm/gtx/string_cast.hpp>
+
 bool firstFrame2 = true;
 unsigned short SpotLight::m_SpotLightCount = 0;
 
 SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec3 pos, glm::vec3 dir) :
 	m_LightingShader(lightingShader), m_LightSourceShader(lightSourceShader),
-	m_LightPos(pos), m_LightDirection(dir),
+	m_LightPos(pos), m_LightDirection(normalize(dir - pos)),
 	m_NearPlane(0.5f), m_FarPlane(70.0f)
 {
-	m_LightDirection = glm::normalize(dir);
 
 	m_SpotLightID = m_SpotLightCount;
 	m_DisplayName = "SpotLight" + std::to_string(m_SpotLightID);
 	m_SpotLightCount+= 1;
+
+	//Check if already normalized direction vector
 
 	//m_SpotLight takes the shape of a sphere
 	m_LightShape = new Sphere();
@@ -94,7 +97,7 @@ void SpotLight::setSpecular(const glm::vec3 specular)
 
 void SpotLight::setLightDirection(const glm::vec3 newDir)
 {
-	m_LightDirection = glm::normalize(newDir);
+	m_LightDirection = glm::normalize(newDir - m_LightPos);
 	m_LightingShader->use();
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].direction", m_LightDirection);
 }

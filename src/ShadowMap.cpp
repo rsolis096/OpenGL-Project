@@ -144,6 +144,7 @@ void ShadowMap::ShadowPass()
         shadowPassShader.setInt("lightType", 1);
 
         for (int i = 0; i < numberOfSpotLights; i++) {
+
             glm::mat4 lightProjection = glm::perspective(
                 glm::radians(45.0f),
                 static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT),
@@ -151,10 +152,16 @@ void ShadowMap::ShadowPass()
                 m_LightController->m_SpotLights[i]->getFarPlane()
             );
 
+            glm::vec3 lightPos = m_LightController->m_SpotLights[i]->getLightPos();
+            glm::vec3 lightDir = m_LightController->m_SpotLights[i]->getLightDirection();
+
+            // Calculate the target point by adding the direction vector to the position
+            glm::vec3 target = lightPos + lightDir;
+
             glm::mat4 lightView = glm::lookAt(
-                m_LightController->m_SpotLights[i]->getLightPos(),
-                m_LightController->m_SpotLights[i]->getLightDirection(),
-                glm::vec3(0.0, 1.0, 0.0)
+                lightPos,      // Position of the light
+                target,        // The target point (position + direction)
+                glm::vec3(0.0, 1.0, 0.0)  // Up vector
             );
 
             m_LightSpaceMatrices.push_back(lightProjection * lightView);
