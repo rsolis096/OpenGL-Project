@@ -70,7 +70,7 @@ void SpotLight::Draw() const
 * ###     SETTER FUNCTIONS        ###
 ###################################*/
 
-void SpotLight::setAmbient(const glm::vec3 ambient)
+void SpotLight::setAmbient(const glm::vec3& ambient)
 {
 	m_Ambient = ambient * m_Intensity;
 	m_LightShape->setAmbient(m_Ambient);
@@ -79,7 +79,7 @@ void SpotLight::setAmbient(const glm::vec3 ambient)
 
 }
 
-void SpotLight::setDiffuse(const glm::vec3 diffuse)
+void SpotLight::setDiffuse(const glm::vec3& diffuse)
 {
 	m_Diffuse = diffuse * m_Intensity;
 	m_LightShape->setDiffuse(m_Diffuse);
@@ -87,7 +87,7 @@ void SpotLight::setDiffuse(const glm::vec3 diffuse)
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].diffuse", m_Diffuse);
 }
 
-void SpotLight::setSpecular(const glm::vec3 specular)
+void SpotLight::setSpecular(const glm::vec3& specular)
 {
 	m_Specular = specular * m_Intensity;
 	m_LightShape->setSpecular(m_Specular);
@@ -95,14 +95,22 @@ void SpotLight::setSpecular(const glm::vec3 specular)
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].specular", m_Specular);
 }
 
-void SpotLight::setLightDirection(const glm::vec3 newDir)
+void SpotLight::setLightDirection(const glm::vec3& newDir)
 {
-	m_LightDirection = glm::normalize(newDir - m_LightPos);
+
+	float length = glm::length(newDir);
+
+	m_LightDirection = newDir;
+
+	// If the vector is not normalized, normalize it
+	if(std::abs(length - 1.0f) > 0.001)
+		m_LightDirection = glm::normalize(newDir - m_LightPos);
+
 	m_LightingShader->use();
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].direction", m_LightDirection);
 }
 
-void SpotLight::setLightPos(const glm::vec3 lightPos)
+void SpotLight::setLightPos(const glm::vec3& lightPos)
 {
 	m_LightPos = lightPos;
 	m_LightingShader->use();
