@@ -18,6 +18,8 @@ struct DirLight {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    vec3 position;
+    sampler2D shadowMap;
 };
 
 struct PointLight {
@@ -61,6 +63,7 @@ in VS_OUT {
     vec3 Normal;
     vec2 TexCoords;
     vec4 FragPosLightSpace[MAX_NR_SHADOW_MAPS];
+    vec4 dirFragPosLightSpace;
 } fs_in;
 
 
@@ -71,11 +74,15 @@ uniform float far_plane;
 uniform vec3 viewPos;
 
 //Scene Light Objects
+
 uniform DirLight dirLight;
+uniform bool hasDirLight;
+
 uniform PointLight pointLights[MAX_NR_POINT_LIGHTS];
-uniform int numberOfPointLightsFRAG;
+uniform int numberOfPointLights;
+
 uniform SpotLight spotLights[MAX_NR_SPOT_LIGHTS];
-uniform int numberOfSpotLightsFRAG;
+uniform int numberOfSpotLights;
 
 //Fragment Properties
 uniform Material material;
@@ -153,6 +160,46 @@ float SpotLightShadowCalculation(vec4 fragPosLightSpace, SpotLight light)
     return shadow / 9.0;
 }
 
+float DirectionalLightShadowCalculation(float dotLightNormal)
+{
+    // perform perspective divide
+    vec3 pos = fs_in.dirFragPosLightSpace.xyz * 0.5 + 0.5;
+
+    // If the fragment is outside the shadow map bounds, make it fully shadowed
+    //Enable this to show directional shadow map boundary
+    /* 
+    if (pos.x < 0.0 || pos.x > 1.0 || pos.y < 0.0 || pos.y > 1.0)
+    {
+        return 1.0; // Full shadow
+    }
+    */
+
+    //Fixes cut-off for scene behind light direction (0.0f indicates no shadow, 1.0f indicates full shadow)
+    if(pos.z > 1.0f){
+        pos.z = 1.0f;
+    }
+
+
+    float depth = texture(dirLight.shadowMap, pos.xy).r;
+
+    //For shadow acne
+    float bias = max(0.05 * (1.0 - dotLightNormal), 0.005);
+
+    //PCF (For blurry edges)
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(dirLight.shadowMap, 0);
+    for(int x = -1; x <= 1; ++x)
+    {
+        for (int y = -1; y <= 1; ++y)
+        {
+            float depth = texture(dirLight.shadowMap, pos.xy + vec2(x, y) * texelSize).r;
+            shadow += (depth + bias) < pos.z ? 1.0: 0.0;
+        }
+
+    }
+    return shadow / 9.0;
+}
+
 
 // array of offset direction for sampling
 vec3 gridSamplingDisk[20] = vec3[]
@@ -226,19 +273,22 @@ void main()
     // properties
     vec3 normal = normalize(fs_in.Normal);
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
-    vec3 result;
+    vec3 result = vec3(0.0f);
 
     // phase 1: directional lights
-    result += CalcDirLight(normal, viewDir);
+    if(hasDirLight){
+        result += CalcDirLight(normal, viewDir);
+    }
+
     // phase 2: point lights
     
-    for(int i = 0; i < numberOfPointLightsFRAG; i++)
+    for(int i = 0; i < numberOfPointLights; i++)
     {
         result += CalcPointLight(pointLights[i], normal, viewDir);           
     }
 
     //phase 3: spot light 
-    for(int i = 0; i < numberOfSpotLightsFRAG; i++)
+    for(int i = 0; i < numberOfSpotLights; i++)
     {
         result += CalcSpotLight(spotLights[i], normal, viewDir, i);           
     }
@@ -362,5 +412,44 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
 }
 
 vec3 CalcDirLight(vec3 normal, vec3 viewDir){
-    return vec3(0.0f);
+
+    
+    vec3 lightDir = normalize(dirLight.direction);
+    float dotLightNormal = dot(lightDir, normal);
+    float diff = max(dotLightNormal, 0.0);
+
+    // Calculate Blinn-Phong specular
+    vec3 halfwayDir = normalize(lightDir + viewDir);  
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
+
+    // Calculate shadow factor
+    float shadow = DirectionalLightShadowCalculation(dotLightNormal);
+
+    // Initialize color components
+    vec3 ambient, diffuse, specular;
+
+    // Apply texture or object colors
+    if (hasTexture)
+    {
+        //ambient = texture(material.diffuse, fs_in.TexCoords).rgb;
+        ambient = object.ambient;
+        diffuse = texture(material.diffuse, fs_in.TexCoords).rgb;
+        specular = texture(material.specular, fs_in.TexCoords).rgb;
+    }
+    else
+    {
+        ambient = object.ambient;
+        diffuse = object.diffuse;
+        specular = object.specular;
+    }
+
+    // Apply lighting influence
+    ambient *= dirLight.ambient;
+    diffuse *= dirLight.diffuse * diff ;
+    specular *= dirLight.specular * spec ;
+
+    // Combine lighting components
+    vec3 result = ambient + (1.0 - shadow) * (diffuse + specular);
+
+    return result;
 }

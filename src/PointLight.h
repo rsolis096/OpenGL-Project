@@ -25,6 +25,7 @@ class PointLight
 		glm::vec3 getAmbient();
 		glm::vec3 getDiffuse();
 		glm::vec3 getSpecular();
+		GLuint& getCubeMapTexture();
 
 		//For Attenuation
 		void setconstant(const float constant);
@@ -55,4 +56,6 @@ class PointLight
 		float m_Constant;
 		float m_Linear;
 		float m_Quadratic;
+
+		GLuint m_CubeMapTexture;
 };

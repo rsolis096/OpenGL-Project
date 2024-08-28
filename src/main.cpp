@@ -211,6 +211,7 @@ GLFWwindow* setupWindow()
         return nullptr;
     }
     glfwMakeContextCurrent(window);
+
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     //Enable cursor and scroll wheel input
@@ -230,8 +231,6 @@ GLFWwindow* setupWindow()
     glEnable(GL_DEPTH_TEST);
 
 
-    
-
     //Gamma Correction (makes everything look washed)
     //glEnable(GL_FRAMEBUFFER_SRGB);
     glDisable(0x809D); //disable multisampling
@@ -247,11 +246,11 @@ void demoScene(Scene& demoScene)
 {
     //GENERATE INITIAL SCENE (ALL OF THESE CAN BE CHANGED IN REAL TIME)
     //demoScene.addObject(new Model("assets/models/dragon/dragon.obj"));
-    demoScene.addObject(new Model("assets/models/backpack/backpack.obj"));
+    //demoScene.addObject(new Model("assets/models/backpack/backpack.obj"));
     //demoScene.addObject(new Model("assets/models/sponza_gltf/scene.gltf"));
     //demoScene.addObject(new Cube("assets/textures/container2.png", "assets/textures/container2_specular.png"));
-	//demoScene.addObject(new Sphere("assets/textures/globe.jpg", "assets/textures/globe.jpg"));
-    //demoScene.addObject(new Plane());
+	demoScene.addObject(new Sphere("assets/textures/globe.jpg", "assets/textures/globe.jpg"));
+    demoScene.addObject(new Plane());
 
     //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
     //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[1]);
@@ -271,12 +270,13 @@ void demoScene(Scene& demoScene)
     spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
 
     demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
-    //demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
-    //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
+    demoScene.m_LightController->addDirectionalLight(glm::vec3(0.0f));
+    demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
+    demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
-    demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 20.0f, 0.0f));
-    demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 9.0f, 0.0f));
-    demoScene.m_LightController->addPointLight(glm::vec3(10.0f, 5.0f, 10.0f));
+	demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 20.0f, 0.0f));
+    //demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 9.0f, 0.0f));
+    //demoScene.m_LightController->addPointLight(glm::vec3(10.0f, 5.0f, 10.0f));
 
 
     //Cube
@@ -285,9 +285,9 @@ void demoScene(Scene& demoScene)
     //Sphere
     //demoScene.m_SceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
     //Model
-    demoScene.m_SceneObjects[0]->setPosition(glm::vec3(-7.0f, -4.0f, 0.0f));
-    demoScene.m_SceneObjects[0]->setScale(glm::vec3(1.0f));
-    demoScene.m_SceneObjects[0]->setRotation(glm::vec3(0.0f, 180.0f, 0.0f));
+    //demoScene.m_SceneObjects[0]->setPosition(glm::vec3(-7.0f, -4.0f, 0.0f));
+    //demoScene.m_SceneObjects[0]->setScale(glm::vec3(1.0f));
+    //demoScene.m_SceneObjects[0]->setRotation(glm::vec3(0.0f, 180.0f, 0.0f));
 }
 
 int main()
@@ -315,6 +315,7 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         //Move light in scene
+        /*
         myScene.m_LightController->m_PointLights[1]->setLightPos(glm::vec3(position, 9.0f, 0.0f));
         position += (0.05f * direction);
         if(position >= 7.5)
@@ -324,7 +325,7 @@ int main()
         else if (position <= -7.5)
         {
             direction *= -1;
-        }
+        }*/
 
         processInput(window);
 

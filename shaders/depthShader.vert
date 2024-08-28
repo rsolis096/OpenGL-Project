@@ -1,9 +1,10 @@
 #version 330 core
 layout (location = 0) in vec3 aPos;
 
-uniform int lightType; //0 = Point Light, 1 = Spot Light
-
-uniform mat4 shadowPassMatrix;
+//0 = Point Light, 1 = Spot Light, 2- Directional Light
+uniform int lightType; 
+uniform mat4 shadowPassMatrixDir;
+uniform mat4 shadowPassMatrixSpot;
 uniform mat4 model;
 
 void main()
@@ -14,6 +15,10 @@ void main()
 	}
 	else if (lightType == 1)
 	{
-		gl_Position = shadowPassMatrix  * model * vec4(aPos, 1.0);
+		gl_Position = shadowPassMatrixSpot  * model * vec4(aPos, 1.0);
+	}
+	else if (lightType == 2)
+	{
+		gl_Position = shadowPassMatrixDir  * model * vec4(aPos, 1.0);
 	}
 }

@@ -6,6 +6,7 @@ LightController::LightController
 {
 	m_LightingShader = lightingShader;
 	m_LightSourceShader = objectShader;
+	m_DirectionalLight = nullptr;
 	m_PlayerCamera = cam;
 	glCheckError();
 }
@@ -15,7 +16,8 @@ LightController::LightController
 void LightController::addPointLight(const glm::vec3& pos)
 {
 	m_PointLights.push_back(new PointLight(m_LightingShader, m_LightSourceShader, pos));
-	m_Scene->m_ShadowMap->addCubeMap();
+	PointLight* newPointLight = m_PointLights.back();
+	m_Scene->m_ShadowMap->addPointLightShadowMap(newPointLight->getCubeMapTexture());
 	glCheckError();
 }
 
@@ -27,8 +29,8 @@ void LightController::removePointLight()
 void LightController::addSpotLight(const glm::vec3 pos, const glm::vec3 dir)
 {
 	m_SpotLights.push_back(new SpotLight(m_LightingShader, m_LightSourceShader, pos, dir));
-	m_Scene->m_ShadowMap->addShadowMap();
-
+	m_Scene->m_ShadowMap->addSpotLightShadowMap(m_SpotLights[m_SpotLights.size() - 1]->getDepthMapTexture());
+	glCheckError();
 }
 
 void LightController::removeSpotLight()
@@ -36,8 +38,18 @@ void LightController::removeSpotLight()
 	//TODO:  LightController::removeSpotLight()
 }
 
-void LightController::addDirectionalLight(const glm::vec3& pos)
+void LightController::addDirectionalLight(const glm::vec3& dir)
 {
+	//Only one directional light can exist
+	if(m_DirectionalLight != nullptr){
+		delete m_DirectionalLight;
+		m_DirectionalLight = nullptr;
+	}
+	m_DirectionalLight = new DirectionalLight(m_LightingShader, dir);
+
+	// Configure a directional shadow map
+	m_Scene->m_ShadowMap->addDirectionalShadowMap(m_DirectionalLight->getDepthMapTexture());
+	glCheckError();
 
 }
 
@@ -45,7 +57,7 @@ void LightController::removeDirectionalLight()
 {
 }
 
-void LightController::drawLighting()
+void LightController::drawLighting() const
 {
 	for (PointLight* pointLight : m_PointLights) {
 		pointLight->Draw();

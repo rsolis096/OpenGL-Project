@@ -11,6 +11,7 @@ PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::
 	setLightPos(pos);
 	m_LightShape->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
+	m_CubeMapTexture = 0;
 	m_LightID = m_PointLightCount;
 	m_DisplayName = "PointLight" + std::to_string(m_LightID);
 	m_PointLightCount++;
@@ -140,4 +141,9 @@ glm::vec3 PointLight::getDiffuse()
 glm::vec3 PointLight::getSpecular()
 {
 	return m_Specular;
+}
+
+GLuint& PointLight::getCubeMapTexture()
+{
+	return m_CubeMapTexture;
 }

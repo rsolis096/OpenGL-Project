@@ -39,6 +39,7 @@ public:
 	float getIntensity() const;
 	float getNearPlane() const;
 	float getFarPlane() const;
+	GLuint& getDepthMapTexture();
 
 	//Private Variables
 	std::string m_DisplayName;
@@ -70,5 +71,7 @@ private:
 	float m_Linear;
 	float m_Quadratic;
 	float m_Intensity;
+
+	GLuint m_DepthMapTexture;
 
 };

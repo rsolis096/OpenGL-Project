@@ -7,15 +7,16 @@
 //Forward Declaration (both depend on eachother)
 class Scene;
 
-enum LightType {
-	SPOT_LIGHT,        // 0
-	POINT_LIGHT,       // 1
-	DIRECTIONAL_LIGHT  // 2
-};
-
 class LightController
 {
 public:
+
+	enum LightType {
+		POINT_LIGHT,       // 0
+		SPOT_LIGHT,        // 1
+		DIRECTIONAL_LIGHT  // 2
+	};
+
 	LightController(Shader*, Shader*, Camera*, Scene*);
 	
 	//Given by the scene
@@ -40,5 +41,5 @@ public:
 	void addDirectionalLight(const glm::vec3&);
 	void removeDirectionalLight();
 
-	void drawLighting();
+	void drawLighting() const;
 };

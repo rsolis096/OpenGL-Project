@@ -7,15 +7,15 @@ unsigned short SpotLight::m_SpotLightCount = 0;
 
 SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec3 pos, glm::vec3 dir) :
 	m_LightingShader(lightingShader), m_LightSourceShader(lightSourceShader),
-	m_LightPos(pos), m_LightDirection(normalize(dir - pos)),
-	m_NearPlane(0.5f), m_FarPlane(70.0f)
+	m_LightPos(pos), m_NearPlane(0.5f), m_FarPlane(70.0f)
 {
-
 	m_SpotLightID = m_SpotLightCount;
 	m_DisplayName = "SpotLight" + std::to_string(m_SpotLightID);
 	m_SpotLightCount+= 1;
 
-	//Check if already normalized direction vector
+	m_LightDirection = glm::normalize(dir - m_LightPos);
+
+	m_DepthMapTexture = 0;
 
 	//m_SpotLight takes the shape of a sphere
 	m_LightShape = new Sphere();
@@ -97,15 +97,7 @@ void SpotLight::setSpecular(const glm::vec3& specular)
 
 void SpotLight::setLightDirection(const glm::vec3& newDir)
 {
-
-	float length = glm::length(newDir);
-
-	m_LightDirection = newDir;
-
-	// If the vector is not normalized, normalize it
-	if(std::abs(length - 1.0f) > 0.001)
-		m_LightDirection = glm::normalize(newDir - m_LightPos);
-
+	m_LightDirection = glm::normalize(newDir - m_LightPos);
 	m_LightingShader->use();
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].direction", m_LightDirection);
 }
@@ -197,4 +189,9 @@ float SpotLight::getNearPlane() const
 float SpotLight::getFarPlane() const
 {
 	return m_FarPlane;
+}
+
+GLuint& SpotLight::getDepthMapTexture()
+{
+	return m_DepthMapTexture;
 }

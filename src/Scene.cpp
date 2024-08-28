@@ -101,8 +101,15 @@ void Scene::removeLightController()
 
 void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 {
+	glEnable(GL_DEPTH_TEST);
 
-	/* //This currently breaks the ImGui display, fix would be to use separate quadVAO and VBO
+	m_ShadowMap->shadowPass();
+
+	// reset viewport after shadow pass
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	/*
 	{ // Uncomment this to render the debug quads for spotlights (cannot be rendered with the actual scene)
 		//You may not be aligned with the debug quads.
 		//Use regular controls to move
@@ -111,21 +118,15 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 		m_ShadowMap->debugDepthShader.setMat4("view", view);
 		m_ShadowMap->debugShadowMap();
 	}*/
-	
-	
+
 	{ // Uncomment this to render the scene
 
-		m_ShadowMap->ShadowPass();
-
-		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Draw Point Light Lamp (light spheres)
 		{
 			pointLightShader->use();
 			pointLightShader->setMat4("projection", proj);
 			pointLightShader->setMat4("view", view);
-
 			//Draw Lights (just the object, lighting is done in shader)
 			m_LightController->drawLighting();
 		}
@@ -143,18 +144,19 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 			//Update physics
 			m_PhysicsWorld->step(static_cast<float>(glfwGetTime()), deltaTime);
 
-
 			//Draw Objects
 			for (Object* element : m_SceneObjects){
 				element->Draw(*lightingShader);
 			}
 
 			m_SkyBox->draw(proj);
+
+
 		}
 	}
-	
 
-	
+	glDisable(GL_DEPTH_TEST);
+
 	//std::cout << "Texture Units used this frame: " << TextureManager::getCurrentUnit() << "\n";
 	//Reset current unit to zero for next render pass
 	TextureManager::reset();

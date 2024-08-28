@@ -94,7 +94,7 @@ SkyBox::SkyBox(Shader& s, Camera* c) : m_CubeMapShader(s), m_PlayerCamera(c)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
     glCheckError();
     m_InvertedTexture = false;
-    m_CubeMap = new Texture(m_CubeMapPaths[0], m_InvertedTexture);
+    m_CubeMap = new Texture(m_CubeMapPaths[1], m_InvertedTexture);
     m_Current = 0;
 }
 

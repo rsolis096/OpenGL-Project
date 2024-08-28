@@ -78,6 +78,7 @@ void GUI::drawList()
 	//Current Tab from left to right
 	static int currentTab = 1;
 	static string selectedType = "none";
+	DirectionalLight* dirLight = myScene.m_LightController->m_DirectionalLight;
 
 	//Left side of window 
 	ImGui::BeginGroup();
@@ -155,13 +156,28 @@ void GUI::drawList()
 
 	//Light List
 	else if (currentTab == 2)
-{
+	{
 		// Start the child window for the light list
 		ImGui::BeginChild("light_list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
 
 		unsigned short numSpotLights = myScene.m_LightController->m_SpotLights.size();
 		unsigned short numPointLights = myScene.m_LightController->m_PointLights.size();
 		unsigned int totalLights = numSpotLights + numPointLights;
+
+		// First, display the directional light if it exists
+		if (dirLight != nullptr)
+		{
+			char label[128];
+			bool isSelected = (selectedType == "dir");
+
+			sprintf_s(label, "%s", dirLight->m_DisplayName.c_str());
+
+			if (ImGui::Selectable(label, isSelected))
+			{
+				lightingSelected = 0;  // Assign a special value (like 0) for the directional light
+				selectedType = "dir";
+			}
+		}
 
 		// Fill the list of lights
 		for (unsigned int i = 0; i < totalLights; ++i)
@@ -367,6 +383,7 @@ void GUI::drawList()
 
 
 						}
+
 
 						// Color
 						{
@@ -664,12 +681,17 @@ void GUI::drawList()
 								selectedSpotLight->setFarPlane(far_plane);
 						}
 
+						
 						// Display the depth map for spotlights
-						if (!myScene.m_ShadowMap->depthMapSpotLights.empty()) {
+						//selectedSpotLight;
+						
+						if (selectedSpotLight->getDepthMapTexture() != 0) {
 							ImGui::Text("Spotlight Depth Map:");
-							GLuint colorTexture = myScene.m_ShadowMap->RenderToGUIWindow(selectedSpotLight->m_SpotLightID);
+							GLuint colorTexture = myScene.m_ShadowMap->renderToGUIWindow(selectedSpotLight->getDepthMapTexture());
 							ImGui::Image((void*)colorTexture, ImVec2(256, 256));
 						}
+						
+						
 					}
 				}
 				if (selectedType == "point")
@@ -735,6 +757,20 @@ void GUI::drawList()
 
 					}
 
+				}
+				if(selectedType == "dir")
+				{
+					ImGui::Text("Directional Light");
+
+
+					if(dirLight != nullptr)
+					{
+						ImGui::Text("Spotlight Depth Map:");
+						GLuint colorTexture = myScene.m_ShadowMap->renderToGUIWindow(dirLight->getDepthMapTexture());
+						ImGui::Image((void*)colorTexture, ImVec2(256, 256));
+					}
+
+					
 				}
 				ImGui::EndTabItem();
 			}

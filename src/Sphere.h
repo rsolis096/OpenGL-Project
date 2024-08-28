@@ -6,8 +6,6 @@ class Sphere : public Object
 {
 public:
 
-
-
     bool changed;
     //Build a primitive Cube with no texture data
     Sphere();

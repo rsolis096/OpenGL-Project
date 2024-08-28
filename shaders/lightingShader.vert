@@ -11,31 +11,36 @@ out VS_OUT {
     vec3 Normal;
     vec2 TexCoords;
     vec4 FragPosLightSpace[MAX_NR_SHADOW_MAPS];
+    vec4 dirFragPosLightSpace;
 } vs_out;
 
-
+// Uniforms
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 lightSpaceMatrices[MAX_NR_SHADOW_MAPS];
-uniform int numberOfSpotLightsVERT;
-
-//Point Light = 0, Spot Light = 1, Directional Light = 2
-uniform int lightType; 
+uniform int numberOfSpotLights;
+uniform bool hasDirLight; 
+uniform mat4 directionalLightSpaceMatrix;
 
 void main()
 {
-
-    vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
-    vs_out.Normal = transpose(inverse(mat3(model))) * aNormal;
+    //Process all lights
+    vec4 worldPosition = model * vec4(aPos, 1.0);
+    vs_out.FragPos = vec3(worldPosition);
+    vs_out.Normal = normalize(transpose(inverse(mat3(model))) * aNormal);
     vs_out.TexCoords = aTexCoords;
-    gl_Position = projection * view * vec4(vs_out.FragPos, 1.0);
-
-    if(lightType == 1)
+    gl_Position = projection * view * worldPosition;
+    
+    // Process Spot Lights
+    for (int i = 0; i < numberOfSpotLights; i++)
     {
-        for(int i = 0; i < numberOfSpotLightsVERT; i++)
-        {
-            vs_out.FragPosLightSpace[i] = lightSpaceMatrices[i] * vec4(vs_out.FragPos, 1.0);
-        }
+        vs_out.FragPosLightSpace[i] = lightSpaceMatrices[i] * vec4(vs_out.FragPos, 1.0);
     }
-};
+    
+    //Process Directional Light
+    if (hasDirLight)
+    {
+        vs_out.dirFragPosLightSpace = directionalLightSpaceMatrix * vec4(vs_out.FragPos, 1.0);
+    }
+}
