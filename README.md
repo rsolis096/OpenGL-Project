@@ -10,16 +10,16 @@
 | D  | Translate Right  |
 | Space  | Ascend  |
 | LCTRL  | Descend  |
-| LSHIFT  | Increase Movement Speed |
+| LSHIFT (Hold)  | Increase Movement Speed |
 | ` | Open Menu, once GUI is open use Mouse to interact  |
 | Scroll Wheel  | Increase/Decrease Field of View (Zoom)  |
 | ESC  | Close Program  |
 
 ## Includes
 - Real time manipulation of 3D objects such as Position, Rotation, Textures and Colors through a Graphical User Interface
-- Real Time Shadows produces using shadow maps (Currently only SpotLights have shadows)
+- Real Time Shadows Maps (Directional, Spot, Point)
 - Blinn Phong Lighting for Spot Lights, Point Lights and Directional Lights 
-- Simple gravity implementation
+- Model Loading
 
 ## How To Run
 
