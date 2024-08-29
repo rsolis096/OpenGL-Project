@@ -31,6 +31,7 @@ Model::~Model()
 void Model::loadModel(string const& path)
 {
     const aiScene* scene = Model::CheckPath(path);
+
     if (scene == nullptr){
         throw std::runtime_error("Failed to load model: scene is nullptr");
     }

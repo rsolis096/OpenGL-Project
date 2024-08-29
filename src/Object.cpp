@@ -178,7 +178,7 @@ void Object::updateObject()
 }
 
 
-
+//Combines vertices and normals
 void Object::buildInterleavedVertices()
 {
     std::vector<float>().swap(m_InterleavedVertices);

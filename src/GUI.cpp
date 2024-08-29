@@ -687,7 +687,7 @@ void GUI::drawList()
 						
 						if (selectedSpotLight->getDepthMapTexture() != 0) {
 							ImGui::Text("Spotlight Depth Map:");
-							GLuint colorTexture = myScene.m_ShadowMap->renderToGUIWindow(selectedSpotLight->getDepthMapTexture());
+							GLuint colorTexture = myScene.m_ShadowMap->renderDepthMapToGUI(selectedSpotLight->getDepthMapTexture());
 							ImGui::Image((void*)colorTexture, ImVec2(256, 256));
 						}
 						
@@ -766,7 +766,7 @@ void GUI::drawList()
 					if(dirLight != nullptr)
 					{
 						ImGui::Text("Spotlight Depth Map:");
-						GLuint colorTexture = myScene.m_ShadowMap->renderToGUIWindow(dirLight->getDepthMapTexture());
+						GLuint colorTexture = myScene.m_ShadowMap->renderDepthMapToGUI(dirLight->getDepthMapTexture());
 						ImGui::Image((void*)colorTexture, ImVec2(256, 256));
 					}
 

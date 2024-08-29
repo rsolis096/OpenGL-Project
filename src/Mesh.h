@@ -31,7 +31,6 @@ struct Vertex {
     float m_Weights[MAX_BONE_INFLUENCE];
 };
 
-
 class Mesh {
 public:
     // mesh Data

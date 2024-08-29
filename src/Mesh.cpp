@@ -64,10 +64,11 @@ void Mesh::ShadowPassDraw(Shader& shader) const
     // draw mesh
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
 
-    // always good practice to set everything back to defaults once configured.
-    glActiveTexture(GL_TEXTURE0);
+    //glActiveTexture(GL_TEXTURE0);
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     glCheckError();
 }
 
@@ -77,6 +78,7 @@ void Mesh::Draw(Shader& shader, bool hasTexture, unsigned int textureUnitOffset)
     // bind appropriate textures
     unsigned int normalNr = 1;
     unsigned int heightNr = 1;
+    glCheckError();
 
     if (hasTexture)
     {
@@ -110,11 +112,15 @@ void Mesh::Draw(Shader& shader, bool hasTexture, unsigned int textureUnitOffset)
             glUniform1i(location, textureUnitOffset + i);
         }
     }
+    glCheckError();
 
     // draw mesh
     glBindVertexArray(VAO);
+    glCheckError();
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
+    glCheckError();
     glBindVertexArray(0);
+    glCheckError();
 
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);

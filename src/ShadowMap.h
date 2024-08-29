@@ -26,23 +26,22 @@ public:
     //Main Loop Methods (Used during the rendering loop every frame)
     void shadowPass();
     void updateShaderUniforms(Shader& shader) const;
-    GLuint renderToGUIWindow(GLuint texture);
-    void debugShadowMap();
+    GLuint renderDepthMapToGUI(GLuint texture);
+    //GLuint renderCubeMapToGUI(PointLight* lightSource, unsigned int i);
 
 private:
 
     // Frame buffer Objects
     GLuint m_FBO;
     GLuint m_CubeMapFBO;
-    GLuint m_GUI_FBO;
+    GLuint m_2DGUI_FBO;
+    GLuint m_3DGUI_FBO;
 
     //Depth Map Textures
-    //std::vector<GLuint> m_DepthMapPointLights;
-    //std::vector<GLuint> m_DepthMapSpotLights;
-    //GLuint m_DepthMapDirLight;
 
     //Color Texture for rendering GUI depth map
     GLuint m_GUIColorTexture;
+    GLuint m_GUIColorCubeMap;
 
     // Light Space Matrices
     std::vector<glm::mat4> m_LightSpaceMatrices;
@@ -67,6 +66,7 @@ private:
 
     // Private helper methods
     void generateGUIShadowMap();
+    //void generateGUICubeMap();
 
     static void initializeQuadBuffers(unsigned int& quadVAO, unsigned int& quadVBO, bool invertQuad);
 };

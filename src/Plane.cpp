@@ -56,14 +56,16 @@ void Plane::Draw(Shader& shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
         shader.setUInt("material.specular", specularUnit);
     }
+    glCheckError();
 
     //Bind Plane
     glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glCheckError();
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+
     glCheckError();
 }
 
@@ -74,10 +76,11 @@ void Plane::ShadowPassDraw(Shader& shader)
 
     //Bind Plane and render
     glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glCheckError();
 }
 
@@ -108,12 +111,10 @@ void Plane::buildPlane()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glBindVertexArray(0);
-
 
     // unbind VAO and VBOs
     glBindVertexArray(0);
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 int Plane::updateTexture(std::vector<std::string> texturePaths)

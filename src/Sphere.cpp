@@ -4,7 +4,7 @@ unsigned int Sphere::sphereCount = 0;
 
 Sphere::ObjectType Sphere::GetType() const { return ObjectType::Sphere; }
 
-//Used for creating a Primtive with texture information
+//Used for creating a Primitive with texture information
 Sphere::Sphere(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
     //Set some rendering properties
@@ -70,6 +70,7 @@ void Sphere::Draw(Shader& shader)
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);  // Unbind the EBO
     glBindTexture(GL_TEXTURE_2D, 0);
     glCheckError();
 

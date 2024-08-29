@@ -13,9 +13,9 @@ DirectionalLight::DirectionalLight(Shader* lightingShader, const glm::vec3& dir)
 	m_DepthMapTexture = 0;
 	m_DisplayName = "Directional Light";
 	//Light color properties
-	m_Ambient = glm::vec3(0.2f, 0.2f, 0.2f);
+	m_Ambient = glm::vec3(0.05f, 0.05f, 0.05f);
 	m_Diffuse = glm::vec3(0.9f, 0.9f, 0.9f);
-	m_Specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_Specular = glm::vec3(0.7f, 0.7f, 0.7f);
 
 
 	m_LightingShader->use();

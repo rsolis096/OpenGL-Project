@@ -23,11 +23,15 @@ ShadowMap::ShadowMap(std::vector<Object*>* objects, LightController* lightContro
     m_CubeMapFBO = 0;
     glGenFramebuffers(1, &m_CubeMapFBO);
 
-    m_GUI_FBO = 0;
-    glGenFramebuffers(1, &m_GUI_FBO);
+    m_2DGUI_FBO = 0;
+    glGenFramebuffers(1, &m_2DGUI_FBO);
+
+    m_3DGUI_FBO = 0;
+    glGenFramebuffers(1, &m_3DGUI_FBO);
 
     //Create a frame buffer object and color texture to be rendered in ImGUI
     generateGUIShadowMap();
+    //generateGUICubeMap();
 }
 
 void ShadowMap::addSpotLightShadowMap(GLuint& depthMapTexture) const
@@ -312,9 +316,7 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
 // Generates a frame buffer with a texture attachment for rendering a shadow map to be used in a GUI window. 
 void ShadowMap::generateGUIShadowMap()
 {
-    // Generate a frame buffer and bind it as the current frame buffer
-    glGenFramebuffers(1, &m_GUI_FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_GUI_FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_2DGUI_FBO);
 
     // Generate a 2D texture for storing the shadow map and configure it
     glGenTextures(1, &m_GUIColorTexture);
@@ -335,15 +337,14 @@ void ShadowMap::generateGUIShadowMap()
     {
         std::cerr << "Frame buffer not complete!\n";
     }
-
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Check for any OpenGL errors during the frame buffer setup
     glCheckError();
 }
 
-
-GLuint ShadowMap::renderToGUIWindow(GLuint texture)
+GLuint ShadowMap::renderDepthMapToGUI(GLuint texture)
 {
 
     // Basic MPV matrices for the ImGui Window
@@ -368,7 +369,7 @@ GLuint ShadowMap::renderToGUIWindow(GLuint texture)
     }
 
     // Bind framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, m_GUI_FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_2DGUI_FBO);
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -387,11 +388,11 @@ GLuint ShadowMap::renderToGUIWindow(GLuint texture)
     //glDeleteTextures(1, &colorTexture);
     //glDeleteVertexArrays(1, &quadVAO);
     //glDeleteBuffers(1, &quadVBO);
+
     glCheckError();
 
     return m_GUIColorTexture;
 }
-
 
 void ShadowMap::initializeQuadBuffers(unsigned int& qVAO, unsigned int& qVBO, bool invertQuad)
 {
