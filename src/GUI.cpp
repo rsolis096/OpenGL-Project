@@ -559,22 +559,15 @@ void GUI::drawList()
 							float a[3] = { ambient[0] / intensity , ambient[1] / intensity, ambient[2] / intensity };
 							float s[3] = { specular[0] / intensity , specular[1] / intensity, specular[2] / intensity };
 
-							bool change = false;
-							if (ImGui::ColorEdit3("Diffuse###Lightcolor 1", d))
-							{
+							if (ImGui::ColorEdit3("Diffuse###SpotLightcolor 1", d))
 								selectedSpotLight->setDiffuse(glm::vec3(d[0], d[1], d[2]));
-								change = true;
-							}
-							if (ImGui::ColorEdit3("Ambient###Lightcolor 2", a))
-							{
+							
+							if (ImGui::ColorEdit3("Ambient###SpotLightcolor 2", a))
 								selectedSpotLight->setAmbient(glm::vec3(a[0], a[1], a[2]));
-								change = true;
-							}
-							if (ImGui::ColorEdit3("Specular###Lightcolor 3", s))
-							{
+							
+							if (ImGui::ColorEdit3("Specular###SpotLightcolor 3", s))
 								selectedSpotLight->setSpecular(glm::vec3(s[0], s[1], s[2]));
-								change = true;
-							}
+							
 
 							ImGui::SameLine(); HelpMarker(
 								"Click on the color square to open a color picker.\n"
@@ -583,7 +576,6 @@ void GUI::drawList()
 								"CTRL+click on individual component to input value.\n");
 							ImGui::Spacing();
 						}
-
 
 						// Position
 						{
@@ -669,7 +661,7 @@ void GUI::drawList()
 							*/
 						}
 
-						//ShadowMap
+						//Shadow Map Properties
 						{
 							ImGui::Spacing();
 							ImGui::Text("Shadows");
@@ -681,13 +673,38 @@ void GUI::drawList()
 								selectedSpotLight->setFarPlane(far_plane);
 						}
 
+						//Shadow Map Resolution
+						{
+
+							int shadowHeight = selectedSpotLight->getShadowHeight();
+							int shadowWidth = selectedSpotLight->getShadowWidth();
+							ImGui::Text("Current Shadow Map Resolution:\t %d x %d", shadowHeight, shadowWidth);
+
+							static int newShadowHeight = shadowHeight; // Store the original value
+							static int newShadowWidth = shadowWidth;   // Store the original value
+
+							ImGui::InputInt("Shadow Height", &newShadowHeight);
+							//ImGui::InputInt("Shadow Width", &newShadowWidth);
+
+							if (ImGui::Button("Submit")) {
+								// Check if the values have changed
+								if (newShadowHeight != shadowHeight || newShadowWidth != shadowWidth) {
+									selectedSpotLight->setShadowHeight(newShadowHeight);
+									selectedSpotLight->setShadowWidth(newShadowHeight);
+									myScene.m_ShadowMap->updateShadowResolution(selectedSpotLight);
+								}
+							}
+
+						}
 						
 						// Display the depth map for spotlights
-						//selectedSpotLight;
-						
 						if (selectedSpotLight->getDepthMapTexture() != 0) {
 							ImGui::Text("Spotlight Depth Map:");
-							GLuint colorTexture = myScene.m_ShadowMap->renderDepthMapToGUI(selectedSpotLight->getDepthMapTexture());
+							GLuint colorTexture = myScene.m_ShadowMap->renderDepthMapToGUI(
+								selectedSpotLight->getDepthMapTexture(),
+								selectedSpotLight->getShadowHeight(),
+								selectedSpotLight->getShadowWidth()
+							);
 							ImGui::Image((void*)colorTexture, ImVec2(256, 256));
 						}
 						
@@ -762,11 +779,69 @@ void GUI::drawList()
 				{
 					ImGui::Text("Directional Light");
 
+						// Light Color
+						{
+							glm::vec3 diffuse = dirLight->getDiffuse();
+							glm::vec3 ambient = dirLight->getAmbient();
+							glm::vec3 specular = dirLight->getSpecular();
+							float intensity = dirLight->getIntensity();
+
+							ImGui::Text("Light Color", "NULL");
+							float d[3] = { diffuse[0] / intensity , diffuse[1] / intensity, diffuse[2] / intensity };
+							float a[3] = { ambient[0] / intensity , ambient[1] / intensity, ambient[2] / intensity };
+							float s[3] = { specular[0] / intensity , specular[1] / intensity, specular[2] / intensity };
+
+							if (ImGui::ColorEdit3("Diffuse###DirLightcolor 1", d))
+								dirLight->setDiffuse(glm::vec3(d[0], d[1], d[2]));
+							
+							if (ImGui::ColorEdit3("Ambient###DirLightcolor 2", a))
+								dirLight->setAmbient(glm::vec3(a[0], a[1], a[2]));
+							
+							if (ImGui::ColorEdit3("Specular###DirLightcolor 3", s))
+								dirLight->setSpecular(glm::vec3(s[0], s[1], s[2]));
+							
+
+							ImGui::SameLine(); HelpMarker(
+								"Click on the color square to open a color picker.\n"
+								"Click and hold to use drag and drop.\n"
+								"Right-click on the color square to show options.\n"
+								"CTRL+click on individual component to input value.\n");
+							ImGui::Spacing();
+						}
+
+					// Resolution
+					{
+
+						int shadowHeight = dirLight->getShadowHeight();
+						int shadowWidth = dirLight->getShadowWidth();
+						ImGui::Text("Current Shadow Map Resolution:\t %d x %d", shadowHeight, shadowWidth);
+
+						static int newShadowHeight = shadowHeight; // Store the original value
+						static int newShadowWidth = shadowWidth;   // Store the original value
+
+						ImGui::InputInt("Shadow Height", &newShadowHeight);
+						//ImGui::InputInt("Shadow Width", &newShadowWidth);
+
+						if (ImGui::Button("Submit")) {
+							// Check if the values have changed
+							if (newShadowHeight != shadowHeight || newShadowWidth != shadowWidth) {
+								dirLight->setShadowHeight(newShadowHeight);
+								dirLight->setShadowWidth(newShadowHeight);
+								myScene.m_ShadowMap->updateShadowResolution(dirLight);
+							}
+						}
+
+					}
+
 
 					if(dirLight != nullptr)
 					{
 						ImGui::Text("Spotlight Depth Map:");
-						GLuint colorTexture = myScene.m_ShadowMap->renderDepthMapToGUI(dirLight->getDepthMapTexture());
+						GLuint colorTexture = myScene.m_ShadowMap->renderDepthMapToGUI(dirLight->getDepthMapTexture(),
+							dirLight->getShadowWidth(),
+							dirLight->getShadowHeight()
+							);
+
 						ImGui::Image((void*)colorTexture, ImVec2(256, 256));
 					}
 

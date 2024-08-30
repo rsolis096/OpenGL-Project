@@ -28,6 +28,10 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f) ;
 	m_Specular = glm::vec3(1.0f, 1.0f, 1.0f) ;
 
+	//Shadow Resolution
+	m_ShadowHeight = 1024;
+	m_ShadowWidth = 1024;
+
 	//For Attenuation
 	m_Constant = 1.0f;
 	m_Linear = 0.09f;
@@ -194,4 +198,24 @@ float SpotLight::getFarPlane() const
 GLuint& SpotLight::getDepthMapTexture()
 {
 	return m_DepthMapTexture;
+}
+
+int SpotLight::getShadowHeight() const
+{
+	return m_ShadowHeight;
+}
+
+int SpotLight::getShadowWidth() const
+{
+	return m_ShadowWidth;
+}
+
+void SpotLight::setShadowHeight(int h)
+{
+	m_ShadowHeight = h;
+}
+
+void SpotLight::setShadowWidth(int w)
+{
+	m_ShadowWidth = w;
 }

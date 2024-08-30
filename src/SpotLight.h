@@ -29,6 +29,8 @@ public:
 	void setIntensity(const float i);
 	void setNearPlane(const float&);
 	void setFarPlane(const float&);
+	void setShadowHeight(int);
+	void setShadowWidth(int);
 
 	//Getters for light properties
 	glm::vec3 getLightPos() const;
@@ -40,6 +42,9 @@ public:
 	float getNearPlane() const;
 	float getFarPlane() const;
 	GLuint& getDepthMapTexture();
+	int getShadowHeight() const;
+	int getShadowWidth() const;
+
 
 	//Private Variables
 	std::string m_DisplayName;
@@ -62,16 +67,17 @@ private:
 	glm::vec3 m_Diffuse;
 	glm::vec3 m_Specular;
 
-	//For shadows
-	float m_NearPlane;
-	float m_FarPlane;
-
 	//For Attenuation
 	float m_Constant;
 	float m_Linear;
 	float m_Quadratic;
 	float m_Intensity;
 
+	//For Shadow Maps
+	int m_ShadowHeight;
+	int m_ShadowWidth;
 	GLuint m_DepthMapTexture;
+	float m_NearPlane;
+	float m_FarPlane;
 
 };

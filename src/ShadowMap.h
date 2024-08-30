@@ -22,18 +22,24 @@ public:
     void addSpotLightShadowMap(GLuint& depthMapTexture) const;
     void addDirectionalShadowMap(GLuint& depthMapTexture) const;
     void addPointLightShadowMap(GLuint& cubeMapTexture) const;
+    void updateShadowResolution(DirectionalLight* light) const; 
+    void updateShadowResolution(SpotLight* light) const;
 
     //Main Loop Methods (Used during the rendering loop every frame)
     void shadowPass();
     void updateShaderUniforms(Shader& shader) const;
-    GLuint renderDepthMapToGUI(GLuint texture);
+    GLuint renderDepthMapToGUI(GLuint texture, int height, int width);
     //GLuint renderCubeMapToGUI(PointLight* lightSource, unsigned int i);
 
 private:
 
     // Frame buffer Objects
+
+    //Shadow Frame buffer objects
     GLuint m_FBO;
     GLuint m_CubeMapFBO;
+
+    //GUI frame buffer objects
     GLuint m_2DGUI_FBO;
     GLuint m_3DGUI_FBO;
 

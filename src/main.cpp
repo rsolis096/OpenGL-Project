@@ -247,8 +247,8 @@ void demoScene(Scene& demoScene)
     //GENERATE INITIAL SCENE (ALL OF THESE CAN BE CHANGED IN REAL TIME)
     //demoScene.addObject(new Model("assets/models/sponza/scene.gltf"));
     //demoScene.addObject(new Cube("assets/textures/container2.png", "assets/textures/container2_specular.png"));
-	//demoScene.addObject(new Sphere("assets/textures/globe.jpg", "assets/textures/globe.jpg"));
-    //demoScene.addObject(new Plane());
+	demoScene.addObject(new Sphere("assets/textures/globe.jpg", "assets/textures/globe.jpg"));
+    demoScene.addObject(new Plane());
 
     //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
     //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[1]);

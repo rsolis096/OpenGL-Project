@@ -206,10 +206,13 @@ void ShadowMap::shadowPass()
 
             shadowPassShader.setMat4("shadowPassMatrixSpot", m_LightSpaceMatrices[i]);
 
+            const int width = m_LightController->m_SpotLights[i]->getShadowWidth();
+            const int height = m_LightController->m_SpotLights[i]->getShadowHeight();
+
             // Set up the frame buffer and viewport for shadow map rendering, and clear the depth buffer.
             glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_LightController->m_SpotLights[i]->getDepthMapTexture(), 0);
-            glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+            glViewport(0, 0, width, height);
             glClear(GL_DEPTH_BUFFER_BIT);
 
             for (Object* obj : *m_SceneObjects) {
@@ -243,7 +246,7 @@ void ShadowMap::shadowPass()
         // Set up the frame buffer and viewport for shadow map rendering, and clear the depth buffer.
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_LightController->m_DirectionalLight->getDepthMapTexture(), 0);
-        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        glViewport(0, 0, m_LightController->m_DirectionalLight->getShadowWidth(), m_LightController->m_DirectionalLight->getShadowHeight());
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // Render scene objects to shadow map
@@ -313,6 +316,67 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
     glCheckError();
 }
 
+void ShadowMap::updateShadowResolution(DirectionalLight* light) const
+{
+	// Step 1: Delete the old texture (optional)
+	glDeleteTextures(1, &light->getDepthMapTexture());
+
+	// Step 2: Create a new texture with the desired resolution
+	int newWidth = light->getShadowWidth(); 
+	int newHeight = light->getShadowHeight(); 
+	glGenTextures(1, &light->getDepthMapTexture());
+	glBindTexture(GL_TEXTURE_2D, light->getDepthMapTexture());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, newWidth, newHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Step 3: Bind the new texture to the framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, light->getDepthMapTexture(), 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// Optionally, check the framebuffer status to ensure it's complete
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+	    std::cerr << "Framebuffer not complete!" << std::endl;
+	}
+
+}
+
+void ShadowMap::updateShadowResolution(SpotLight* light) const
+{
+    // Step 1: Delete the old texture (optional)
+    glDeleteTextures(1, &light->getDepthMapTexture());
+
+    // Step 2: Create a new texture with the desired resolution
+    int newWidth = light->getShadowWidth();
+    int newHeight = light->getShadowHeight();
+    glGenTextures(1, &light->getDepthMapTexture());
+    glBindTexture(GL_TEXTURE_2D, light->getDepthMapTexture());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, newWidth, newHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Step 3: Bind the new texture to the framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, light->getDepthMapTexture(), 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // Optionally, check the framebuffer status to ensure it's complete
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << "Framebuffer not complete!" << std::endl;
+    }
+}
+
 // Generates a frame buffer with a texture attachment for rendering a shadow map to be used in a GUI window. 
 void ShadowMap::generateGUIShadowMap()
 {
@@ -344,9 +408,8 @@ void ShadowMap::generateGUIShadowMap()
     glCheckError();
 }
 
-GLuint ShadowMap::renderDepthMapToGUI(GLuint texture)
+GLuint ShadowMap::renderDepthMapToGUI(GLuint texture, int height, int width)
 {
-
     // Basic MPV matrices for the ImGui Window
     glm::mat4 modelMatrix = glm::mat4(1.0f); // Identity matrix for the model
     glm::mat4 projectionMatrix = glm::perspective(glm::radians(54.0f), 1.0f, 0.1f, 100.0f);
@@ -370,7 +433,7 @@ GLuint ShadowMap::renderDepthMapToGUI(GLuint texture)
 
     // Bind framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, m_2DGUI_FBO);
-    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Render the depth map texture
