@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <array>
+
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>

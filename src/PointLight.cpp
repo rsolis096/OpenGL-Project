@@ -1,5 +1,7 @@
 #include "PointLight.h"
 
+#include <glm/gtx/string_cast.hpp>
+
 unsigned short PointLight::m_PointLightCount = 0;
 bool firstFrame = true;
 
@@ -8,7 +10,7 @@ PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::
 	m_LightingShader(lightingShader), m_LightSourceShader(objectShader)
 {
 	m_LightShape = new Cube(); //Create the physical light object
-	setLightPos(pos);
+	setLightPos(pos); //Need to update light object too
 	m_LightShape->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
 	m_CubeMapTexture = 0;
@@ -32,7 +34,25 @@ PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::
 	m_Linear = 0.09f;
 	m_Quadratic = 0.032f;
 
-	//Set these properties in the lightingShader.frag for the corresponding lightsource at index m_LightID
+	//For Shadows
+	m_NearPlane = 0.1f;
+	m_FarPlane = 25.0f;
+
+	glm::mat4 m_ShadowProj = glm::perspective(glm::radians(90.0f),
+		1.0f, // static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT) 
+		m_NearPlane,
+		m_FarPlane);
+
+	m_LightViews = {
+		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
+		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
+		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
+		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
+		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
+		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
+	};
+
+	//Set these properties in the lightingShader.frag for the corresponding light source at index m_LightID
 	m_LightingShader->use();
 	m_LightingShader->setInt("numberOfPointLightsFRAG", m_PointLightCount);
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].ambient", m_Ambient);
@@ -98,7 +118,22 @@ void PointLight::setSpecular(const glm::vec3 specular)
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].specular", m_Specular);
 }
 
-void PointLight::setconstant(const float constant)
+void PointLight::setNearPlane(const float& n)
+{
+	m_NearPlane = n;
+}
+
+void PointLight::setFarPlane(const float& f)
+{
+	m_FarPlane = f;
+}
+
+void PointLight::setLightViews(const std::array<glm::mat4, 6>& lv)
+{
+	m_LightViews = lv;
+}
+
+void PointLight::setConstant(const float constant)
 {
 	m_Constant = constant;
 	m_LightingShader->use();
@@ -123,27 +158,47 @@ void PointLight::setQuadratic(const float quadratic)
 * ###     GETTER FUNCTIONS        ###
 ###################################*/
 
-glm::vec3 PointLight::getLightPos()
+glm::vec3 PointLight::getLightPos() const
 {
 	return m_LightPos;
 }
 
-glm::vec3 PointLight::getAmbient()
+glm::vec3 PointLight::getAmbient() const
 {
 	return m_Ambient;
 }
 
-glm::vec3 PointLight::getDiffuse()
+glm::vec3 PointLight::getDiffuse() const
 {
 	return m_Diffuse;
 }
 
-glm::vec3 PointLight::getSpecular()
+glm::vec3 PointLight::getSpecular() const
 {
 	return m_Specular;
 }
 
-GLuint& PointLight::getCubeMapTexture()
+GLuint& PointLight::getCubeMapTexture() 
 {
 	return m_CubeMapTexture;
+}
+
+float PointLight::getFarPlane() const
+{
+	return m_FarPlane;
+}
+
+float PointLight::getNearPlane() const
+{
+	return m_NearPlane;
+}
+
+const glm::mat4& PointLight::getShadowProj() const
+{
+	return m_ShadowProj;
+}
+
+const std::array<glm::mat4, 6>& PointLight::getLightViews() const
+{
+	return m_LightViews;
 }

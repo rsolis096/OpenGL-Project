@@ -34,19 +34,19 @@ ShadowMap::ShadowMap(std::vector<Object*>* objects, LightController* lightContro
     //generateGUICubeMap();
 }
 
-void ShadowMap::addSpotLightShadowMap(GLuint& depthMapTexture) const
+void ShadowMap::addSpotLightShadowMap(GLuint& depthMapTexture)
 {
     // Expand the vector to accommodate the new shadow map
     addShadowMap(depthMapTexture);
 }
 
-void ShadowMap::addDirectionalShadowMap(GLuint& depthMapTexture) const
+void ShadowMap::addDirectionalShadowMap(GLuint& depthMapTexture)
 {
     //Create a new 2D Depth map for Directional Lights (only supports 1 atm)
     addShadowMap(depthMapTexture);
 }
 
-void ShadowMap::addPointLightShadowMap(GLuint& cubeMapTexture) const
+void ShadowMap::addPointLightShadowMap(GLuint& cubeMapTexture)
 {
     //Create a new 3D Depth map for Point Lights
     addCubeMap(cubeMapTexture);
@@ -124,37 +124,21 @@ void ShadowMap::shadowPass()
     // Process point lights
     if (numberOfPointLights > 0) {
 
-        const float nearPlane = 1.0f;
-        const float farPlane = 25.0f;
-
         shadowPassShader.setInt("lightType", LightController::LightType::POINT_LIGHT);  // Set light type to point light
-        shadowPassShader.setFloat("far_plane", farPlane);  // Set far plane distance
-
-        const glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f),
-            1.0f, // static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT) 
-            nearPlane, 
-            farPlane);
 
         // Set viewport to match shadow map resolution
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-
-        // Bind the FBO
-        glBindFramebuffer(GL_FRAMEBUFFER, m_CubeMapFBO);
+    	glBindFramebuffer(GL_FRAMEBUFFER, m_CubeMapFBO);
 
         for (int i = 0; i < static_cast<int>(numberOfPointLights); i++)
         {
+
             glm::vec3 lightPos = m_LightController->m_PointLights[i]->getLightPos();
             shadowPassShader.setVec3("pointLightPos", lightPos);
+            shadowPassShader.setFloat("far_plane", m_LightController->m_PointLights[i]->getFarPlane());  // Set far plane distance
 
-            // Calculate light view matrices for the six faces of the cube map
-            const glm::mat4 lightViews[6] = {
-                shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-                shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-                shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
-                shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
-                shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
-                shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
-            };
+            // See point light shader for projection matrices computations
+            const std::array<glm::mat4, 6> lightViews = m_LightController->m_PointLights[i]->getLightViews();
 
             // Set shadow matrices for each face (used in geometry shader)
             for (int j = 0; j < 6; j++) {

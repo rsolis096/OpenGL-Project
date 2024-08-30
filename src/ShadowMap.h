@@ -19,9 +19,9 @@ public:
     ShadowMap(std::vector<Object*>* objects, LightController* lightController);
 
     // Public methods
-    void addSpotLightShadowMap(GLuint& depthMapTexture) const;
-    void addDirectionalShadowMap(GLuint& depthMapTexture) const;
-    void addPointLightShadowMap(GLuint& cubeMapTexture) const;
+    void addSpotLightShadowMap(GLuint& depthMapTexture) ;
+    void addDirectionalShadowMap(GLuint& depthMapTexture) ;
+    void addPointLightShadowMap(GLuint& cubeMapTexture) ;
     void updateShadowResolution(DirectionalLight* light) const; 
     void updateShadowResolution(SpotLight* light) const;
 

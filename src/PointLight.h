@@ -3,7 +3,6 @@
 #include "Cube.h"
 #include "Shader.h"
 
-
 class PointLight
 {
 	public:
@@ -20,15 +19,22 @@ class PointLight
 		void setAmbient(const glm::vec3 ambient);
 		void setDiffuse(const glm::vec3 diffuse);
 		void setSpecular(const glm::vec3 specular);
+		void setNearPlane(const float& n);
+		void setFarPlane(const float& f);
+		void setLightViews(const std::array<glm::mat4, 6>& lv);
 
-		glm::vec3 getLightPos();
-		glm::vec3 getAmbient();
-		glm::vec3 getDiffuse();
-		glm::vec3 getSpecular();
+		glm::vec3 getLightPos() const;
+		glm::vec3 getAmbient() const;
+		glm::vec3 getDiffuse() const;
+		glm::vec3 getSpecular() const;
 		GLuint& getCubeMapTexture();
+		float getFarPlane() const;
+		float getNearPlane() const;
+		const glm::mat4& getShadowProj() const;
+		const std::array<glm::mat4, 6>& getLightViews() const;
 
 		//For Attenuation
-		void setconstant(const float constant);
+		void setConstant(const float constant);
 		void setLinear(const float linear);
 		void setQuadratic(const float quadratic);
 
@@ -57,5 +63,11 @@ class PointLight
 		float m_Linear;
 		float m_Quadratic;
 
+		//For Shadows
+		float m_NearPlane;
+		float m_FarPlane;
 		GLuint m_CubeMapTexture;
+		glm::mat4 m_ShadowProj;
+		std::array<glm::mat4, 6> m_LightViews;
+
 };

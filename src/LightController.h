@@ -4,6 +4,7 @@
 #include "DirectionalLight.h"
 #include "SpotLight.h"
 
+
 //Forward Declaration (both depend on eachother)
 class Scene;
 
