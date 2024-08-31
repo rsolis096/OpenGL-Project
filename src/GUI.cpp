@@ -711,39 +711,51 @@ void GUI::drawList()
 						
 					}
 				}
+
 				if (selectedType == "point")
 				{
 					PointLight* selectedPointLight = nullptr;
 					if (myScene.m_LightController->m_PointLights.size() > 0)
 					{
 						selectedPointLight = myScene.m_LightController->m_PointLights[lightingSelected];
+
 						glm::vec3 diffuse = selectedPointLight->getDiffuse();
 						glm::vec3 ambient = selectedPointLight->getAmbient();
 						glm::vec3 specular = selectedPointLight->getSpecular();
+						float intensity = selectedPointLight->getIntensity();
+
+						// Intensity
+						{
+							ImGui::Spacing();
+							ImGui::Text("SpotLight");
+							if (ImGui::DragFloat("Intensity", &intensity, 0.5f, 1.0f, 100.0f, "%.2f", 0))
+							{
+								if (intensity < 0)
+									intensity = 0;
+								selectedPointLight->setIntensity(intensity);
+								selectedPointLight->setDiffuse(diffuse);
+								selectedPointLight->setDiffuse(ambient);
+								selectedPointLight->setDiffuse(specular);
+							}
+						}
 
 						// Light Color
 						{
-							ImGui::Text("Light Color", "NULL");
-							float d[3] = { diffuse[0], diffuse[1], diffuse[2] };
-							float a[3] = { ambient[0], ambient[1], ambient[2] };
-							float s[3] = { specular[0], specular[1], specular[2] };
 
-							bool change = false;
+							ImGui::Text("Light Color", "NULL");
+							float d[3] = { diffuse[0] / intensity , diffuse[1] / intensity, diffuse[2] / intensity };
+							float a[3] = { ambient[0] / intensity , ambient[1] / intensity, ambient[2] / intensity };
+							float s[3] = { specular[0] / intensity , specular[1] / intensity, specular[2] / intensity };
+
 							if (ImGui::ColorEdit3("Diffuse###Lightcolor 1", d))
-							{
 								selectedPointLight->setDiffuse(glm::vec3(d[0], d[1], d[2]));
-								change = true;
-							}
+							
 							if (ImGui::ColorEdit3("Ambient###Lightcolor 2", a))
-							{
 								selectedPointLight->setAmbient(glm::vec3(a[0], a[1], a[2]));
-								change = true;
-							}
+							
 							if (ImGui::ColorEdit3("Specular###Lightcolor 3", s))
-							{
 								selectedPointLight->setSpecular(glm::vec3(s[0], s[1], s[2]));
-								change = true;
-							}
+							
 
 							ImGui::SameLine(); HelpMarker(
 								"Click on the color square to open a color picker.\n"
@@ -772,9 +784,30 @@ void GUI::drawList()
 
 						}
 
+						//Shadow Map Properties
+						{
+							ImGui::Spacing();
+							ImGui::Text("Shadows");
+							float near_plane = selectedPointLight->getNearPlane();
+							if (ImGui::InputFloat("Near Plane", &near_plane, 0.1f, 1.0f, "%.3f", 0))
+								selectedPointLight->setNearPlane(near_plane);
+							float far_plane = selectedPointLight->getFarPlane();
+							if (ImGui::InputFloat("Far Plane", &far_plane, 0.1f, 1.0f, "%.3f", 0))
+								selectedPointLight->setFarPlane(far_plane);
+							float fov = selectedPointLight->getShadowFOV();
+							if (ImGui::InputFloat("Shadow FOV", &fov, 0.1f, 1.0f, "%.3f", 0))
+								selectedPointLight->setShadowFOV(fov);
+
+							bool toggleShadowPass = selectedPointLight->getShadowPassUpdate();
+							if (ImGui::Checkbox("Enable Shadow Pass", &toggleShadowPass))
+								selectedPointLight->setShadowPassUpdate(toggleShadowPass);
+							
+						}
+
 					}
 
 				}
+
 				if(selectedType == "dir")
 				{
 					ImGui::Text("Directional Light");

@@ -27,6 +27,7 @@ struct PointLight {
     float padding;
     float constant;
     float linear;
+    float far_plane;
     float quadratic;	
     vec3 ambient;
     vec3 diffuse;
@@ -65,10 +66,6 @@ in VS_OUT {
     vec4 FragPosLightSpace[MAX_NR_SHADOW_MAPS];
     vec4 dirFragPosLightSpace;
 } fs_in;
-
-
-uniform float far_plane;
-
 
 //Player Position
 uniform vec3 viewPos;
@@ -211,6 +208,7 @@ vec3 gridSamplingDisk[20] = vec3[]
    vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
 );
 
+
 float PointLightShadowCalculation(vec3 fragPos, PointLight light)
 {
 
@@ -219,12 +217,6 @@ float PointLightShadowCalculation(vec3 fragPos, PointLight light)
 
     // Calculate the current depth from the light's perspective
     float currentDepth = length(fragToLight);
-
-    // Early exit if the fragment is outside the light's range
-    if (currentDepth > far_plane)
-    {
-        return 1.0; // Fragment is fully shadowed (or outside light range)
-    }
 
     // PCF (Percentage Closer Filtering) shadow calculation
     float shadow = 0.0;        // Initialize shadow factor
@@ -248,7 +240,7 @@ float PointLightShadowCalculation(vec3 fragPos, PointLight light)
                 float closestDepth = texture(light.shadowMap, fragToLight + vec3(x, y, z)).r;
 
                 // Convert the depth from [0,1] range back to the original depth range
-                closestDepth *= far_plane;
+                closestDepth *= light.far_plane;
 
                 // Compare the fragment's depth to the sampled depth
                 if(currentDepth - bias > closestDepth)
@@ -261,7 +253,7 @@ float PointLightShadowCalculation(vec3 fragPos, PointLight light)
     shadow /= (samples * samples * samples);
 
     // Optionally, display closestDepth for debugging purposes
-    // FragColor = vec4(vec3(closestDepth / far_plane), 1.0);    
+    // FragColor = vec4(vec3(closestDepth / light.far_plane), 1.0);    
         
     // 1.0 = fully in shadow, 0.0 = fully lit
     return shadow;

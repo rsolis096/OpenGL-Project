@@ -19,9 +19,15 @@ class PointLight
 		void setAmbient(const glm::vec3 ambient);
 		void setDiffuse(const glm::vec3 diffuse);
 		void setSpecular(const glm::vec3 specular);
+		void setConstant(const float constant);
+		void setLinear(const float linear);
+		void setQuadratic(const float quadratic);
 		void setNearPlane(const float& n);
 		void setFarPlane(const float& f);
 		void setLightViews(const std::array<glm::mat4, 6>& lv);
+		void setShadowFOV(const float& fov);
+		void setIntensity(const float& i);
+		void setShadowPassUpdate(bool val);
 
 		glm::vec3 getLightPos() const;
 		glm::vec3 getAmbient() const;
@@ -32,11 +38,10 @@ class PointLight
 		float getNearPlane() const;
 		const glm::mat4& getShadowProj() const;
 		const std::array<glm::mat4, 6>& getLightViews() const;
+		float getShadowFOV() const;
+		float getIntensity() const;
+		bool getShadowPassUpdate() const;
 
-		//For Attenuation
-		void setConstant(const float constant);
-		void setLinear(const float linear);
-		void setQuadratic(const float quadratic);
 
 		//Variables
 		std::string m_DisplayName;
@@ -57,6 +62,7 @@ class PointLight
 		glm::vec3 m_Ambient;
 		glm::vec3 m_Diffuse;
 		glm::vec3 m_Specular;
+		float m_Intensity;
 
 		//For Attenuation
 		float m_Constant;
@@ -66,8 +72,11 @@ class PointLight
 		//For Shadows
 		float m_NearPlane;
 		float m_FarPlane;
+		float m_ShadowFOV;
 		GLuint m_CubeMapTexture;
 		glm::mat4 m_ShadowProj;
 		std::array<glm::mat4, 6> m_LightViews;
+		bool m_ShadowPassUpdate;
+
 
 };

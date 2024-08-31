@@ -132,27 +132,30 @@ void ShadowMap::shadowPass()
 
         for (int i = 0; i < static_cast<int>(numberOfPointLights); i++)
         {
+            if(m_LightController->m_PointLights[i]->getShadowPassUpdate())
+            {
+                glm::vec3 lightPos = m_LightController->m_PointLights[i]->getLightPos();
+                shadowPassShader.setVec3("pointLightPos", lightPos);
+                shadowPassShader.setFloat("far_plane", m_LightController->m_PointLights[i]->getFarPlane());  // Set far plane distance
 
-            glm::vec3 lightPos = m_LightController->m_PointLights[i]->getLightPos();
-            shadowPassShader.setVec3("pointLightPos", lightPos);
-            shadowPassShader.setFloat("far_plane", m_LightController->m_PointLights[i]->getFarPlane());  // Set far plane distance
+                // See point light shader for projection matrices computations
+                const std::array<glm::mat4, 6> lightViews = m_LightController->m_PointLights[i]->getLightViews();
 
-            // See point light shader for projection matrices computations
-            const std::array<glm::mat4, 6> lightViews = m_LightController->m_PointLights[i]->getLightViews();
+                // Set shadow matrices for each face (used in geometry shader)
+                for (int j = 0; j < 6; j++) {
+                    shadowPassShader.setMat4("shadowMatricesPoint[" + std::to_string(j) + "]", lightViews[j]);
 
-            // Set shadow matrices for each face (used in geometry shader)
-            for (int j = 0; j < 6; j++) {
-                shadowPassShader.setMat4("shadowMatricesPoint[" + std::to_string(j) + "]", lightViews[j]);
+                    // Attach the appropriate face of the cube map texture as the depth attachment
+                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, m_LightController->m_PointLights[i]->getCubeMapTexture(), 0);
+                    glClear(GL_DEPTH_BUFFER_BIT);
 
-                // Attach the appropriate face of the cube map texture as the depth attachment
-                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, m_LightController->m_PointLights[i]->getCubeMapTexture(), 0);
-                glClear(GL_DEPTH_BUFFER_BIT);
-
-                // Render scene objects to shadow map (6 times for each light source)
-                for (Object* obj : *m_SceneObjects) {
-                    obj->ShadowPassDraw(shadowPassShader);
+                    // Render scene objects to shadow map (6 times for each light source)
+                    for (Object* obj : *m_SceneObjects) {
+                        obj->ShadowPassDraw(shadowPassShader);
+                    }
                 }
             }
+
         }
 
         // Unbind the FBO
