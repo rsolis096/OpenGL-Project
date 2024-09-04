@@ -28,6 +28,7 @@ class PointLight
 		void setShadowFOV(const float& fov);
 		void setIntensity(const float& i);
 		void setShadowPassUpdate(bool val);
+		void setBias(const float& b);
 
 		glm::vec3 getLightPos() const;
 		glm::vec3 getAmbient() const;
@@ -41,7 +42,7 @@ class PointLight
 		float getShadowFOV() const;
 		float getIntensity() const;
 		bool getShadowPassUpdate() const;
-
+		float getBias() const;
 
 		//Variables
 		std::string m_DisplayName;
@@ -77,6 +78,7 @@ class PointLight
 		glm::mat4 m_ShadowProj;
 		std::array<glm::mat4, 6> m_LightViews;
 		bool m_ShadowPassUpdate;
+		float m_Bias;
 
 
 };

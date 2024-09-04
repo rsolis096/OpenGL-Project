@@ -124,11 +124,12 @@ void ShadowMap::shadowPass()
     // Process point lights
     if (numberOfPointLights > 0) {
 
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+
+
         shadowPassShader.setInt("lightType", LightController::LightType::POINT_LIGHT);  // Set light type to point light
 
-        // Set viewport to match shadow map resolution
-        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-    	glBindFramebuffer(GL_FRAMEBUFFER, m_CubeMapFBO);
+
 
         for (int i = 0; i < static_cast<int>(numberOfPointLights); i++)
         {
@@ -141,13 +142,17 @@ void ShadowMap::shadowPass()
                 // See point light shader for projection matrices computations
                 const std::array<glm::mat4, 6> lightViews = m_LightController->m_PointLights[i]->getLightViews();
 
+                // Set viewport to match shadow map resolution
+                glBindFramebuffer(GL_FRAMEBUFFER, m_CubeMapFBO);
+                glClear(GL_DEPTH_BUFFER_BIT);
+
                 // Set shadow matrices for each face (used in geometry shader)
                 for (int j = 0; j < 6; j++) {
                     shadowPassShader.setMat4("shadowMatricesPoint[" + std::to_string(j) + "]", lightViews[j]);
 
                     // Attach the appropriate face of the cube map texture as the depth attachment
-                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, m_LightController->m_PointLights[i]->getCubeMapTexture(), 0);
-                    glClear(GL_DEPTH_BUFFER_BIT);
+                    //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, m_LightController->m_PointLights[i]->getCubeMapTexture(), 0);
+                    //glClear(GL_DEPTH_BUFFER_BIT);
 
                     // Render scene objects to shadow map (6 times for each light source)
                     for (Object* obj : *m_SceneObjects) {

@@ -797,6 +797,10 @@ void GUI::drawList()
 							float fov = selectedPointLight->getShadowFOV();
 							if (ImGui::InputFloat("Shadow FOV", &fov, 0.1f, 1.0f, "%.3f", 0))
 								selectedPointLight->setShadowFOV(fov);
+							float bias = selectedPointLight->getBias();
+							if (ImGui::InputFloat("Shadow Bias", &bias, 0.01f, 1.0f, "%.3f", 0))
+								selectedPointLight->setBias(bias);
+
 
 							bool toggleShadowPass = selectedPointLight->getShadowPassUpdate();
 							if (ImGui::Checkbox("Enable Shadow Pass", &toggleShadowPass))

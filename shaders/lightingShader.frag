@@ -32,6 +32,7 @@ struct PointLight {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    float bias;
     samplerCube shadowMap;
 };
 
@@ -220,7 +221,7 @@ float PointLightShadowCalculation(vec3 fragPos, PointLight light)
 
     // PCF (Percentage Closer Filtering) shadow calculation
     float shadow = 0.0;        // Initialize shadow factor
-    float bias = 0.5;          // Bias to prevent shadow acne
+    float bias = light.bias;          // Bias to prevent shadow acne
 
     //Less samples is more blocky but faster, more samples is smoother but slower [4, 16]
     float samples = 4.0;       // Number of samples for PCF

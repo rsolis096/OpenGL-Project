@@ -36,10 +36,11 @@ PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::
 	m_Quadratic = 0.032f;
 
 	//For Shadows
-	m_NearPlane = 5.4f;
-	m_FarPlane = 100.0f;
-	m_ShadowFOV = 85.0f;
+	m_NearPlane = 1.0f;
+	m_FarPlane = 25.0f;
+	m_ShadowFOV = 90.0f;
 	m_ShadowPassUpdate = true;
+	m_Bias = 0.05f;
 
 	m_ShadowProj = glm::perspective(
 		glm::radians(m_ShadowFOV),
@@ -67,6 +68,7 @@ PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::
 	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].quadratic", m_Quadratic);
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].position", m_LightPos);
 	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].far_plane", m_FarPlane);
+	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].bias", m_Bias);  // Set far plane distance
 
 }
 
@@ -228,6 +230,13 @@ void PointLight::setShadowPassUpdate(bool val)
 	};
 }
 
+void PointLight::setBias(const float& b)
+{
+	m_Bias = b;
+	m_LightingShader->use();
+	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].bias", m_Bias);  // Set far plane distance
+}
+
 void PointLight::setConstant(const float constant)
 {
 	m_Constant = constant;
@@ -311,4 +320,9 @@ float PointLight::getIntensity() const
 bool PointLight::getShadowPassUpdate() const
 {
 	return m_ShadowPassUpdate;
+}
+
+float PointLight::getBias() const
+{
+	return m_Bias;
 }
