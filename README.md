@@ -25,6 +25,8 @@
 
 - View the releases tab to download an executable of the program. 
 - Running the project in Visual Studio requires building your own assimp-vc143-mt.dll (Release), assimp-vc143-mtd.dll (Debug) via https://github.com/assimp/assimp
+- This project expects assets which can be downloaded here : https://drive.google.com/drive/folders/1xrtGR_Ftvw49WWUczeX7o8o1jT-aFrRH?usp=sharing
+- For the assets, place the assets folder in the same directory as the .exe or the .sln file if running on visual studio
 ## 
 
 ### Point Light Shadows
