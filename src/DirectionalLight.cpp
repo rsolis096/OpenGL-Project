@@ -34,7 +34,15 @@ DirectionalLight::DirectionalLight(Shader* lightingShader, const glm::vec3& dir)
 
 DirectionalLight::~DirectionalLight()
 {
+	m_LightingShader->use();
+	m_LightingShader->setBool("hasDirLight", true);
+
 	m_LightingShader = nullptr;
+
+	// Delete the depth map texture
+	if (m_DepthMapTexture != 0) {
+		glDeleteTextures(1, &m_DepthMapTexture);
+	}
 }
 
 /*###################################

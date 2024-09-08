@@ -235,11 +235,17 @@ void GUI::drawList()
 		if (ImGui::Button("PointLight +")) {
 
 			if (myScene.m_LightController->m_PointLights.size() < 8)
-			{
 				myScene.m_LightController->addPointLight(glm::vec3(0.0f, 3.0f, 0.0f));
-			}
 			else
 				std::cout << "Max PointLight Limit" << std::endl;
+		}
+
+		if (ImGui::Button("Directional Light +")) {
+
+			if (myScene.m_LightController->m_DirectionalLight == nullptr)
+				myScene.m_LightController->addDirectionalLight(glm::vec3(0.0f));
+			else
+				std::cout << "Directional Light already exists!" << std::endl;
 		}
 
 	}
@@ -812,39 +818,39 @@ void GUI::drawList()
 
 				}
 
-				if(selectedType == "dir")
+				if(selectedType == "dir" && dirLight != nullptr)
 				{
 					ImGui::Text("Directional Light");
 
-						// Light Color
-						{
-							glm::vec3 diffuse = dirLight->getDiffuse();
-							glm::vec3 ambient = dirLight->getAmbient();
-							glm::vec3 specular = dirLight->getSpecular();
-							float intensity = dirLight->getIntensity();
+					// Light Color
+					{
+						glm::vec3 diffuse = dirLight->getDiffuse();
+						glm::vec3 ambient = dirLight->getAmbient();
+						glm::vec3 specular = dirLight->getSpecular();
+						float intensity = dirLight->getIntensity();
 
-							ImGui::Text("Light Color", "NULL");
-							float d[3] = { diffuse[0] / intensity , diffuse[1] / intensity, diffuse[2] / intensity };
-							float a[3] = { ambient[0] / intensity , ambient[1] / intensity, ambient[2] / intensity };
-							float s[3] = { specular[0] / intensity , specular[1] / intensity, specular[2] / intensity };
+						ImGui::Text("Light Color", "NULL");
+						float d[3] = { diffuse[0] / intensity , diffuse[1] / intensity, diffuse[2] / intensity };
+						float a[3] = { ambient[0] / intensity , ambient[1] / intensity, ambient[2] / intensity };
+						float s[3] = { specular[0] / intensity , specular[1] / intensity, specular[2] / intensity };
 
-							if (ImGui::ColorEdit3("Diffuse###DirLightcolor 1", d))
-								dirLight->setDiffuse(glm::vec3(d[0], d[1], d[2]));
-							
-							if (ImGui::ColorEdit3("Ambient###DirLightcolor 2", a))
-								dirLight->setAmbient(glm::vec3(a[0], a[1], a[2]));
-							
-							if (ImGui::ColorEdit3("Specular###DirLightcolor 3", s))
-								dirLight->setSpecular(glm::vec3(s[0], s[1], s[2]));
-							
+						if (ImGui::ColorEdit3("Diffuse###DirLightcolor 1", d))
+							dirLight->setDiffuse(glm::vec3(d[0], d[1], d[2]));
+						
+						if (ImGui::ColorEdit3("Ambient###DirLightcolor 2", a))
+							dirLight->setAmbient(glm::vec3(a[0], a[1], a[2]));
+						
+						if (ImGui::ColorEdit3("Specular###DirLightcolor 3", s))
+							dirLight->setSpecular(glm::vec3(s[0], s[1], s[2]));
+						
 
-							ImGui::SameLine(); HelpMarker(
-								"Click on the color square to open a color picker.\n"
-								"Click and hold to use drag and drop.\n"
-								"Right-click on the color square to show options.\n"
-								"CTRL+click on individual component to input value.\n");
-							ImGui::Spacing();
-						}
+						ImGui::SameLine(); HelpMarker(
+							"Click on the color square to open a color picker.\n"
+							"Click and hold to use drag and drop.\n"
+							"Right-click on the color square to show options.\n"
+							"CTRL+click on individual component to input value.\n");
+						ImGui::Spacing();
+					}
 
 					// Resolution
 					{
@@ -870,19 +876,28 @@ void GUI::drawList()
 
 					}
 
-
-					if(dirLight != nullptr)
+					//Depth Map Window
 					{
-						ImGui::Text("Spotlight Depth Map:");
+						ImGui::Text("Directional Depth Map:");
 						GLuint colorTexture = myScene.m_ShadowMap->renderDepthMapToGUI(dirLight->getDepthMapTexture(),
 							dirLight->getShadowWidth(),
 							dirLight->getShadowHeight()
-							);
-
+						);
 						ImGui::Image((void*)colorTexture, ImVec2(256, 256));
 					}
 
-					
+					//Delete Directional Light
+					{
+						if (ImGui::Button("Delete Directional Light"))
+						{
+							std::cout << "Deleted " << dirLight->m_DisplayName << "\n";
+							myScene.m_LightController->removeDirectionalLight();
+							lightingSelected = 0;
+							selectedType = "none";
+						}
+
+					}
+
 				}
 				ImGui::EndTabItem();
 			}

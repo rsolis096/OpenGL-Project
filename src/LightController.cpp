@@ -50,11 +50,14 @@ void LightController::addDirectionalLight(const glm::vec3& dir)
 	// Configure a directional shadow map
 	m_Scene->m_ShadowMap->addDirectionalShadowMap(m_DirectionalLight->getDepthMapTexture());
 	glCheckError();
-
 }
 
 void LightController::removeDirectionalLight()
 {
+	if (m_DirectionalLight != nullptr) {
+		delete m_DirectionalLight;
+		m_DirectionalLight = nullptr;
+	}
 }
 
 void LightController::drawLighting() const
