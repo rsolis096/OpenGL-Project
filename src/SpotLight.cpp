@@ -15,7 +15,6 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 
 	m_LightDirection = glm::normalize(dir - m_LightPos);
 
-	m_DepthMapTexture = 0;
 
 	//m_SpotLight takes the shape of a sphere
 	m_LightShape = new Sphere();
@@ -28,7 +27,20 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f) ;
 	m_Specular = glm::vec3(1.0f, 1.0f, 1.0f) ;
 
-	//Shadow Resolution
+	//Shadow Properties
+	m_LightProjectionMatrix = glm::perspective(
+		glm::radians(45.0f),
+		1.0f, //static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT)
+		m_NearPlane,
+		m_FarPlane
+	);
+	m_LightViewMatrix = glm::lookAt(
+		m_LightPos,      // Position of the light
+		m_LightPos + m_LightDirection,        // The target point (position + direction)
+		glm::vec3(0.0, 1.0, 0.0)  // Up vector
+	);
+	m_LightSpaceMatrix = m_LightProjectionMatrix * m_LightViewMatrix;
+
 	m_ShadowHeight = 1024;
 	m_ShadowWidth = 1024;
 
@@ -36,7 +48,9 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_Constant = 1.0f;
 	m_Linear = 0.09f;
 	m_Quadratic = 0.032f;
-	
+	m_DepthMapTexture = 0;
+
+	//TODO: Remove dependence on SpotLight Indexing to allow for dynamic removal/addition to spotlights
 	m_LightingShader->use();
 	m_LightingShader->setInt("numberOfSpotLightsFRAG", m_SpotLightCount);
 	m_LightingShader->setInt("numberOfSpotLightsVERT", m_SpotLightCount);
@@ -51,6 +65,8 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].quadratic", m_Quadratic);
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].cutOff", glm::cos(glm::radians(12.5f)));
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].outerCutOff", glm::cos(glm::radians(15.0f)));
+	m_LightingShader->setMat4("spotLights[" + std::to_string(m_SpotLightID) + "].lightSpaceMatrix", m_LightSpaceMatrix);
+
 }
 
 SpotLight::~SpotLight()
@@ -68,6 +84,26 @@ void SpotLight::Draw() const
 	m_LightingShader->setInt("lightType", 1);
 	if(m_LightShape != nullptr)
 		m_LightShape->Draw(*m_LightSourceShader);
+}
+
+void SpotLight::updateLightSpaceMatrix()
+{
+	//Shadow Properties
+	m_LightProjectionMatrix = glm::perspective(
+		glm::radians(45.0f),
+		1.0f, //static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT)
+		m_NearPlane,
+		m_FarPlane
+	);
+	m_LightViewMatrix = glm::lookAt(
+		m_LightPos,      // Position of the light
+		m_LightPos + m_LightDirection,        // The target point (position + direction)
+		glm::vec3(0.0, 1.0, 0.0)  // Up vector
+	);
+	m_LightSpaceMatrix = m_LightProjectionMatrix * m_LightViewMatrix;
+
+	//Shader uniform must be updated separately. (used in both shadow pass shader and lighting shader)
+
 }
 
 /*###################################
@@ -151,6 +187,21 @@ void SpotLight::setIntensity(const float i)
 	m_Intensity = i;
 }
 
+void SpotLight::setShadowHeight(int h)
+{
+	m_ShadowHeight = h;
+}
+
+void SpotLight::setShadowWidth(int w)
+{
+	m_ShadowWidth = w;
+}
+
+void SpotLight::setLightSpaceMatrix(const glm::mat4& ls)
+{
+	m_LightSpaceMatrix = ls;
+}
+
 /*###################################
 * ###     GETTER FUNCTIONS        ###
 ###################################*/
@@ -210,12 +261,9 @@ int SpotLight::getShadowWidth() const
 	return m_ShadowWidth;
 }
 
-void SpotLight::setShadowHeight(int h)
+glm::mat4& SpotLight::getLightSpaceMatrix()
 {
-	m_ShadowHeight = h;
+	return m_LightSpaceMatrix;
 }
 
-void SpotLight::setShadowWidth(int w)
-{
-	m_ShadowWidth = w;
-}
+

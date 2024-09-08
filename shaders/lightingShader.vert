@@ -5,6 +5,8 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 
 const int MAX_NR_SHADOW_MAPS = 8;
+const int MAX_NR_POINT_LIGHTS = 8;
+const int MAX_NR_SPOT_LIGHTS = 8;
 
 out VS_OUT {
     vec3 FragPos;
@@ -18,10 +20,29 @@ out VS_OUT {
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-uniform mat4 lightSpaceMatrices[MAX_NR_SHADOW_MAPS];
-uniform int numberOfSpotLights;
+//uniform mat4 lightSpaceMatrices[MAX_NR_SHADOW_MAPS];
 uniform bool hasDirLight; 
 uniform mat4 directionalLightSpaceMatrix;
+
+//Consider making a smaller struct for spotlights
+struct SpotLight {
+    vec3 position;
+    vec3 direction;
+    float cutOff;
+    float outerCutOff;  
+    float constant;
+    float linear;
+    float far_plane;
+    float quadratic;  
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;       
+    sampler2D shadowMap;
+    mat4 lightSpaceMatrix; //This is the only member used
+};
+
+uniform SpotLight spotLights[MAX_NR_SPOT_LIGHTS];
+uniform int numberOfSpotLights;
 
 void main()
 {
@@ -35,7 +56,7 @@ void main()
     // Process Spot Lights
     for (int i = 0; i < numberOfSpotLights; i++)
     {
-        vs_out.FragPosLightSpace[i] = lightSpaceMatrices[i] * vec4(vs_out.FragPos, 1.0);
+        vs_out.FragPosLightSpace[i] = spotLights[i].lightSpaceMatrix * vec4(vs_out.FragPos, 1.0);
     }
     
     //Process Directional Light

@@ -49,6 +49,7 @@ struct SpotLight {
     vec3 diffuse;
     vec3 specular;       
     sampler2D shadowMap;
+    mat4 lightSpaceMatrix;
 };
 
 //Object color properties (used if texture is not available or if you want to change tint of texture)
@@ -72,13 +73,10 @@ in VS_OUT {
 uniform vec3 viewPos;
 
 //Scene Light Objects
-
 uniform DirLight dirLight;
 uniform bool hasDirLight;
-
 uniform PointLight pointLights[MAX_NR_POINT_LIGHTS];
 uniform int numberOfPointLights;
-
 uniform SpotLight spotLights[MAX_NR_SPOT_LIGHTS];
 uniform int numberOfSpotLights;
 

@@ -15,8 +15,10 @@ public:
 	SpotLight(Shader*, Shader* , glm::vec3 , glm::vec3 );
 	~SpotLight();
 
+	//Methods
 	void Draw() const;
-	
+	void updateLightSpaceMatrix();
+
 	//Setters for light properties
 	void setLightPos(const glm::vec3&);
 	void setLightDirection(const glm::vec3&);
@@ -31,6 +33,7 @@ public:
 	void setFarPlane(const float&);
 	void setShadowHeight(int);
 	void setShadowWidth(int);
+	void setLightSpaceMatrix(const glm::mat4&);
 
 	//Getters for light properties
 	glm::vec3 getLightPos() const;
@@ -44,6 +47,7 @@ public:
 	GLuint& getDepthMapTexture();
 	int getShadowHeight() const;
 	int getShadowWidth() const;
+	glm::mat4& getLightSpaceMatrix();
 
 
 	//Private Variables
@@ -79,5 +83,7 @@ private:
 	GLuint m_DepthMapTexture;
 	float m_NearPlane;
 	float m_FarPlane;
-
+	glm::mat4 m_LightSpaceMatrix;
+	glm::mat4 m_LightProjectionMatrix;
+	glm::mat4 m_LightViewMatrix;
 };

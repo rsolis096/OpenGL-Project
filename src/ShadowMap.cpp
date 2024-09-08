@@ -172,31 +172,14 @@ void ShadowMap::shadowPass()
     //Process SpotLights
     if (numberOfSpotLights > 0) {
 
-        m_LightSpaceMatrices.clear(); //This doesn't need to happen every frame for every light, opportunity to improve
-
         shadowPassShader.setInt("lightType", LightController::LightType::SPOT_LIGHT);
 
         for (int i = 0; i < numberOfSpotLights; i++)
         {
-            glm::mat4 lightProjection = glm::perspective(
-                glm::radians(45.0f),
-                1.0f, //static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT)
-                m_LightController->m_SpotLights[i]->getNearPlane(),
-                m_LightController->m_SpotLights[i]->getFarPlane()
-            );
+            //LightSpace Matrix initialized in constructor and updated here:
+            m_LightController->m_SpotLights[i]->updateLightSpaceMatrix();
 
-            glm::vec3 lightPos = m_LightController->m_SpotLights[i]->getLightPos();
-            glm::vec3 lightDir = m_LightController->m_SpotLights[i]->getLightDirection();
-
-            glm::mat4 lightView = glm::lookAt(
-                lightPos,      // Position of the light
-                lightPos + lightDir,        // The target point (position + direction)
-                glm::vec3(0.0, 1.0, 0.0)  // Up vector
-            );
-
-            m_LightSpaceMatrices.push_back(lightProjection * lightView);
-
-            shadowPassShader.setMat4("shadowPassMatrixSpot", m_LightSpaceMatrices[i]);
+            shadowPassShader.setMat4("shadowPassMatrixSpot", m_LightController->m_SpotLights[i]->getLightSpaceMatrix());
 
             const int width = m_LightController->m_SpotLights[i]->getShadowWidth();
             const int height = m_LightController->m_SpotLights[i]->getShadowHeight();
@@ -207,6 +190,7 @@ void ShadowMap::shadowPass()
             glViewport(0, 0, width, height);
             glClear(GL_DEPTH_BUFFER_BIT);
 
+            //Draw Scene (limited for shadow pass)
             for (Object* obj : *m_SceneObjects) {
                 obj->ShadowPassDraw(shadowPassShader);
             }
@@ -267,7 +251,7 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
         shader.setInt("numberOfPointLights", numberOfPointLights);
 
         // Apply Textures for Point Lights
-        for (int i = 0; i < static_cast<int>(m_LightController->m_PointLights.size()); i++)
+        for (int i = 0; i < numberOfPointLights; i++)
         {
             const int textureUnit = static_cast<int>(TextureManager::getNextUnit());
             glActiveTexture(GL_TEXTURE0 + textureUnit);
@@ -281,16 +265,18 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
     if (numberOfSpotLights > 0)
     {
         //Send over the light space matrices generated during the shadow pass
-        shader.setMat4Array("lightSpaceMatrices", m_LightSpaceMatrices);
-        shader.setInt("numberOfSpotLights", static_cast<int>(m_LightSpaceMatrices.size()));
+        shader.setInt("numberOfSpotLights", numberOfSpotLights);
 
-        //Apply Textures
-        for (int i = 0; i < m_LightController->m_SpotLights.size(); i++)
+        //Apply Textures and update uniforms
+        for (int i = 0; i < numberOfSpotLights; i++)
         {
             const int textureUnit = static_cast<int>(TextureManager::getNextUnit());
             glActiveTexture(GL_TEXTURE0 + textureUnit);
             glBindTexture(GL_TEXTURE_2D, m_LightController->m_SpotLights[i]->getDepthMapTexture());
+
+            //TODO: Remove dependence on SpotLight Indexing to allow for dynamic removal/addition to spotlights
             shader.setInt("spotLights[" + std::to_string(i) + "].shadowMap", textureUnit);
+            shader.setMat4("spotLights[" + std::to_string(i) + "].lightSpaceMatrix", m_LightController->m_SpotLights[i]->getLightSpaceMatrix());
         }
     }
 
