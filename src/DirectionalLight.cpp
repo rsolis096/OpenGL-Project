@@ -20,6 +20,7 @@ DirectionalLight::DirectionalLight(Shader* lightingShader, const glm::vec3& dir)
 
 	m_ShadowHeight = 1024;
 	m_ShadowWidth = 1024;
+	m_ShowShadowArea = false;
 
 	m_LightingShader->use();
 	m_LightingShader->setVec3("dirLight.position", m_LightPosition);
@@ -28,6 +29,7 @@ DirectionalLight::DirectionalLight(Shader* lightingShader, const glm::vec3& dir)
 	m_LightingShader->setVec3("dirLight.diffuse", m_Diffuse);
 	m_LightingShader->setVec3("dirLight.specular", m_Specular);
 	m_LightingShader->setBool("hasDirLight", true);
+	m_LightingShader->setBool("dirLight.showShadowArea", m_ShowShadowArea);
 
 	glCheckError();
 }
@@ -99,6 +101,21 @@ int DirectionalLight::getShadowHeight() const
 int DirectionalLight::getShadowWidth() const
 {
 	return m_ShadowWidth;
+}
+
+bool DirectionalLight::getShadowArea() const
+{
+	return m_ShowShadowArea;
+}
+
+bool DirectionalLight::showShadowArea()
+{
+	m_ShowShadowArea = !m_ShowShadowArea;
+
+	m_LightingShader->use();
+	m_LightingShader->setBool("dirLight.showShadowArea", m_ShowShadowArea);
+
+	return m_ShowShadowArea;
 }
 
 GLuint& DirectionalLight::getDepthMapTexture()

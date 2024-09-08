@@ -898,6 +898,22 @@ void GUI::drawList()
 
 					}
 
+					//Show Shadow Area
+					{
+						bool showShadowArea = dirLight->getShadowArea();
+						ImGui::Text("Show Shadow Area");
+						ImGui::SameLine();
+						if (ImGui::Checkbox("##shadowarea", &showShadowArea))
+						{
+							dirLight->showShadowArea();
+						}
+
+						ImGui::SameLine(); HelpMarker(
+							"Enabling this will light only the area \n"
+							"where shadows are being computed.\n");
+						ImGui::Spacing();
+					}
+
 				}
 				ImGui::EndTabItem();
 			}

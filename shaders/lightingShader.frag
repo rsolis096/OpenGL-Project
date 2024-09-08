@@ -20,6 +20,7 @@ struct DirLight {
     vec3 specular;
     vec3 position;
     sampler2D shadowMap;
+    bool showShadowArea;
 };
 
 struct PointLight {
@@ -163,12 +164,13 @@ float DirectionalLightShadowCalculation(float dotLightNormal)
 
     // If the fragment is outside the shadow map bounds, make it fully shadowed
     //Enable this to show directional shadow map boundary
-    /* 
-    if (pos.x < 0.0 || pos.x > 1.0 || pos.y < 0.0 || pos.y > 1.0)
+    if(dirLight.showShadowArea)
     {
+        if (pos.x < 0.0 || pos.x > 1.0 || pos.y < 0.0 || pos.y > 1.0)
+        {
         return 1.0; // Full shadow
+        }
     }
-    */
 
     //Fixes cut-off for scene behind light direction (0.0f indicates no shadow, 1.0f indicates full shadow)
     if(pos.z > 1.0f){
