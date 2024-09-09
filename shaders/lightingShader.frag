@@ -50,6 +50,7 @@ struct SpotLight {
     vec3 diffuse;
     vec3 specular;       
     sampler2D shadowMap;
+    float bias;
     mat4 lightSpaceMatrix;
 };
 
@@ -115,7 +116,7 @@ float SpotLightShadowCalculation(vec4 fragPosLightSpace, SpotLight light)
     float diffuseFactor = dot(fs_in.Normal, -lightDirection);
 
     // Bias to prevent shadow acne (adjust based on your scene)
-    float bias = 0.005; 
+    float bias = light.bias; 
 
     // Calculate the size of a single texel in shadow map texture coordinates
     vec2 texelSize = 1.0 / textureSize(light.shadowMap, 0);

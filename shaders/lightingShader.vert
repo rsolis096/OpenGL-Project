@@ -38,7 +38,8 @@ struct SpotLight {
     vec3 diffuse;
     vec3 specular;       
     sampler2D shadowMap;
-    mat4 lightSpaceMatrix; //This is the only member used
+    float bias;
+    mat4 lightSpaceMatrix; //We only use this in vertex shader 
 };
 
 uniform SpotLight spotLights[MAX_NR_SPOT_LIGHTS];

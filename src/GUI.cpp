@@ -667,16 +667,25 @@ void GUI::drawList()
 							*/
 						}
 
-						//Shadow Map Properties
+						//Shadow Properties
 						{
 							ImGui::Spacing();
 							ImGui::Text("Shadows");
 							float near_plane = selectedSpotLight->getNearPlane();
-							if (ImGui::InputFloat("Near Plane", &near_plane, 0.1f, 1.0f, "%.3f", 0))
+							if (ImGui::InputFloat("Near Plane##Spot", &near_plane, 0.1f, 1.0f, "%.3f", 0))
 								selectedSpotLight->setNearPlane(near_plane);
 							float far_plane = selectedSpotLight->getFarPlane();
-							if (ImGui::InputFloat("Far Plane", &far_plane, 0.1f, 1.0f, "%.3f", 0))
+							if (ImGui::InputFloat("Far Plane##Spot", &far_plane, 0.1f, 1.0f, "%.3f", 0))
 								selectedSpotLight->setFarPlane(far_plane);
+							float fov = selectedSpotLight->getShadowFOV();
+							if (ImGui::InputFloat("Shadow FOV##Spot", &fov, 0.1f, 1.0f, "%.3f", 0))
+								selectedSpotLight->setShadowFOV(fov);
+							float bias = selectedSpotLight->getShadowBias();
+							if (ImGui::InputFloat("Shadow Bias##Spot", &bias, 0.01f, 1.0f, "%.3f", 0))
+								selectedSpotLight->setShadowBias(bias);
+							bool toggleShadowPass = selectedSpotLight->getShadowPassUpdate();
+							if (ImGui::Checkbox("Enable Shadow Pass", &toggleShadowPass))
+								selectedSpotLight->setShadowPassUpdate(toggleShadowPass);
 						}
 
 						//Shadow Map Resolution
@@ -795,17 +804,17 @@ void GUI::drawList()
 							ImGui::Spacing();
 							ImGui::Text("Shadows");
 							float near_plane = selectedPointLight->getNearPlane();
-							if (ImGui::InputFloat("Near Plane", &near_plane, 0.1f, 1.0f, "%.3f", 0))
+							if (ImGui::InputFloat("Near Plane##Point", &near_plane, 0.1f, 1.0f, "%.3f", 0))
 								selectedPointLight->setNearPlane(near_plane);
 							float far_plane = selectedPointLight->getFarPlane();
-							if (ImGui::InputFloat("Far Plane", &far_plane, 0.1f, 1.0f, "%.3f", 0))
+							if (ImGui::InputFloat("Far Plane##Point", &far_plane, 0.1f, 1.0f, "%.3f", 0))
 								selectedPointLight->setFarPlane(far_plane);
 							float fov = selectedPointLight->getShadowFOV();
-							if (ImGui::InputFloat("Shadow FOV", &fov, 0.1f, 1.0f, "%.3f", 0))
+							if (ImGui::InputFloat("Shadow FOV##Point", &fov, 0.1f, 1.0f, "%.3f", 0))
 								selectedPointLight->setShadowFOV(fov);
-							float bias = selectedPointLight->getBias();
-							if (ImGui::InputFloat("Shadow Bias", &bias, 0.01f, 1.0f, "%.3f", 0))
-								selectedPointLight->setBias(bias);
+							float bias = selectedPointLight->getShadowBias();
+							if (ImGui::InputFloat("Shadow Bias##Point", &bias, 0.01f, 1.0f, "%.3f", 0))
+								selectedPointLight->setShadowBias(bias);
 
 
 							bool toggleShadowPass = selectedPointLight->getShadowPassUpdate();

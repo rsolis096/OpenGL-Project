@@ -28,9 +28,9 @@ void main()
    
     vec3 result = ambientColor + diffuseColor + specularColor;
 
-    //Dummy operation to aviod no uniform location error
+    //Dummy operation to aviod no uniform location error, without this the variable will be optimized out
+
     if (hasTexture) {
-        //Without this the variable will be optimized out
         result += vec3(0.1f);
     }
 

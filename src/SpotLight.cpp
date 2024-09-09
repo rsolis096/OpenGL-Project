@@ -28,21 +28,12 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_Specular = glm::vec3(1.0f, 1.0f, 1.0f) ;
 
 	//Shadow Properties
-	m_LightProjectionMatrix = glm::perspective(
-		glm::radians(45.0f),
-		1.0f, //static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT)
-		m_NearPlane,
-		m_FarPlane
-	);
-	m_LightViewMatrix = glm::lookAt(
-		m_LightPos,      // Position of the light
-		m_LightPos + m_LightDirection,        // The target point (position + direction)
-		glm::vec3(0.0, 1.0, 0.0)  // Up vector
-	);
-	m_LightSpaceMatrix = m_LightProjectionMatrix * m_LightViewMatrix;
-
+	m_ShadowFOV = 45.0f;
 	m_ShadowHeight = 1024;
 	m_ShadowWidth = 1024;
+	m_ShadowBias = 0.005f;
+	m_ShadowPassUpdate = true;
+	updateLightSpaceMatrix();
 
 	//For Attenuation
 	m_Constant = 1.0f;
@@ -66,6 +57,7 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].cutOff", glm::cos(glm::radians(12.5f)));
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].outerCutOff", glm::cos(glm::radians(15.0f)));
 	m_LightingShader->setMat4("spotLights[" + std::to_string(m_SpotLightID) + "].lightSpaceMatrix", m_LightSpaceMatrix);
+	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].bias", m_ShadowBias);  
 
 }
 
@@ -88,9 +80,9 @@ void SpotLight::Draw() const
 
 void SpotLight::updateLightSpaceMatrix()
 {
-	//Shadow Properties
+
 	m_LightProjectionMatrix = glm::perspective(
-		glm::radians(45.0f),
+		glm::radians(m_ShadowFOV),
 		1.0f, //static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT)
 		m_NearPlane,
 		m_FarPlane
@@ -103,7 +95,6 @@ void SpotLight::updateLightSpaceMatrix()
 	m_LightSpaceMatrix = m_LightProjectionMatrix * m_LightViewMatrix;
 
 	//Shader uniform must be updated separately. (used in both shadow pass shader and lighting shader)
-
 }
 
 /*###################################
@@ -140,6 +131,7 @@ void SpotLight::setLightDirection(const glm::vec3& newDir)
 	m_LightDirection = glm::normalize(newDir - m_LightPos);
 	m_LightingShader->use();
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].direction", m_LightDirection);
+	updateLightSpaceMatrix();
 }
 
 void SpotLight::setLightPos(const glm::vec3& lightPos)
@@ -149,16 +141,19 @@ void SpotLight::setLightPos(const glm::vec3& lightPos)
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].position", m_LightPos);
 	if (m_LightShape != nullptr)
 		m_LightShape->setPosition(lightPos);
+	updateLightSpaceMatrix();
 }
 
 void SpotLight::setFarPlane(const float& val)
 {
 	m_FarPlane = val;
+	updateLightSpaceMatrix();
 }
 
 void SpotLight::setNearPlane(const float& val)
 {
 	m_NearPlane = val;
+	updateLightSpaceMatrix();
 }
 
 void SpotLight::setConstant(const float constant)
@@ -201,6 +196,27 @@ void SpotLight::setLightSpaceMatrix(const glm::mat4& ls)
 {
 	m_LightSpaceMatrix = ls;
 }
+
+void SpotLight::setShadowBias(const float& b)
+{
+	m_ShadowBias = b;
+	m_LightingShader->use();
+	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].bias", m_ShadowBias);
+}
+
+void SpotLight::setShadowPassUpdate(bool val)
+{
+	m_ShadowPassUpdate = val;
+	updateLightSpaceMatrix();
+}
+
+void SpotLight::setShadowFOV(const float& fov)
+{
+	m_ShadowFOV = fov;
+	updateLightSpaceMatrix();
+}
+
+
 
 /*###################################
 * ###     GETTER FUNCTIONS        ###
@@ -266,4 +282,18 @@ glm::mat4& SpotLight::getLightSpaceMatrix()
 	return m_LightSpaceMatrix;
 }
 
+float SpotLight::getShadowBias() const
+{
+	return m_ShadowBias;
+}
 
+float SpotLight::getShadowFOV() const
+{
+	return m_ShadowFOV;
+}
+
+
+bool SpotLight::getShadowPassUpdate() const
+{
+	return m_ShadowPassUpdate;
+}

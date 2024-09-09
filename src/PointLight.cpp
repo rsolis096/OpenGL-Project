@@ -40,22 +40,9 @@ PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::
 	m_FarPlane = 25.0f;
 	m_ShadowFOV = 90.0f;
 	m_ShadowPassUpdate = true;
-	m_Bias = 0.05f;
+	m_ShadowBias = 0.05f;
 
-	m_ShadowProj = glm::perspective(
-		glm::radians(m_ShadowFOV),
-		1.0f, // static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT) 
-		m_NearPlane,
-		m_FarPlane);
-
-	m_LightViews = {
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
-	};
+	updateLightSpaceMatrices();
 
 	//Set these properties in the lightingShader.frag for the corresponding light source at index m_LightID
 	m_LightingShader->use();
@@ -68,7 +55,7 @@ PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::
 	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].quadratic", m_Quadratic);
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].position", m_LightPos);
 	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].far_plane", m_FarPlane);
-	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].bias", m_Bias);  // Set far plane distance
+	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].bias", m_ShadowBias);
 
 }
 
@@ -89,6 +76,26 @@ void PointLight::Draw()
 	m_LightShape->Draw(*m_LightSourceShader);
 }
 
+void PointLight::updateLightSpaceMatrices()
+{
+	m_ShadowProj = glm::perspective(
+		glm::radians(m_ShadowFOV),
+		1.0f, // static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT) 
+		m_NearPlane,
+		m_FarPlane);
+
+	m_LightViews = {
+		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
+		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
+		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
+		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
+		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
+		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
+	};
+
+	//Shader uniform must be updated separately. (used in both shadow pass shader and lighting shader)
+}
+
 /*###################################
 * ###     SETTER FUNCTIONS        ###
 ###################################*/
@@ -100,14 +107,7 @@ void PointLight::setLightPos(const glm::vec3 lightPos)
 	m_LightingShader->use();
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].position", m_LightPos);
 
-	m_LightViews = {
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
-	};
+	updateLightSpaceMatrices();
 
 	glCheckError();
 }
@@ -140,40 +140,13 @@ void PointLight::setNearPlane(const float& n)
 {
 	m_NearPlane = n;
 
-	m_ShadowProj = glm::perspective(
-		glm::radians(m_ShadowFOV),
-		1.0f, // static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT) 
-		m_NearPlane,
-		m_FarPlane);
-
-	m_LightViews = {
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
-	};
+	updateLightSpaceMatrices();
 }
 
 void PointLight::setFarPlane(const float& f)
 {
 	m_FarPlane = f;
-
-	m_ShadowProj = glm::perspective(
-		glm::radians(m_ShadowFOV),
-		1.0f, // static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT) 
-		m_NearPlane,
-		m_FarPlane);
-
-	m_LightViews = {
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
-	};
+	updateLightSpaceMatrices();
 
 	m_LightingShader->use();
 	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].far_plane", m_FarPlane);
@@ -189,20 +162,7 @@ void PointLight::setShadowFOV(const float& fov)
 {
 	m_ShadowFOV = fov;
 
-	m_ShadowProj = glm::perspective(
-		glm::radians(m_ShadowFOV),
-		1.0f, // static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT) 
-		m_NearPlane,
-		m_FarPlane);
-
-	m_LightViews = {
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
-	};
+	updateLightSpaceMatrices();
 }
 
 void PointLight::setIntensity(const float& i)
@@ -213,28 +173,14 @@ void PointLight::setIntensity(const float& i)
 void PointLight::setShadowPassUpdate(bool val)
 {
 	m_ShadowPassUpdate = val;
-
-	m_ShadowProj = glm::perspective(
-		glm::radians(m_ShadowFOV),
-		1.0f, // static_cast<float>(SHADOW_WIDTH / SHADOW_HEIGHT) 
-		m_NearPlane,
-		m_FarPlane);
-
-	m_LightViews = {
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
-		m_ShadowProj * glm::lookAt(m_LightPos, m_LightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
-	};
+	updateLightSpaceMatrices();
 }
 
-void PointLight::setBias(const float& b)
+void PointLight::setShadowBias(const float& b)
 {
-	m_Bias = b;
+	m_ShadowBias = b;
 	m_LightingShader->use();
-	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].bias", m_Bias);  // Set far plane distance
+	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].bias", m_ShadowBias);  // Set far plane distance
 }
 
 void PointLight::setConstant(const float constant)
@@ -322,7 +268,7 @@ bool PointLight::getShadowPassUpdate() const
 	return m_ShadowPassUpdate;
 }
 
-float PointLight::getBias() const
+float PointLight::getShadowBias() const
 {
-	return m_Bias;
+	return m_ShadowBias;
 }

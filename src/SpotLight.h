@@ -34,6 +34,9 @@ public:
 	void setShadowHeight(int);
 	void setShadowWidth(int);
 	void setLightSpaceMatrix(const glm::mat4&);
+	void setShadowBias(const float&);
+	void setShadowPassUpdate(bool val);
+	void setShadowFOV(const float& fov);
 
 	//Getters for light properties
 	glm::vec3 getLightPos() const;
@@ -48,6 +51,9 @@ public:
 	int getShadowHeight() const;
 	int getShadowWidth() const;
 	glm::mat4& getLightSpaceMatrix();
+	float getShadowBias() const;
+	float getShadowFOV() const;
+	bool getShadowPassUpdate() const;
 
 
 	//Private Variables
@@ -83,7 +89,10 @@ private:
 	GLuint m_DepthMapTexture;
 	float m_NearPlane;
 	float m_FarPlane;
+	float m_ShadowBias;
 	glm::mat4 m_LightSpaceMatrix;
 	glm::mat4 m_LightProjectionMatrix;
 	glm::mat4 m_LightViewMatrix;
+	bool m_ShadowPassUpdate;
+	float m_ShadowFOV;
 };

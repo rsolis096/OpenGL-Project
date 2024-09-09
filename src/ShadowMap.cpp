@@ -130,7 +130,6 @@ void ShadowMap::shadowPass()
         shadowPassShader.setInt("lightType", LightController::LightType::POINT_LIGHT);  // Set light type to point light
 
 
-
         for (int i = 0; i < static_cast<int>(numberOfPointLights); i++)
         {
             if(m_LightController->m_PointLights[i]->getShadowPassUpdate())
@@ -139,7 +138,7 @@ void ShadowMap::shadowPass()
                 shadowPassShader.setVec3("pointLightPos", lightPos);
                 shadowPassShader.setFloat("far_plane", m_LightController->m_PointLights[i]->getFarPlane());  // Set far plane distance
 
-                // See point light shader for projection matrices computations
+                // See point light constructor for projection matrices computations
                 const std::array<glm::mat4, 6> lightViews = m_LightController->m_PointLights[i]->getLightViews();
 
                 // Set viewport to match shadow map resolution
@@ -176,9 +175,7 @@ void ShadowMap::shadowPass()
 
         for (int i = 0; i < numberOfSpotLights; i++)
         {
-            //LightSpace Matrix initialized in constructor and updated here:
-            m_LightController->m_SpotLights[i]->updateLightSpaceMatrix();
-
+            //LightSpace Matrix initialized in spotlight constructor 
             shadowPassShader.setMat4("shadowPassMatrixSpot", m_LightController->m_SpotLights[i]->getLightSpaceMatrix());
 
             const int width = m_LightController->m_SpotLights[i]->getShadowWidth();
