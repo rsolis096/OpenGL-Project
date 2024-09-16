@@ -23,12 +23,21 @@
 
 ## How To Run
 
-- View the releases tab to download an executable of the program. 
-- Running the project in Visual Studio requires building your own assimp-vc143-mt.dll (Release), assimp-vc143-mtd.dll (Debug) via https://github.com/assimp/assimp
-- This project expects assets which can be downloaded here : https://drive.google.com/drive/folders/1xrtGR_Ftvw49WWUczeX7o8o1jT-aFrRH?usp=sharing
-- For the assets, place the assets folder in the same directory as the .exe or the .sln file if running on visual studio
-## 
+#### <ins>Using the executable</ins>
+- Views the "Releases" tab and download the latest executable of the project
+- This project expects assets which can be downloaded [here](https://drive.google.com/drive/folders/1xrtGR_Ftvw49WWUczeX7o8o1jT-aFrRH?usp=sharing). Store the assets folder in the same directory as the executable
+- Run the executable
 
+#### <ins>Using Visual Studio 2022</ins> 
+(If any of the following folders do not exist, then create them with the folder storing the .sln acting as the root)
+- Download GLFW 64-bit Windows Binaries [here](https://www.glfw.org/download).
+- Copy glfw3.lib into "third party\lib\glfw\Debug" and "third party\lib\glfw\Release".
+- Build Assimp 64-bit binaries by downloading [assimp](https://github.com/assimp/assimp) and running BUILDBINARIES_EXAMPLE.bat for your version of Visual Studio.
+- Copy assimp-vc143-mt.lib into "third party\lib\assimp\Release" and assimp-vc143-mtd.lib into "third party\lib\assimp\Debug"
+- Copy assimp-vc143-mt.dll into "x64\Release" and assimp-vc143-mtd.dll into "x64\Debug"
+- This project expects assets which can be downloaded [here](https://drive.google.com/drive/folders/1xrtGR_Ftvw49WWUczeX7o8o1jT-aFrRH?usp=sharing). Store the assets folder in the same directory as the .sln
+  
+## Screenshots
 ### Point Light Shadows
 ![sponza-demo](https://github.com/user-attachments/assets/ceccfcf2-3ba8-48a2-954a-fca7fdb37943)
 
