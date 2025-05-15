@@ -61,10 +61,10 @@ void Plane::Draw(Shader& shader)
     //Bind Plane
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    glCheckError();
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     glCheckError();
 }
@@ -76,7 +76,7 @@ void Plane::ShadowPassDraw(Shader& shader)
 
     //Bind Plane and render
     glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Unbind buffers and reset state
     glBindVertexArray(0);

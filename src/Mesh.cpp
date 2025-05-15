@@ -63,12 +63,11 @@ void Mesh::ShadowPassDraw(Shader& shader) const
 {
     // draw mesh
     glBindVertexArray(VAO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
 
-    //glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
-
     glCheckError();
 }
 

@@ -136,7 +136,7 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 			lightingShader->use();
 			lightingShader->setMat4("projection", proj);
 			lightingShader->setMat4("view", view);
-			lightingShader->setVec3("viewPos", mainCamera->cameraPos);
+			lightingShader->setVec3("viewPos", mainCamera->m_LookFrom);
 
 			//Apply Textures to scene for shadow maps
 			m_ShadowMap->updateShaderUniforms(*lightingShader);

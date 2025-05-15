@@ -1,7 +1,10 @@
 #include "GUI.h"
 
+bool GUI::isWindowHidden = true;
+int selectedItemIndex = -1;
+static float vec3a[3] = { 0.00f, 0.00f, 0.00f };
+
 // Helper to display a little (?) mark which shows a tooltip when hovered.
-// In your own code you may want to display an actual icon if you are using a merged icon fonts (see docs/FONTS.md)
 static void HelpMarker(const char* desc)
 {
 	ImGui::TextDisabled("(?)");
@@ -13,11 +16,6 @@ static void HelpMarker(const char* desc)
 		ImGui::EndTooltip();
 	}
 }
-
-bool GUI::isWindowHidden = false;
-
-int selectedItemIndex = -1;
-static float vec3a[3] = { 0.00f, 0.00f, 0.00f };
 
 GUI::GUI(GLFWwindow* windowParam, Scene& scene) : window(windowParam), myScene(scene)
 {
@@ -39,7 +37,7 @@ GUI::GUI(GLFWwindow* windowParam, Scene& scene) : window(windowParam), myScene(s
 
 void GUI::displayWindow()
 {
-	if (!isWindowHidden)
+	if (!GUI::isWindowHidden)
 	{
 		// Start the Dear ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
@@ -47,7 +45,6 @@ void GUI::displayWindow()
 		ImGui::NewFrame();
 
 		// Rendering
-		// (Your code clears your framebuffer, renders your other stuff etc.)
 		ImGui::Begin("OpenGL Project");
 		ImGui::Text("%.3f fps", myScene.fps);
 		drawList();
@@ -70,9 +67,9 @@ void GUI::drawList()
 {
 
 	ImGui::Text("Player Position: x: %.2f, y: %.2f, z: %.2f", 
-		myScene.mainCamera->cameraPos[0],
-		myScene.mainCamera->cameraPos[1],
-		myScene.mainCamera->cameraPos[2]);
+		myScene.mainCamera->m_LookFrom[0],
+		myScene.mainCamera->m_LookFrom[1],
+		myScene.mainCamera->m_LookFrom[2]);
 	ImGui::Text("Object Count: %d", myScene.m_SceneObjects.size());
 
 	//Current Tab from left to right

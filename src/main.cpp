@@ -34,12 +34,14 @@ float lastFrame = 0.0f; // Time of last frame
 bool firstMouse = true;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
-bool cursorLocked = true;
-bool isWindowHidden = true;
 double lastKeyPressTime = 0.0;
 double debounceThreshold = 0.2; // Adjust this value based on your needs
-double mouseX = 0, mouseY = 0; //Save cursor position when gui is opened
-float xpos = 0, ypos = 0;
+
+
+// Saved position of the cursor when gui is opened
+float saved_mouse_x = 0, saved_mouse_y = 0;
+// Current position of the cursor
+float current_mouse_x = 0, current_mouse_y = 0;
 
 
 //Initialize Camera
@@ -49,7 +51,6 @@ Camera* myCamera = new Camera();
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    std::cout << "resize window called" << std::endl;
     SCR_WIDTH = width;
     SCR_HEIGHT = height;
     glViewport(0, 0, width, height);
@@ -66,38 +67,39 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS)
     {
         double currentTime = glfwGetTime();
+
         if (currentTime - lastKeyPressTime > debounceThreshold)
         {
             GUI::isWindowHidden = !GUI::isWindowHidden;
-            if (cursorLocked)
+            
+            if (GUI::isWindowHidden)
             {
-                //Save previous mouse location
-                mouseX = xpos;
-                mouseY = ypos;
-                //Unlock mouse
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-                cursorLocked = false;
-                //Set mouse to center
-                glfwSetCursorPos(window, SCR_WIDTH / 2, SCR_HEIGHT / 2);
+                //Place mouse on middle of screen
+                glfwSetCursorPos(window, saved_mouse_x, saved_mouse_y);
+                //Lock mouse
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                //Reset last position for mouse
+                saved_mouse_x = 0;
+                saved_mouse_y = 0;
             }
             else
             {
-                //Place mouse on middle of screen
-                glfwSetCursorPos(window, mouseX, mouseY);
-                //Lock mouse
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-                cursorLocked = true;
-                //Reset last position for mouse
-                mouseX = 0;
-                mouseY = 0;
+                //Save previous mouse location
+                saved_mouse_x = current_mouse_x;
+                saved_mouse_y = current_mouse_y;
+
+                //Unlock mouse
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                //Set mouse to center
+                glfwSetCursorPos(window, SCR_WIDTH / 2, SCR_HEIGHT / 2);
 
             }
-            lastKeyPressTime = currentTime; // Update debounce timer
         }
+        lastKeyPressTime = currentTime;
     }
 
-    //Mouse Input (input disabled when imgui menu is opened)
-    if (cursorLocked)
+    // Keyboard input (disabled when gui window is opened)
+    if (GUI::isWindowHidden)
     {
         float cameraSpeed = myCamera->getMovementSpeed() * deltaTime;
         //Forward
@@ -126,43 +128,29 @@ void processInput(GLFWwindow* window)
     }
 }
 
-void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+void mouse_callback(GLFWwindow* window, double mouse_x, double mouse_y)
 {
     //Only change camera if cursor is locked
-    if (cursorLocked)
+    if (GUI::isWindowHidden)
     {
-        //Cursor is locked, save current mouse positon
-        xpos = xposIn;
-        ypos = yposIn;
-        //If this call is immedietly after unlock/lock, set mouse to previous position before unlock (mouseX and mouseY)
-        if (mouseX != 0 && mouseY != 0)
-        {
-            xpos = static_cast<float>(mouseX);
-            ypos = static_cast<float>(mouseY);
-            mouseX = 0;
-            mouseY = 0;
-        }
-        //if this call is done during cursor lock, set mouse position to new xposIn, yposIn
-        else
-        {
-            xpos = static_cast<float>(xposIn);
-            ypos = static_cast<float>(yposIn);
-        }
+        std::cout << "window is hidden" << std::endl;
 
-        if (firstMouse)
-        {
-            lastX = xpos;
-            lastY = ypos;
-            firstMouse = false;
-        }
 
-        float xoffset = xpos - lastX;
-        float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+        //Cursor is locked (gui closed), save current mouse positon
+        current_mouse_x = static_cast<float>(mouse_x);
+        current_mouse_y = static_cast<float>(mouse_y);
 
-        lastX = xpos;
-        lastY = ypos;
+        double delta_x = mouse_x - lastX;
+        double delta_y = lastY - mouse_y; // reversed since y-coordinates go from bottom to top
 
-        myCamera->processMouse(xoffset, yoffset);
+        lastX = mouse_x;
+        lastY = mouse_y;
+
+        const double sensitivity = 0.3;
+        delta_x *= sensitivity;
+        delta_y *= sensitivity;
+
+        myCamera->processMouse(delta_x, delta_y);
     }
 }
 
@@ -245,46 +233,46 @@ GLFWwindow* setupWindow()
 void demoScene(Scene& demoScene)
 {
     //GENERATE INITIAL SCENE (ALL OF THESE CAN BE CHANGED IN REAL TIME)
-    //demoScene.addObject(new Model("assets/models/sponza/scene.gltf"));
-	//demoScene.addObject(new Cube("assets/textures/container2.png", "assets/textures/container2_specular.png"));
+    demoScene.addObject(new Model("assets/models/backpack/backpack.obj"));
+	demoScene.addObject(new Cube("assets/textures/container2.png", "assets/textures/container2_specular.png"));
     demoScene.addObject(new Plane());
-	//demoScene.addObject(new Sphere("assets/textures/globe.jpg", "assets/textures/globe.jpg"));
+	demoScene.addObject(new Sphere("assets/textures/globe.jpg", "assets/textures/globe.jpg"));
 
-    //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
-    //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[1]);
-    //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[2]);
-    //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[3]);
+    demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
+    demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[1]);
+    demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[2]);
+    demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[3]);
 
-    //glm::vec3 spotLightPos1 = glm::vec3(3.0f, 3.0f, -1.0f);
-    //glm::vec3 spotLightDir1 = glm::vec3(-7.0f, 0.0f, 0.0f);
-    //spotLightDir1 = glm::normalize(spotLightDir1 - spotLightPos1);
+    glm::vec3 spotLightPos1 = glm::vec3(3.0f, 3.0f, -1.0f);
+    glm::vec3 spotLightDir1 = glm::vec3(-7.0f, 0.0f, 0.0f);
+    spotLightDir1 = glm::normalize(spotLightDir1 - spotLightPos1);
 
-    //glm::vec3 spotLightPos2 = glm::vec3(10.0f, 7.0f, 0.0f);
-    //glm::vec3 spotLightDir2 = glm::vec3(-14.0f, 0.0f, 0.0f);
-    //spotLightDir2 = glm::normalize(spotLightDir2 - spotLightPos2);
+    glm::vec3 spotLightPos2 = glm::vec3(10.0f, 7.0f, 0.0f);
+    glm::vec3 spotLightDir2 = glm::vec3(-14.0f, 0.0f, 0.0f);
+    spotLightDir2 = glm::normalize(spotLightDir2 - spotLightPos2);
 
-    //glm::vec3 spotLightPos3 = glm::vec3(-14.0f, 3.0f, -13.0f);
-    //glm::vec3 spotLightDir3 = glm::vec3(0.0f, 0.0f, 1.0f);
-    //spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
+    glm::vec3 spotLightPos3 = glm::vec3(-14.0f, 3.0f, -13.0f);
+    glm::vec3 spotLightDir3 = glm::vec3(0.0f, 0.0f, 1.0f);
+    spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
 
-    //demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
-    //demoScene.m_LightController->addDirectionalLight(glm::vec3(0.0f));
-    //demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
-    //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
+    demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
+    demoScene.m_LightController->addDirectionalLight(glm::vec3(0.0f));
+    demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
+    demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
-	//demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 10.0f, 0.0f));
-    //demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 9.0f, 0.0f));
-    //demoScene.m_LightController->addPointLight(glm::vec3(10.0f, 5.0f, 10.0f));
+	demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 10.0f, 0.0f));
+    demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 9.0f, 0.0f));
+    demoScene.m_LightController->addPointLight(glm::vec3(10.0f, 5.0f, 10.0f));
 
 
-    //demoScene.m_SceneObjects[1]->setPosition(glm::vec3(4.0f, 3.0f, 0.0));
-    //demoScene.m_SceneObjects[1]->setScale(glm::vec3(1.0f, 1.0f, 1.0f));
-    //demoScene.m_SceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
-    //demoScene.m_SceneObjects[0]->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    //demoScene.m_SceneObjects[0]->setScale(glm::vec3(0.01f));
-    //demoScene.m_SceneObjects[1]->setPosition(glm::vec3(0.0f, 5.0f, 0.0f));
+    demoScene.m_SceneObjects[1]->setPosition(glm::vec3(4.0f, 3.0f, 0.0));
+    demoScene.m_SceneObjects[1]->setScale(glm::vec3(1.0f, 1.0f, 1.0f));
+    demoScene.m_SceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
+    demoScene.m_SceneObjects[0]->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    demoScene.m_SceneObjects[0]->setScale(glm::vec3(0.01f));
+    demoScene.m_SceneObjects[1]->setPosition(glm::vec3(0.0f, 5.0f, 0.0f));
 
-    //demoScene.m_SceneObjects[0]->setRotation(glm::vec3(0.0f, 180.0f, 0.0f));
+    demoScene.m_SceneObjects[0]->setRotation(glm::vec3(0.0f, 180.0f, 0.0f));
 }
 
 int main()
@@ -306,23 +294,9 @@ int main()
 
     glCheckError();
 
-    float position = 0;
-    short direction = 1;
     //Main loop
     while (!glfwWindowShouldClose(window))
     {
-        //Move light in scene
-        /*
-        myScene.m_LightController->m_PointLights[1]->setLightPos(glm::vec3(position, 9.0f, 0.0f));
-        position += (0.05f * direction);
-        if(position >= 7.5)
-        {
-            direction *= -1;
-        }
-        else if (position <= -7.5)
-        {
-            direction *= -1;
-        }*/
 
         processInput(window);
 
@@ -346,15 +320,13 @@ int main()
         //Ready the GUI in the background
         myGUI.displayWindow();
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        glfwSwapBuffers(window);//swap back frame buffer with front frame buffer.
+        glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     //Delete everything
     myScene.m_PhysicsWorld->removeAllObjects();
     myScene.removeAllObjects();
-
 
     //imgui: terminate
     ImGui_ImplOpenGL3_Shutdown();

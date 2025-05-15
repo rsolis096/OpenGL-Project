@@ -15,8 +15,8 @@ public:
     Camera();
 
     //glm::vec3 direction;
-    glm::vec3 cameraPos;
-    glm::vec3 cameraFront;
+    glm::vec3 m_LookFrom;
+    glm::vec3 m_LookAt;
     glm::vec3 cameraUp;
     glm::vec3 worldUp;
 
@@ -37,7 +37,5 @@ private:
     float m_FOV;
     float m_Yaw;
     float m_Pitch;
-
-    void updateCameraVectors();
 
 };

@@ -71,7 +71,7 @@ void Sphere::Draw(Shader& shader)
     // Unbind buffers and reset state
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);  // Unbind the EBO
-    glBindTexture(GL_TEXTURE_2D, 0);
+   // glBindTexture(GL_TEXTURE_2D, 0);
     glCheckError();
 
 }

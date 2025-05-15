@@ -10,46 +10,37 @@ const float FOV = 80.0f;
 Camera::Camera() : m_Yaw(YAW), m_Pitch(PITCH),
     m_MovementSpeed(SPEED), m_MouseSensitivity(SENSITIVITY), m_FOV(FOV)
 {
-    cameraPos = glm::vec3(0.0f, 3.0f, 0.0f);
+    m_LookFrom = glm::vec3(0.0f, 0.0f, 0.0f);
     worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
     cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-    cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    m_LookAt = glm::vec3(0.0f, 0.0f, -1.0f);
+
+    glm::vec3 dir = glm::normalize(m_LookAt - m_LookFrom);
+    m_Pitch = glm::degrees(asin(dir.y));
+    m_Yaw =  glm::degrees(atan2(dir.z, dir.x));
 }
 
 glm::mat4 Camera::GetViewMatrix()
 {
-    return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    return glm::lookAt(m_LookFrom, m_LookFrom + m_LookAt, cameraUp);
 }
-
-void Camera::updateCameraVectors()
-{
-    cameraFront.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
-    cameraFront.y = sin(glm::radians(m_Pitch));
-    cameraFront.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
-    cameraFront = glm::normalize(cameraFront);
-}
-
 //Handle input that moves camera
 void Camera::processKeyboard(float changeValue, unsigned int keyPressed)
 {
     if (keyPressed == GLFW_KEY_S || keyPressed == GLFW_KEY_W)
-        cameraPos += changeValue * cameraFront;
+        m_LookFrom += changeValue * m_LookAt;
     else if (keyPressed == GLFW_KEY_D || keyPressed == GLFW_KEY_A)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * changeValue;
+        m_LookFrom += glm::normalize(glm::cross(m_LookAt, cameraUp)) * changeValue;
     else if (keyPressed == GLFW_KEY_SPACE)
-        cameraPos.y += 0.05;
+        m_LookFrom.y += 0.05;
     else if (keyPressed == GLFW_KEY_LEFT_CONTROL)
-        cameraPos.y -= 0.05;
+        m_LookFrom.y -= 0.05;
 }
 
-void Camera::processMouse(double xpos, double ypos, GLboolean constrainPitch)
+void Camera::processMouse(double xoffset, double yoffset, GLboolean constrainPitch)
 {
-    xpos *= (double)m_MouseSensitivity;
-    ypos *= (double)m_MouseSensitivity;
-
-    //Add the offset values to the globally declared pitch and yaw values:
-    m_Yaw += (float)xpos;
-    m_Pitch += (float)ypos;
+    m_Yaw += xoffset;
+    m_Pitch += yoffset;
 
     // make sure that when pitch is out of bounds, screen doesn't get flipped
     if (constrainPitch)
@@ -61,7 +52,10 @@ void Camera::processMouse(double xpos, double ypos, GLboolean constrainPitch)
     }
 
     // update Front, Right and Up Vectors using the updated Euler angles
-    updateCameraVectors();
+    m_LookAt.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
+    m_LookAt.y = sin(glm::radians(m_Pitch));
+    m_LookAt.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
+    m_LookAt = glm::normalize(m_LookAt);
 }
 
 void Camera::processScroll(double xoffset, double yoffset)
