@@ -133,8 +133,6 @@ void mouse_callback(GLFWwindow* window, double mouse_x, double mouse_y)
     //Only change camera if cursor is locked
     if (GUI::isWindowHidden)
     {
-        std::cout << "window is hidden" << std::endl;
-
 
         //Cursor is locked (gui closed), save current mouse positon
         current_mouse_x = static_cast<float>(mouse_x);
