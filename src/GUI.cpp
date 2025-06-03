@@ -858,6 +858,25 @@ void GUI::drawList()
 						ImGui::Spacing();
 					}
 
+					// Position
+					{
+
+						//For transformation
+						glm::vec3 pos = dirLight->m_LightPosition;
+						float vec4f[3] = { pos[0], pos[1], pos[2] };
+						ImGui::Text("Current Light Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
+
+						if (ImGui::DragFloat("x##dirlight_position", &vec4f[0], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+							dirLight->m_LightPosition = (glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+
+						if (ImGui::DragFloat("y##dirlight_position", &vec4f[1], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+							dirLight->m_LightPosition = (glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+
+						if (ImGui::DragFloat("z##dirlight_position", &vec4f[2], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
+							dirLight->m_LightPosition = (glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+
+					}
+
 					// Resolution
 					{
 
