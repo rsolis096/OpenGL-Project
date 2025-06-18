@@ -109,51 +109,36 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	/*
-	{ // Uncomment this to render the debug quads for spotlights (cannot be rendered with the actual scene)
-		//You may not be aligned with the debug quads.
-		//Use regular controls to move
-		m_ShadowMap->debugDepthShader.use();
-		m_ShadowMap->debugDepthShader.setMat4("projection", proj);
-		m_ShadowMap->debugDepthShader.setMat4("view", view);
-		m_ShadowMap->debugShadowMap();
-	}*/
-
-	{ // Uncomment this to render the scene
-
-
-		//Draw Point Light Lamp (light spheres)
-		{
-			pointLightShader->use();
-			pointLightShader->setMat4("projection", proj);
-			pointLightShader->setMat4("view", view);
-			//Draw Lights (just the object, lighting is done in shader)
-			m_LightController->drawLighting();
-		}
-
-		// Draw main scene and update physics
-		{
-			lightingShader->use();
-			lightingShader->setMat4("projection", proj);
-			lightingShader->setMat4("view", view);
-			lightingShader->setVec3("viewPos", mainCamera->m_LookFrom);
-
-			//Apply Textures to scene for shadow maps
-			m_ShadowMap->updateShaderUniforms(*lightingShader);
-
-			//Update physics
-			m_PhysicsWorld->step(static_cast<float>(glfwGetTime()), deltaTime);
-
-			//Draw Objects
-			for (Object* element : m_SceneObjects){
-				element->Draw(*lightingShader);
-			}
-
-			m_SkyBox->draw(proj);
-
-
-		}
+	//Draw Light Sources as white spheres
+	{
+		pointLightShader->use();
+		pointLightShader->setMat4("projection", proj);
+		pointLightShader->setMat4("view", view);
+		m_LightController->drawLighting();
 	}
+
+	// Draw main scene with lighting and update physics
+	{
+		lightingShader->use();
+		lightingShader->setMat4("projection", proj);
+		lightingShader->setMat4("view", view);
+		lightingShader->setVec3("viewPos", mainCamera->m_LookFrom);
+
+		//Apply Textures to scene for shadow maps
+		m_ShadowMap->updateShaderUniforms(*lightingShader);
+
+		//Update physics
+		m_PhysicsWorld->step(static_cast<float>(glfwGetTime()), deltaTime);
+
+		//Draw Objects
+		for (Object* element : m_SceneObjects){
+			element->Draw(*lightingShader);
+		}
+
+		m_SkyBox->draw(proj);
+
+	}
+	
 
 	glDisable(GL_DEPTH_TEST);
 

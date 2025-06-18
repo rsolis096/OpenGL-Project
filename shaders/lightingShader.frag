@@ -425,8 +425,8 @@ vec3 CalcDirLight(vec3 normal, vec3 viewDir){
     // Apply texture or object colors
     if (hasTexture)
     {
-        //ambient = texture(material.diffuse, fs_in.TexCoords).rgb;
-        ambient = object.ambient;
+        ambient = texture(material.diffuse, fs_in.TexCoords).rgb;
+        //ambient = object.ambient;
         diffuse = texture(material.diffuse, fs_in.TexCoords).rgb;
         specular = texture(material.specular, fs_in.TexCoords).rgb;
     }

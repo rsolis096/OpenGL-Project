@@ -858,10 +858,28 @@ void GUI::drawList()
 						ImGui::Spacing();
 					}
 
-					// Position
+					// Near plane Far Plane
 					{
 
 						//For transformation
+						float planes[2] = { dirLight->getNearPlane(), dirLight->getFarPlane() };
+
+						static float far_plane = planes[0];
+						static float near_plane = planes[1];
+
+						ImGui::Text("Near Plane:\n");
+						if (ImGui::DragFloat("##near_plane", &near_plane, 0.1f, 0.1f, 1000.0f, "%.2f", 0))
+							dirLight->setNearPlane(near_plane);
+
+						ImGui::Text("Far Plane:\n");
+						if (ImGui::DragFloat("##far_plane", &far_plane, 0.1f, 0.1f, 1000.0f, "%.2f", 0))
+							dirLight->setFarPlane(far_plane);
+
+					}
+
+					// Position
+					{
+
 						glm::vec3 pos = dirLight->m_LightPosition;
 						float vec4f[3] = { pos[0], pos[1], pos[2] };
 						ImGui::Text("Current Light Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
@@ -874,6 +892,38 @@ void GUI::drawList()
 
 						if (ImGui::DragFloat("z##dirlight_position", &vec4f[2], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
 							dirLight->m_LightPosition = (glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+
+					}
+
+					// Pitch Yaw
+					{
+
+						float original[2] = { dirLight->getPitch(), dirLight->getYaw() };
+
+						static float pitch = original[0];
+						static float yaw = original[1];
+
+						ImGui::Text("Pitch:\n");
+						if (ImGui::DragFloat("##pitch", &pitch, 0.1f, -89.9f, 89.9f, "%.2f", 0))
+							dirLight->setPitch(pitch);
+
+						ImGui::Text("Yaw:\n");
+						if (ImGui::DragFloat("##yaw", &yaw, 0.1f, -89.9f, 89.9f, "%.2f", 0))
+							dirLight->setYaw(yaw);
+
+					}
+
+					// Scene Radius
+					{
+
+						float og_radius = dirLight->getRadius();
+
+						static float radius = og_radius;
+
+						ImGui::Text("Radius:\n");
+						if (ImGui::DragFloat("##radius-dir", &radius, 0.1f, 10.0f, 100.0f, "%.2f", 0))
+							dirLight->setRadius(radius);
+
 
 					}
 

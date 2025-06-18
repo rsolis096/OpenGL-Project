@@ -83,7 +83,7 @@ void Mesh::Draw(Shader& shader, bool hasTexture, unsigned int textureUnitOffset)
     {
         for (unsigned int i = 0; i < textures.size(); i++) {
 
-            glActiveTexture(GL_TEXTURE0 + textureUnitOffset + i);  // Correct usage with GL_TEXTURE0 as base
+            glActiveTexture(GL_TEXTURE0 + textureUnitOffset + i);
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
 
             std::string number;
@@ -114,6 +114,8 @@ void Mesh::Draw(Shader& shader, bool hasTexture, unsigned int textureUnitOffset)
     glCheckError();
 
     // draw mesh
+
+
     glBindVertexArray(VAO);
     glCheckError();
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
@@ -121,11 +123,11 @@ void Mesh::Draw(Shader& shader, bool hasTexture, unsigned int textureUnitOffset)
     glBindVertexArray(0);
     glCheckError();
 
-    // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
     glCheckError();
 }
 
+// From LearnOpenGL
 void Mesh::setupMesh()
 {
     // create buffers/arrays
@@ -136,6 +138,7 @@ void Mesh::setupMesh()
     glBindVertexArray(VAO);
     // load data into vertex buffers
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
     // A great thing about structs is that their memory layout is sequential for all its items.
     // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
     // again translates to 3/2 floats which translates to a byte array.

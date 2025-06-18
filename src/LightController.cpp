@@ -11,8 +11,6 @@ LightController::LightController
 	glCheckError();
 }
 
-
-
 void LightController::addPointLight(const glm::vec3& pos)
 {
 	m_PointLights.push_back(new PointLight(m_LightingShader, m_LightSourceShader, pos));

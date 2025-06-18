@@ -26,6 +26,11 @@ public:
 	void setShadowHeight(int);
 	void setShadowWidth(int);
 	void setIntensity(const float i);
+	void setNearPlane(const float i);
+	void setFarPlane(const float i);
+	void setYaw(const float i);
+	void setPitch(const float i);
+	void setRadius(const float i);
 
 	glm::vec3 m_LightDirection;
 	glm::vec3 m_LightPosition;
@@ -35,6 +40,11 @@ public:
 	GLuint& getDepthMapTexture();
 	int getShadowHeight() const;
 	int getShadowWidth() const;
+	float getFarPlane() const;
+	float getNearPlane() const;
+	float getPitch() const;
+	float getYaw() const;
+	float getRadius() const;
 	bool getShadowArea() const;
 
 private:
@@ -43,6 +53,12 @@ private:
 
 	int m_ShadowHeight;
 	int m_ShadowWidth;
+
+	float m_NearPlane;
+	float m_FarPlane;
+	float m_Yaw;
+	float m_Pitch;
+	float m_Radius;
 
 	float m_Intensity;
 

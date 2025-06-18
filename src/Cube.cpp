@@ -259,7 +259,7 @@ int Cube::updateTexture(std::vector<std::string> texturePaths)
     // Three Scenarios
     // 1. Updating a texture of an Object that already has textures
     // 2. Updating a texture of an Object with no initial texture
-    // 3. Updating the texture of a model object
+    // 3. Updating the texture of a model object (do nothing)
 
     //Secenario 1
     if (m_HasTexture == true)

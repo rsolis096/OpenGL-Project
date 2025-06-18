@@ -31,7 +31,9 @@ ShadowMap::ShadowMap(std::vector<Object*>* objects, LightController* lightContro
 
     //Create a frame buffer object and color texture to be rendered in ImGUI
     generateGUIShadowMap();
-    //generateGUICubeMap();
+
+    // Initialize the quad the gui will render depth maps to
+    initializeQuadBuffers(quadVAO, quadVBO, true);
 }
 
 void ShadowMap::addSpotLightShadowMap(GLuint& depthMapTexture)
@@ -59,7 +61,7 @@ void ShadowMap::addShadowMap(GLuint& depthMapTexture) const
     glGenTextures(1, &depthMapTexture);
     glBindTexture(GL_TEXTURE_2D, depthMapTexture);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -199,15 +201,26 @@ void ShadowMap::shadowPass()
     // Process directional light
     if (m_LightController->m_DirectionalLight != nullptr)
     {
+
         shadowPassShader.setInt("lightType", LightController::LightType::DIRECTIONAL_LIGHT);  // Set light type to directional light
 
-        const glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 17.5f);
+        float near_plane = m_LightController->m_DirectionalLight->getNearPlane();
+        float far_plane = m_LightController->m_DirectionalLight->getFarPlane();
+        float scene_radius = m_LightController->m_DirectionalLight->getRadius();
+
+        const glm::mat4 lightProjection = 
+            glm::ortho(
+                -scene_radius, scene_radius, 
+                -scene_radius, scene_radius, 
+                near_plane, far_plane
+            );
+
         const glm::vec3 lightDir = -m_LightController->m_DirectionalLight->m_LightDirection;
         const glm::vec3 lightPos = m_LightController->m_DirectionalLight->m_LightPosition;
 
         const glm::mat4 lightView = glm::lookAt(
-            lightPos,      // Position of the light
-            lightDir,        // The target point (position + direction)
+            lightPos,      
+            lightPos + lightDir,        
             glm::vec3(0.0, 1.0, 0.0)  // Up vector
         );
 
@@ -228,11 +241,12 @@ void ShadowMap::shadowPass()
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     }
 
 }
 
-// This method sets up the uniforms for both spotlights and point lights in the main rendering pass.
+// Updates Shadow Map shader uniforms for each light source
 void ShadowMap::updateShaderUniforms(Shader& shader) const
 {
     const int numberOfSpotLights = static_cast<int>(m_LightController->m_SpotLights.size());
@@ -241,13 +255,13 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
     //Main lighting shader used for all light sources
     shader.use();
 
+    shader.setInt("numberOfSpotLights", numberOfSpotLights);
+    shader.setInt("numberOfPointLights", numberOfPointLights);
+
     // Type 0 - Point Lights
     if (numberOfPointLights > 0)
     {
-        shader.setFloat("far_plane", 25.0f);
-        shader.setInt("numberOfPointLights", numberOfPointLights);
-
-        // Apply Textures for Point Lights
+        // Apply shadow map textures for Point Lights
         for (int i = 0; i < numberOfPointLights; i++)
         {
             const int textureUnit = static_cast<int>(TextureManager::getNextUnit());
@@ -261,10 +275,7 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
     //Type 1 - SpotLights
     if (numberOfSpotLights > 0)
     {
-        //Send over the light space matrices generated during the shadow pass
-        shader.setInt("numberOfSpotLights", numberOfSpotLights);
-
-        //Apply Textures and update uniforms
+        //Apply shadow map textures and light space matrix
         for (int i = 0; i < numberOfSpotLights; i++)
         {
             const int textureUnit = static_cast<int>(TextureManager::getNextUnit());
@@ -278,30 +289,30 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
     }
 
     //Type 2 - Directional Lights
-    if (m_LightController->m_DirectionalLight != nullptr)
+    if (m_LightController->m_DirectionalLight)
     {
         shader.setMat4("directionalLightSpaceMatrix", directionalLightSpaceMatrix);
         const int textureUnit = static_cast<int>(TextureManager::getNextUnit());
         glActiveTexture(GL_TEXTURE0 + textureUnit);
         glBindTexture(GL_TEXTURE_2D, m_LightController->m_DirectionalLight->getDepthMapTexture());
         shader.setInt("dirLight.shadowMap", textureUnit);
-
     }
 
     glCheckError();
 }
 
+// Updates shadow map resolution for provided directional light
 void ShadowMap::updateShadowResolution(DirectionalLight* light) const
 {
-	// Step 1: Delete the old texture (optional)
+	// Delete the old texture
 	glDeleteTextures(1, &light->getDepthMapTexture());
 
-	// Step 2: Create a new texture with the desired resolution
+	// Create a new texture with the new resolution
 	int newWidth = light->getShadowWidth(); 
 	int newHeight = light->getShadowHeight(); 
 	glGenTextures(1, &light->getDepthMapTexture());
 	glBindTexture(GL_TEXTURE_2D, light->getDepthMapTexture());
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, newWidth, newHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, newWidth, newHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -310,29 +321,25 @@ void ShadowMap::updateShadowResolution(DirectionalLight* light) const
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	// Step 3: Bind the new texture to the framebuffer
+	// Bind the new texture to the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, light->getDepthMapTexture(), 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// Optionally, check the framebuffer status to ensure it's complete
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-	    std::cerr << "Framebuffer not complete!" << std::endl;
-	}
-
 }
 
+// Updates shadow map resolution for provided spot light
 void ShadowMap::updateShadowResolution(SpotLight* light) const
 {
-    // Step 1: Delete the old texture (optional)
+    // Delete the old texture
     glDeleteTextures(1, &light->getDepthMapTexture());
 
-    // Step 2: Create a new texture with the desired resolution
+    // Create a new texture with the updated resolution
     int newWidth = light->getShadowWidth();
     int newHeight = light->getShadowHeight();
     glGenTextures(1, &light->getDepthMapTexture());
     glBindTexture(GL_TEXTURE_2D, light->getDepthMapTexture());
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, newWidth, newHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, newWidth, newHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -341,15 +348,11 @@ void ShadowMap::updateShadowResolution(SpotLight* light) const
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    // Step 3: Bind the new texture to the framebuffer
+    // Bind the new texture to the framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, light->getDepthMapTexture(), 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // Optionally, check the framebuffer status to ensure it's complete
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cerr << "Framebuffer not complete!" << std::endl;
-    }
 }
 
 // Generates a frame buffer with a texture attachment for rendering a shadow map to be used in a GUI window. 
@@ -371,11 +374,7 @@ void ShadowMap::generateGUIShadowMap()
     // Attach the texture to the frame buffer as the color attachment
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_GUIColorTexture, 0);
 
-    // Check if the frame buffer is complete and report any errors
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        std::cerr << "Frame buffer not complete!\n";
-    }
+    // Cleanup
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -383,10 +382,13 @@ void ShadowMap::generateGUIShadowMap()
     glCheckError();
 }
 
+// Renders the shadow map of a given light source to a small quad in the gui
 GLuint ShadowMap::renderDepthMapToGUI(GLuint texture, int height, int width)
 {
     // Basic MPV matrices for the ImGui Window
-    glm::mat4 modelMatrix = glm::mat4(1.0f); // Identity matrix for the model
+    glm::mat4 modelMatrix = glm::mat4(1.0f);
+
+    // The following values are manually tuned and cannot be changed in real-time
     glm::mat4 projectionMatrix = glm::perspective(glm::radians(54.0f), 1.0f, 0.1f, 100.0f);
     glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     float near_plane = 1.0f, far_plane = 17.5f;
@@ -399,33 +401,23 @@ GLuint ShadowMap::renderDepthMapToGUI(GLuint texture, int height, int width)
     debugDepthShader.setMat4("view", viewMatrix);
     debugDepthShader.setMat4("projection", projectionMatrix);
 
-    //Set up the quad to be rendered to
-    if (!quadInitialized)
-    {
-        initializeQuadBuffers(quadVAO, quadVBO, true);
-        quadInitialized = true;
-    }
-
     // Bind framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, m_2DGUI_FBO);
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Render the depth map texture
-    glActiveTexture(GL_TEXTURE0);
+    // Set texture unit with depth map texture
+    glActiveTexture(GL_TEXTURE0 + TextureManager::getCurrentUnit());
     glBindTexture(GL_TEXTURE_2D, texture);
-    debugDepthShader.setInt("depthMap", 0);
+    debugDepthShader.setInt("depthMap", TextureManager::getNextUnit());
+
+    // Draw to GUI quad
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    // Clean up
     glBindVertexArray(0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-    // Clean up resources (need to re-add this)
-    //glDeleteFramebuffers(1, &framebuffer);
-    //glDeleteTextures(1, &colorTexture);
-    //glDeleteVertexArrays(1, &quadVAO);
-    //glDeleteBuffers(1, &quadVBO);
 
     glCheckError();
 

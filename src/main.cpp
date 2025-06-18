@@ -37,7 +37,6 @@ float lastY = SCR_HEIGHT / 2.0f;
 double lastKeyPressTime = 0.0;
 double debounceThreshold = 0.2; // Adjust this value based on your needs
 
-
 // Saved position of the cursor when gui is opened
 float saved_mouse_x = 0, saved_mouse_y = 0;
 // Current position of the cursor
@@ -241,9 +240,11 @@ void demoScene(Scene& demoScene)
     //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[2]);
     //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[3]);
 
-    glm::vec3 spotLightPos1 = glm::vec3(3.0f, 3.0f, -1.0f);
-    glm::vec3 spotLightDir1 = glm::vec3(-7.0f, 0.0f, 0.0f);
-    spotLightDir1 = glm::normalize(spotLightDir1 - spotLightPos1);
+
+
+    //glm::vec3 spotLightPos1 = glm::vec3(3.0f, 3.0f, -1.0f);
+    //glm::vec3 spotLightDir1 = glm::vec3(-7.0f, 0.0f, 0.0f);
+    //spotLightDir1 = glm::normalize(spotLightDir1 - spotLightPos1);
 
     //glm::vec3 spotLightPos2 = glm::vec3(10.0f, 7.0f, 0.0f);
     //glm::vec3 spotLightDir2 = glm::vec3(-14.0f, 0.0f, 0.0f);
@@ -253,8 +254,8 @@ void demoScene(Scene& demoScene)
     //glm::vec3 spotLightDir3 = glm::vec3(0.0f, 0.0f, 1.0f);
     //spotLightDir3 = glm::normalize(spotLightDir3 - spotLightPos3);
 
-    demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
-    //demoScene.m_LightController->addDirectionalLight(glm::vec3(-5.f, 1.f,1.f));
+    //demoScene.m_LightController->addSpotLight(spotLightPos1, spotLightDir1);
+    demoScene.m_LightController->addDirectionalLight(glm::vec3(-5.f, 1.f,1.f));
     //demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
     //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
