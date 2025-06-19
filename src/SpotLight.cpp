@@ -13,7 +13,15 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_DisplayName = "SpotLight" + std::to_string(m_SpotLightID);
 	m_SpotLightCount+= 1;
 
-	m_LightDirection = glm::normalize(dir - m_LightPos);
+
+	m_Yaw = 0.f;
+	m_Pitch = 30.f;
+	float yaw_rads = glm::radians(m_Yaw);
+	float pitch_rads = glm::radians(m_Pitch);
+	m_LightDirection.x = cos(pitch_rads) * cos(yaw_rads);
+	m_LightDirection.y = sin(pitch_rads);
+	m_LightDirection.z = cos(pitch_rads) * sin(yaw_rads);
+	m_LightDirection = glm::normalize(m_LightDirection);
 
 
 	//m_SpotLight takes the shape of a sphere
@@ -126,14 +134,6 @@ void SpotLight::setSpecular(const glm::vec3& specular)
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].specular", m_Specular);
 }
 
-void SpotLight::setLightDirection(const glm::vec3& newDir)
-{
-	m_LightDirection = glm::normalize(newDir - m_LightPos);
-	m_LightingShader->use();
-	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].direction", m_LightDirection);
-	updateLightSpaceMatrix();
-}
-
 void SpotLight::setLightPos(const glm::vec3& lightPos)
 {
 	m_LightPos = lightPos;
@@ -216,6 +216,33 @@ void SpotLight::setShadowFOV(const float& fov)
 	updateLightSpaceMatrix();
 }
 
+void SpotLight::setYaw(float i)
+{
+	m_Yaw = i;
+	float yaw_rads = glm::radians(m_Yaw);
+	float pitch_rads = glm::radians(m_Pitch);
+	m_LightDirection.x = cos(pitch_rads) * cos(yaw_rads);
+	m_LightDirection.y = sin(pitch_rads);
+	m_LightDirection.z = cos(pitch_rads) * sin(yaw_rads);
+	m_LightDirection = glm::normalize(m_LightDirection);
+	m_LightingShader->use();
+	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].direction", m_LightDirection);
+	updateLightSpaceMatrix();
+}
+
+void SpotLight::setPitch(float i)
+{
+	m_Pitch = i;
+	float yaw_rads = glm::radians(m_Yaw);
+	float pitch_rads = glm::radians(m_Pitch);
+	m_LightDirection.x = cos(pitch_rads) * cos(yaw_rads);
+	m_LightDirection.y = sin(pitch_rads);
+	m_LightDirection.z = cos(pitch_rads) * sin(yaw_rads);
+	m_LightDirection = glm::normalize(m_LightDirection);
+	m_LightingShader->use();
+	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].direction", m_LightDirection);
+	updateLightSpaceMatrix();
+}
 
 
 /*###################################
@@ -290,6 +317,16 @@ float SpotLight::getShadowBias() const
 float SpotLight::getShadowFOV() const
 {
 	return m_ShadowFOV;
+}
+
+float SpotLight::getYaw() const
+{
+	return m_Yaw;
+}
+
+float SpotLight::getPitch() const
+{
+	return m_Pitch;
 }
 
 

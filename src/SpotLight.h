@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include "Shader.h"
 #include "Sphere.h"
 
@@ -21,7 +19,6 @@ public:
 
 	//Setters for light properties
 	void setLightPos(const glm::vec3&);
-	void setLightDirection(const glm::vec3&);
 	void setAmbient(const glm::vec3& ambient);
 	void setDiffuse(const glm::vec3& diffuse);
 	void setSpecular(const glm::vec3& specular);
@@ -37,6 +34,8 @@ public:
 	void setShadowBias(const float&);
 	void setShadowPassUpdate(bool val);
 	void setShadowFOV(const float& fov);
+	void setYaw(float i);
+	void setPitch(float i);
 
 	//Getters for light properties
 	glm::vec3 getLightPos() const;
@@ -53,6 +52,8 @@ public:
 	glm::mat4& getLightSpaceMatrix();
 	float getShadowBias() const;
 	float getShadowFOV() const;
+	float getYaw() const;
+	float getPitch() const;
 	bool getShadowPassUpdate() const;
 
 
@@ -82,6 +83,8 @@ private:
 	float m_Linear;
 	float m_Quadratic;
 	float m_Intensity;
+	float m_Yaw;
+	float m_Pitch;
 
 	//For Shadow Maps
 	int m_ShadowHeight;

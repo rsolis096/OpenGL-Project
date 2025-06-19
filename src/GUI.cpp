@@ -599,70 +599,21 @@ void GUI::drawList()
 
 						}
 
-						// Light Direction (Needs Work)
+						// Pitch Yaw
 						{
-							ImGui::Spacing();
-							glm::vec3 lightDir = selectedSpotLight->getLightDirection();
-							//Direction
-							static float dir[3] = { lightDir[0], lightDir[1], lightDir[2] };
-							ImGui::Text("Direction");
-							if (ImGui::DragFloat("##Direction1", &dir[0], 0.1f, -100.0f, 100.0f, "%.2f", 0))
-							{
-								selectedSpotLight->setLightDirection(
-									glm::vec3(
-										dir[0],
-										dir[1],
-										dir[2])
-								);
-							}
 
-							if (ImGui::DragFloat("##Direction2", &dir[1], 0.1f, -100.0f, 100.0f, "%.2f", 0))
-							{
-								selectedSpotLight->setLightDirection(
-									glm::vec3(
-										dir[0],
-										dir[1],
-										dir[2])
-								);
-							}
+							float original[2] = { selectedSpotLight->getPitch(), selectedSpotLight->getYaw() };
 
-							if (ImGui::DragFloat("##Direction3", &dir[2], 0.1f, -100.0f, 100.0f, "%.2f", 0))
-							{
-								selectedSpotLight->setLightDirection(
-									glm::vec3(
-										dir[0],
-										dir[1],
-										dir[2])
-								);
-							}
+							static float pitch = original[0];
+							static float yaw = original[1];
 
-
-							/* Light Rotation (Better for direction but no implemented yet)
-							ImGui::Spacing();
-							ImGui::Text("Rotation");
-							float rX = selectedObject->m_Rotation[0];
-							float rY = selectedObject->m_Rotation[2];
-							float rZ = selectedObject->m_Rotation[1];
-							glm::vec3 currentRotation = glm::vec3(rX, rY, rZ);
-
-							if (ImGui::DragFloat("x", &rX, 1.0f, 0.0f, 360.0f, "%.2f", 0))
-							{
-
-								currentRotation[0] = rX;
-								selectedObject->setRotation(currentRotation, glm::vec3(1.0f, 0.0f, 0.0f), 0);
-							}
-							if (ImGui::DragFloat("z", &rZ, 1.0f, 0.0f, 360.0f, "%.2f", 0))
-							{
-								currentRotation[1] = rZ;
-								selectedObject->setRotation(currentRotation, glm::vec3(0.0f, 1.0f, 0.0f), 1);
-							}
-							if (ImGui::DragFloat("y", &rY, 1.0f, 0.0f, 360.0f, "%.2f", 0))
-							{
-								currentRotation[2] = rY;
-								selectedObject->setRotation(currentRotation, glm::vec3(0.0f, 0.0f, 1.0f), 2);
-							}
-							*/
+							ImGui::Text("Direction:\n");
+							if (ImGui::DragFloat("Pitch##pitch-spotlight", &pitch, 0.1f, -89.9f, 89.9f, "%.2f", 0))
+								selectedSpotLight->setPitch(pitch);
+							if (ImGui::DragFloat("Yaw##yaw-spotlight", &yaw, 0.1f, -89.9f, 89.9f, "%.2f", 0))
+								selectedSpotLight->setYaw(yaw);
 						}
+
 
 						//Shadow Properties
 						{
@@ -903,12 +854,10 @@ void GUI::drawList()
 						static float pitch = original[0];
 						static float yaw = original[1];
 
-						ImGui::Text("Pitch:\n");
-						if (ImGui::DragFloat("##pitch", &pitch, 0.1f, -89.9f, 89.9f, "%.2f", 0))
+						ImGui::Text("Direction:\n");
+						if (ImGui::DragFloat("Pitch##dir-pitch", &pitch, 0.1f, -89.9f, 89.9f, "%.2f", 0))
 							dirLight->setPitch(pitch);
-
-						ImGui::Text("Yaw:\n");
-						if (ImGui::DragFloat("##yaw", &yaw, 0.1f, -89.9f, 89.9f, "%.2f", 0))
+						if (ImGui::DragFloat("Yaw##dir-yaw", &yaw, 0.1f, -89.9f, 89.9f, "%.2f", 0))
 							dirLight->setYaw(yaw);
 
 					}

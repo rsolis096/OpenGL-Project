@@ -438,7 +438,7 @@ vec3 CalcDirLight(vec3 normal, vec3 viewDir){
     }
 
     // Apply lighting influence
-    ambient *= dirLight.ambient;
+    ambient *= dirLight.ambient * 1.5f;
     diffuse *= dirLight.diffuse * diff ;
     specular *= dirLight.specular * spec ;
 

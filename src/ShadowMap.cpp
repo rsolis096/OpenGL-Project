@@ -407,9 +407,9 @@ GLuint ShadowMap::renderDepthMapToGUI(GLuint texture, int height, int width)
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Set texture unit with depth map texture
-    glActiveTexture(GL_TEXTURE0 + TextureManager::getCurrentUnit());
+    glActiveTexture(GL_TEXTURE0 );
     glBindTexture(GL_TEXTURE_2D, texture);
-    debugDepthShader.setInt("depthMap", TextureManager::getNextUnit());
+    debugDepthShader.setInt("depthMap", 0);
 
     // Draw to GUI quad
     glBindVertexArray(quadVAO);
