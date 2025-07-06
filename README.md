@@ -38,12 +38,15 @@
 - This project expects assets which can be downloaded [here](https://drive.google.com/drive/folders/1xrtGR_Ftvw49WWUczeX7o8o1jT-aFrRH?usp=sharing). Store the assets folder in the same directory as the .sln
   
 ## Screenshots
+
+### Lighting and Textures
+![image](https://github.com/user-attachments/assets/105506b2-48a8-4a60-aba1-3bf10fa6e72c)
+
 ### Point Light Shadows
 ![sponza-demo](https://github.com/user-attachments/assets/ceccfcf2-3ba8-48a2-954a-fca7fdb37943)
 
-#### Spot Light Shadows
+### Spot Light Shadows
 ![image](https://github.com/rsolis096/OpenGL-Project/assets/63280140/824838b2-cafa-46a1-b358-2600c045b7c2)
-
 
 
 
