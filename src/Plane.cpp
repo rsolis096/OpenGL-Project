@@ -46,15 +46,13 @@ void Plane::Draw(Shader& shader)
     //Bind texture and send texture to fragment shader
     if (m_HasTexture)
     {
-        int diffuseUnit = TextureManager::getNextUnit();
-        glActiveTexture(GL_TEXTURE0 + diffuseUnit); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-        shader.setUInt("material.diffuse", diffuseUnit);
+        shader.setUInt("material.diffuse", GL_TEXTURE1);
 
-        int specularUnit = TextureManager::getNextUnit();
-        glActiveTexture(GL_TEXTURE0 + specularUnit); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glActiveTexture(GL_TEXTURE2); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-        shader.setUInt("material.specular", specularUnit);
+        shader.setUInt("material.specular", GL_TEXTURE2);
     }
     glCheckError();
 
@@ -64,7 +62,6 @@ void Plane::Draw(Shader& shader)
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
 
     glCheckError();
 }
@@ -80,7 +77,6 @@ void Plane::ShadowPassDraw(Shader& shader)
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
     glCheckError();
 }
 

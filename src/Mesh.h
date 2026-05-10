@@ -43,7 +43,7 @@ public:
     Mesh& operator=(Mesh&& other) noexcept;
     ~Mesh();
     // render the mesh
-    void Draw(Shader& shader, bool hasTexture, GLuint textureUnitOffset) const;
+    void Draw(Shader& shader, bool hasTexture) const;
     void ShadowPassDraw(Shader& shader) const;
 private:
     // render data 

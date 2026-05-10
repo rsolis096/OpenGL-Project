@@ -61,70 +61,87 @@ Mesh::~Mesh()
 
 void Mesh::ShadowPassDraw(Shader& shader) const
 {
-    // draw mesh
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
+
+    glDrawElements(
+        GL_TRIANGLES,
+        static_cast<GLsizei>(indices.size()),
+        GL_UNSIGNED_INT,
+        nullptr
+    );
 
     glBindVertexArray(0);
+
+
+    // THIS IS THE LINE THAT FIXES IT BUT WHYYYYYY
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
-    glCheckError();
 }
 
 // render the mesh
-void Mesh::Draw(Shader& shader, bool hasTexture, unsigned int textureUnitOffset) const
+void Mesh::Draw(Shader& shader, bool hasTexture) const
 {
     // bind appropriate textures
     unsigned int normalNr = 1;
     unsigned int heightNr = 1;
-    glCheckError();
+
+    bool hasBindedDiffuse = false;
+    bool hasBindedSpecular = false;
+    bool hasBindedNormal = false;
+
 
     if (hasTexture)
     {
         for (unsigned int i = 0; i < textures.size(); i++) {
 
-            glActiveTexture(GL_TEXTURE0 + textureUnitOffset + i);
-            glBindTexture(GL_TEXTURE_2D, textures[i].id);
+
 
             std::string number;
             std::string name = textures[i].type;
             GLint location;
             if (name == "texture_diffuse") {
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, textures[i].id);
                 location = glGetUniformLocation(shader.m_ProgramId, "material.diffuse");
+                glUniform1i(location, 1);
             }
             else if (name == "texture_specular") {
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, textures[i].id);
                 location = glGetUniformLocation(shader.m_ProgramId, "material.specular");
+                glUniform1i(location, 2);
             }
             else if (name == "texture_normal") {
+                glActiveTexture(GL_TEXTURE3);
+                glBindTexture(GL_TEXTURE_2D, textures[i].id);
                 number = std::to_string(normalNr++); // Convert unsigned int to string
                 location = glGetUniformLocation(shader.m_ProgramId, ("material." + name + number).c_str());
+                glUniform1i(location, 3);
             }
+            /*
             else if (name == "texture_height") {
+                glActiveTexture(GL_TEXTURE10);
+                glBindTexture(GL_TEXTURE_2D, textures[i].id);
                 number = std::to_string(heightNr++); // Convert unsigned int to string
                 location = glGetUniformLocation(shader.m_ProgramId, ("material." + name + number).c_str());
+                glUniform1i(location, 10);
             }
             else {
                 std::cout << "continued \n";
                 continue;
             }
+            */
 
-            glUniform1i(location, textureUnitOffset + i);
         }
     }
+
     glCheckError();
-
-    // draw mesh
-
 
     glBindVertexArray(VAO);
-    glCheckError();
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
-    glCheckError();
     glBindVertexArray(0);
     glCheckError();
 
-    glActiveTexture(GL_TEXTURE0);
-    glCheckError();
 }
 
 // From LearnOpenGL

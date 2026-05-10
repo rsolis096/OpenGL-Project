@@ -1,22 +1,13 @@
 #pragma once
 
-#include <iostream>
-struct TextureManager
+class TextureManager
 {
-	//Variables
-	static const int m_MaxUnits = 192;
-	static unsigned int m_HighestUnit;
-	static unsigned int m_CurrentUnit;
+public:
+    static unsigned int getNextUnit();
+    static unsigned int getCurrentUnit();
+    static void reset(unsigned int val = 0);
 
-	//Functions
-	static unsigned int getNextUnit();
-	static unsigned int getCurrentUnit();
-	static void reset();
-
+private:
+    static unsigned int m_CurrentUnit;
+    static constexpr unsigned int m_MaxUnits = 16;
 };
-
-/*
-int maxTextureSize;
-glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-std::cout << "Max Texture Size: " << maxTextureSize << std::endl;
-*/

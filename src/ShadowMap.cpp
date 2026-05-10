@@ -61,7 +61,7 @@ void ShadowMap::addShadowMap(GLuint& depthMapTexture) const
     glGenTextures(1, &depthMapTexture);
     glBindTexture(GL_TEXTURE_2D, depthMapTexture);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -148,17 +148,14 @@ void ShadowMap::shadowPass()
                 glClear(GL_DEPTH_BUFFER_BIT);
 
                 // Set shadow matrices for each face (used in geometry shader)
-                for (int j = 0; j < 6; j++) {
+                for (int j = 0; j < 6; j++)
+                {
                     shadowPassShader.setMat4("shadowMatricesPoint[" + std::to_string(j) + "]", lightViews[j]);
+                }
 
-                    // Attach the appropriate face of the cube map texture as the depth attachment
-                    //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, m_LightController->m_PointLights[i]->getCubeMapTexture(), 0);
-                    //glClear(GL_DEPTH_BUFFER_BIT);
-
-                    // Render scene objects to shadow map (6 times for each light source)
-                    for (Object* obj : *m_SceneObjects) {
-                        obj->ShadowPassDraw(shadowPassShader);
-                    }
+                for (Object* obj : *m_SceneObjects)
+                {
+                    obj->ShadowPassDraw(shadowPassShader);
                 }
             }
 
@@ -194,8 +191,9 @@ void ShadowMap::shadowPass()
                 obj->ShadowPassDraw(shadowPassShader);
             }
 
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        }
+        }      
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     // Process directional light
@@ -241,9 +239,7 @@ void ShadowMap::shadowPass()
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     }
-
 }
 
 // Updates Shadow Map shader uniforms for each light source
@@ -264,11 +260,10 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
         // Apply shadow map textures for Point Lights
         for (int i = 0; i < numberOfPointLights; i++)
         {
-            const int textureUnit = static_cast<int>(TextureManager::getNextUnit());
-            glActiveTexture(GL_TEXTURE0 + textureUnit);
+            glActiveTexture(GL_TEXTURE4);
             glBindTexture(GL_TEXTURE_CUBE_MAP, m_LightController->m_PointLights[i]->getCubeMapTexture());
             shader.setVec3("pointLights[" + std::to_string(i) + "].position", m_LightController->m_PointLights[i]->getLightPos());
-            shader.setInt("pointLights[" + std::to_string(i) + "].shadowMap", textureUnit);
+            shader.setInt("pointLights[" + std::to_string(i) + "].shadowMap", 4);
         }
     }
 
@@ -278,12 +273,11 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
         //Apply shadow map textures and light space matrix
         for (int i = 0; i < numberOfSpotLights; i++)
         {
-            const int textureUnit = static_cast<int>(TextureManager::getNextUnit());
-            glActiveTexture(GL_TEXTURE0 + textureUnit);
+            glActiveTexture(GL_TEXTURE5);
             glBindTexture(GL_TEXTURE_2D, m_LightController->m_SpotLights[i]->getDepthMapTexture());
 
             //TODO: Remove dependence on SpotLight Indexing to allow for dynamic removal/addition to spotlights
-            shader.setInt("spotLights[" + std::to_string(i) + "].shadowMap", textureUnit);
+            shader.setInt("spotLights[" + std::to_string(i) + "].shadowMap", 5);
             shader.setMat4("spotLights[" + std::to_string(i) + "].lightSpaceMatrix", m_LightController->m_SpotLights[i]->getLightSpaceMatrix());
         }
     }
@@ -292,10 +286,9 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
     if (m_LightController->m_DirectionalLight)
     {
         shader.setMat4("directionalLightSpaceMatrix", directionalLightSpaceMatrix);
-        const int textureUnit = static_cast<int>(TextureManager::getNextUnit());
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, m_LightController->m_DirectionalLight->getDepthMapTexture());
-        shader.setInt("dirLight.shadowMap", textureUnit);
+        shader.setInt("dirLight.shadowMap", 6);
     }
 
     glCheckError();
@@ -319,6 +312,8 @@ void ShadowMap::updateShadowResolution(DirectionalLight* light) const
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Bind the new texture to the framebuffer
@@ -346,6 +341,8 @@ void ShadowMap::updateShadowResolution(SpotLight* light) const
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Bind the new texture to the framebuffer
@@ -375,6 +372,7 @@ void ShadowMap::generateGUIShadowMap()
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_GUIColorTexture, 0);
 
     // Cleanup
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -426,6 +424,7 @@ GLuint ShadowMap::renderDepthMapToGUI(GLuint texture, int height, int width)
 
 void ShadowMap::initializeQuadBuffers(unsigned int& qVAO, unsigned int& qVBO, bool invertQuad)
 {
+
     if (qVAO == 0)
     {
         //Regular

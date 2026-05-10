@@ -114,13 +114,12 @@ void SkyBox::draw(glm::mat4& projection)
     m_CubeMapShader.setMat4("projection", projection);
 
     // Bind the correct texture unit
-    GLuint textureUnit = TextureManager::getNextUnit();
-    glActiveTexture(GL_TEXTURE0 + textureUnit);
+    glActiveTexture(GL_TEXTURE7);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMap->ID);
 
     // Update the shader with the new texture unit
     GLuint skyboxLoc = glGetUniformLocation(m_CubeMapShader.m_ProgramId, "skybox");
-    glUniform1i(skyboxLoc, textureUnit);
+    glUniform1i(skyboxLoc, GL_TEXTURE7);
 
     // Draw the skybox
     glBindVertexArray(m_SkyBoxVAO);

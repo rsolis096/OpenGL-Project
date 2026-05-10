@@ -50,13 +50,13 @@ void Sphere::Draw(Shader& shader)
     if (m_HasTexture)
     {
 
-        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-        shader.setUInt("material.diffuse", TextureManager::getCurrentUnit());
+        shader.setUInt("material.diffuse", 1);
 
-        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glActiveTexture(GL_TEXTURE2); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-        shader.setUInt("material.specular", TextureManager::getCurrentUnit());
+        shader.setUInt("material.specular", 2);
 
     }
 
@@ -71,7 +71,6 @@ void Sphere::Draw(Shader& shader)
     // Unbind buffers and reset state
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);  // Unbind the EBO
-   // glBindTexture(GL_TEXTURE_2D, 0);
     glCheckError();
 
 }
@@ -90,7 +89,6 @@ void Sphere::ShadowPassDraw(Shader& shader)
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
     glCheckError();
 
 }

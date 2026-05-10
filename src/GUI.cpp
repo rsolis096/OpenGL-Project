@@ -37,6 +37,7 @@ GUI::GUI(GLFWwindow* windowParam, Scene& scene) : window(windowParam), myScene(s
 
 void GUI::displayWindow()
 {
+
 	if (!GUI::isWindowHidden)
 	{
 		// Start the Dear ImGui frame
@@ -54,6 +55,7 @@ void GUI::displayWindow()
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
+	
 }
 
 //Left Side of window
@@ -62,6 +64,8 @@ static int lightingSelected = 0; //Default selected object is first object in sc
 static int skyBoxSelected = 0; //Default selected object is first object in scene
 static bool showModel = false;
 static bool modelSucceed = true;
+static bool renderDebugDepthMap = false;
+
 
 void GUI::drawList()
 {
@@ -659,9 +663,11 @@ void GUI::drawList()
 							}
 
 						}
-						
-						// Display the depth map for spotlights
-						if (selectedSpotLight->getDepthMapTexture() != 0) {
+
+						// Debug Shadopw Map
+						ImGui::Checkbox("Render Debug Depth map", &renderDebugDepthMap);
+
+						if (renderDebugDepthMap && selectedSpotLight->getDepthMapTexture() != 0) {
 							ImGui::Text("Spotlight Depth Map:");
 							GLuint colorTexture = myScene.m_ShadowMap->renderDepthMapToGUI(
 								selectedSpotLight->getDepthMapTexture(),
@@ -670,8 +676,7 @@ void GUI::drawList()
 							);
 							ImGui::Image((void*)colorTexture, ImVec2(256, 256));
 						}
-						
-						
+
 					}
 				}
 

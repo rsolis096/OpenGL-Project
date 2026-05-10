@@ -35,7 +35,7 @@ DirectionalLight::DirectionalLight(Shader* lightingShader, const glm::vec3& dir)
 	m_ShadowWidth = 1024;
 	m_ShowShadowArea = true; // Darken or light the areas outside shadow frustrum
 
-	m_LightingShader->use();
+	m_LightingShader->use();		
 	m_LightingShader->setVec3("dirLight.position", m_LightPosition);
 	m_LightingShader->setVec3("dirLight.direction", m_LightDirection);
 	m_LightingShader->setVec3("dirLight.ambient", m_Ambient);

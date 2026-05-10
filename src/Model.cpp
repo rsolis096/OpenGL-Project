@@ -244,18 +244,19 @@ void Model::Draw(Shader& shader)
 {
     shader.use();
     shader.setMat4("model", m_Model);
-    shader.setBool("hasTexture", m_HasTexture);
+    //shader.setBool("hasTexture", m_HasTexture);
+    shader.setBool("hasTexture", true);
     shader.setVec3("object.ambient", m_Ambient);
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
 
-    //Used for textures, fix this!!!
-    //std::cout << "Meshes Size: " << meshes.size() << "\n";
-    GLuint textureUnit = TextureManager::getNextUnit();
-    for (unsigned int i = 0; i < meshes.size(); i++)
-        meshes[i].Draw(shader, m_HasTexture, textureUnit);
+    glDisable(GL_BLEND);
 
-    glCheckError();
+    for (unsigned int i = 0; i < meshes.size(); i++)
+    {
+        shader.setBool("hasTexture", true);
+        meshes[i].Draw(shader, true);
+    }
 }
 
 unsigned int TextureFromFile(const char* path, const string& directory, bool gamma)

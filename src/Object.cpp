@@ -108,8 +108,6 @@ void Object::setPosition(glm::vec3 newPosition)
 void Object::setRotation(glm::vec3 newRotation)
 {
     m_Rotation = newRotation;
-    //m_RotationAxis = axis;
-    //m_RotationIndex = index;
     updateObject();
 }
 
@@ -142,38 +140,6 @@ void Object::updateObject()
     m_Model = glm::rotate(m_Model, theta_x, glm::vec3(1.0f, 0.0f, 0.0f));
     m_Model = glm::rotate(m_Model, theta_y, glm::vec3(0.0f, 1.0f, 0.0f));
     m_Model = glm::rotate(m_Model, theta_z, glm::vec3(0.0f, 0.0f, 1.0f));
-
-    /*
-    const float* matPtr = glm::value_ptr(m_Model); // Get a pointer to the first element of the matrix
-    std::cout << "\r"; // Carriage return to the beginning of the line
-    std::cout << " Update Made: \n";
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            std::cout << matPtr[i * 4 + j] << " ";
-        }
-        std::cout << "\n"; // Move to the next line
-    }
-    std::cout.flush(); // Flush the output buffer to ensure everything is printed
-    */
-
-    //Manual Rotation
-    /*
-    glm::mat4 x_rotation = glm::mat4(1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, glm::cos(theta_x), glm::sin(theta_x), 0.0f,
-        0.0f, -glm::sin(theta_x), glm::cos(theta_x), 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f);
-
-    glm::mat4 y_rotation = glm::mat4(glm::cos(theta_y), 0.0f, -glm::sin(theta_y), 0.0f,
-        0.0f,1.0f, 0.0f, 0.0f,
-        glm::sin(theta_y), 0.0f, glm::cos(theta_y), 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f);
-
-    glm::mat4 z_rotation = glm::mat4(glm::cos(theta_z), glm::sin(theta_z), 0.0f, 0.0f,
-        -glm::sin(theta_z), glm::cos(theta_z), 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f);
-    m_Model *= x_rotation * y_rotation * z_rotation;
-    */
 
 }
 

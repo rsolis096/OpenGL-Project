@@ -50,13 +50,13 @@ void Cube::Draw(Shader& shader)
     if (m_HasTexture)
     {
 
-        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-        shader.setUInt("material.diffuse", TextureManager::getCurrentUnit());
+        shader.setUInt("material.diffuse", GL_TEXTURE1);
 
-        glActiveTexture(GL_TEXTURE0 + TextureManager::getNextUnit()); // activate the texture unit first before binding texture (2 texture in frag shader)
+        glActiveTexture(GL_TEXTURE2); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-        shader.setUInt("material.specular", TextureManager::getCurrentUnit());
+        shader.setUInt("material.specular", GL_TEXTURE2);
 
     }
     
@@ -67,7 +67,7 @@ void Cube::Draw(Shader& shader)
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+
     glCheckError();
 }
 
@@ -82,7 +82,6 @@ void Cube::ShadowPassDraw(Shader& shader)
 
     // Unbind buffers and reset state
     glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
     glCheckError();
 }
 

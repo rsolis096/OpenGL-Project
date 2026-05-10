@@ -141,8 +141,4 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 	
 
 	glDisable(GL_DEPTH_TEST);
-
-	//std::cout << "Texture Units used this frame: " << TextureManager::getCurrentUnit() << "\n";
-	//Reset current unit to zero for next render pass
-	TextureManager::reset();
 }
