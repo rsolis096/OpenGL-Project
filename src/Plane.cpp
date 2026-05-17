@@ -48,11 +48,9 @@ void Plane::Draw(Shader& shader)
     {
         glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-        shader.setUInt("material.diffuse", GL_TEXTURE1);
 
         glActiveTexture(GL_TEXTURE2); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-        shader.setUInt("material.specular", GL_TEXTURE2);
     }
     glCheckError();
 

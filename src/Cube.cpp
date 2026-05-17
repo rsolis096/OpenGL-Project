@@ -52,11 +52,9 @@ void Cube::Draw(Shader& shader)
 
         glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-        shader.setInt("material.diffuse", 1);
 
         glActiveTexture(GL_TEXTURE2); // activate the texture unit first before binding texture (2 texture in frag shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-        shader.setInt("material.specular", 2);
 
     }
    
