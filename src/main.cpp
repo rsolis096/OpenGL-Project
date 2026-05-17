@@ -234,8 +234,9 @@ void demoScene(Scene& demoScene)
 	//demoScene.addObject(new Cube("assets/textures/container2.png", "assets/textures/container2_specular.png"));
     //demoScene.addObject(new Plane());
 	//demoScene.addObject(new Sphere("assets/textures/globe.jpg", "assets/textures/globe.jpg"));
+    //demoScene.addObject(new Cube());
 
-    demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
+    //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
     //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[1]);
     //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[2]);
     //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[3]);
@@ -268,7 +269,7 @@ void demoScene(Scene& demoScene)
     //demoScene.m_SceneObjects[1]->setScale(glm::vec3(1.0f, 1.0f, 1.0f));
     //demoScene.m_SceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
     demoScene.m_SceneObjects[0]->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    demoScene.m_SceneObjects[0]->setScale(glm::vec3(0.01f));
+    demoScene.m_SceneObjects[0]->setScale(glm::vec3(.01f));
     //demoScene.m_SceneObjects[1]->setPosition(glm::vec3(0.0f, 5.0f, 0.0f));
 
     demoScene.m_SceneObjects[0]->setRotation(glm::vec3(0.0f, 180.0f, 0.0f));

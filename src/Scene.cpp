@@ -16,6 +16,7 @@ Scene::Scene(Camera* mC)
 
 	//Enable this to use the main shader
 	lightingShader = new Shader("shaders/lightingShader.vert", "shaders/lightingShader.frag");
+	InitLightingShaderSamplers(*lightingShader);
 
 	//Enable this to view normals
 	//lightingShader = new Shader("shaders/visualizeNormals.vert", "shaders/visualizeNormals.frag", "shaders/visualizeNormals.gs");
@@ -31,6 +32,23 @@ Scene::Scene(Camera* mC)
 	m_SkyBox = new SkyBox(*cubeMapShader, mainCamera);
 
 	glCheckError();
+}
+
+void Scene::InitLightingShaderSamplers(Shader& shader)
+{
+	shader.use();
+
+	shader.setInt("material.ambient", 0);
+	shader.setInt("material.diffuse", 1);
+	shader.setInt("material.specular", 2);
+
+	shader.setInt("dirLight.shadowMap", 4);
+
+	for (int i = 0; i < 8; i++)
+	{
+		shader.setInt("spotLights[" + std::to_string(i) + "].shadowMap", 5 + i);
+		shader.setInt("pointLights[" + std::to_string(i) + "].shadowMap", 13 + i);
+	}
 }
 
 //Add an object to the scene (only objects part of a scene are rendered)

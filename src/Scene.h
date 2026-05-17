@@ -41,6 +41,8 @@ public:
 	//Constructors
 	Scene(Camera*);
 
+	void InitLightingShaderSamplers(Shader& shader);
+
 
 	int addObject(Object* obj);
 	int removeObject(Object* obj);

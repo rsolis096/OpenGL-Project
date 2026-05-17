@@ -244,18 +244,14 @@ void Model::Draw(Shader& shader)
 {
     shader.use();
     shader.setMat4("model", m_Model);
-    //shader.setBool("hasTexture", m_HasTexture);
-    shader.setBool("hasTexture", true);
+    shader.setBool("hasTexture", m_HasTexture);
     shader.setVec3("object.ambient", m_Ambient);
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
 
-    glDisable(GL_BLEND);
-
     for (unsigned int i = 0; i < meshes.size(); i++)
     {
-        shader.setBool("hasTexture", true);
-        meshes[i].Draw(shader, true);
+        meshes[i].Draw(shader, m_HasTexture);
     }
 }
 

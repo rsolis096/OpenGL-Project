@@ -263,12 +263,10 @@ float PointLightShadowCalculation(vec3 fragPos, PointLight light)
 
 void main()
 {
-      
     // properties
     vec3 normal = normalize(fs_in.Normal);
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
     vec3 result = vec3(0.0f);
-
 
     // phase 1: directional lights
     if(hasDirLight){

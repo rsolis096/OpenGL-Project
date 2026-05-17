@@ -90,7 +90,6 @@ void Sphere::ShadowPassDraw(Shader& shader)
     // Unbind buffers and reset state
     glBindVertexArray(0);
     glCheckError();
-
 }
 
 

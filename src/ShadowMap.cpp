@@ -248,47 +248,55 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
     const int numberOfSpotLights = static_cast<int>(m_LightController->m_SpotLights.size());
     const int numberOfPointLights = static_cast<int>(m_LightController->m_PointLights.size());
 
-    //Main lighting shader used for all light sources
     shader.use();
 
     shader.setInt("numberOfSpotLights", numberOfSpotLights);
     shader.setInt("numberOfPointLights", numberOfPointLights);
 
-    // Type 0 - Point Lights
-    if (numberOfPointLights > 0)
-    {
-        // Apply shadow map textures for Point Lights
-        for (int i = 0; i < numberOfPointLights; i++)
-        {
-            glActiveTexture(GL_TEXTURE4);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, m_LightController->m_PointLights[i]->getCubeMapTexture());
-            shader.setVec3("pointLights[" + std::to_string(i) + "].position", m_LightController->m_PointLights[i]->getLightPos());
-            shader.setInt("pointLights[" + std::to_string(i) + "].shadowMap", 4);
-        }
-    }
-
-    //Type 1 - SpotLights
-    if (numberOfSpotLights > 0)
-    {
-        //Apply shadow map textures and light space matrix
-        for (int i = 0; i < numberOfSpotLights; i++)
-        {
-            glActiveTexture(GL_TEXTURE5);
-            glBindTexture(GL_TEXTURE_2D, m_LightController->m_SpotLights[i]->getDepthMapTexture());
-
-            //TODO: Remove dependence on SpotLight Indexing to allow for dynamic removal/addition to spotlights
-            shader.setInt("spotLights[" + std::to_string(i) + "].shadowMap", 5);
-            shader.setMat4("spotLights[" + std::to_string(i) + "].lightSpaceMatrix", m_LightController->m_SpotLights[i]->getLightSpaceMatrix());
-        }
-    }
-
-    //Type 2 - Directional Lights
+    // Directional light: sampler2D
     if (m_LightController->m_DirectionalLight)
     {
-        shader.setMat4("directionalLightSpaceMatrix", directionalLightSpaceMatrix);
-        glActiveTexture(GL_TEXTURE6);
+        constexpr int unit = 4;
+
+        glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_2D, m_LightController->m_DirectionalLight->getDepthMapTexture());
-        shader.setInt("dirLight.shadowMap", 6);
+
+        shader.setInt("dirLight.shadowMap", unit);
+        shader.setMat4("directionalLightSpaceMatrix", directionalLightSpaceMatrix);
+    }
+
+    // Spot lights: sampler2D
+    constexpr int spotStartUnit = 5;
+
+    for (int i = 0; i < numberOfSpotLights; i++)
+    {
+        int unit = spotStartUnit + i;
+
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_2D, m_LightController->m_SpotLights[i]->getDepthMapTexture());
+
+        shader.setInt("spotLights[" + std::to_string(i) + "].shadowMap", unit);
+        shader.setMat4(
+            "spotLights[" + std::to_string(i) + "].lightSpaceMatrix",
+            m_LightController->m_SpotLights[i]->getLightSpaceMatrix()
+        );
+    }
+
+    // Point lights: samplerCube
+    constexpr int pointStartUnit = 13;
+
+    for (int i = 0; i < numberOfPointLights; i++)
+    {
+        int unit = pointStartUnit + i;
+
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_LightController->m_PointLights[i]->getCubeMapTexture());
+
+        shader.setInt("pointLights[" + std::to_string(i) + "].shadowMap", unit);
+        shader.setVec3(
+            "pointLights[" + std::to_string(i) + "].position",
+            m_LightController->m_PointLights[i]->getLightPos()
+        );
     }
 
     glCheckError();

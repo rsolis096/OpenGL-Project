@@ -72,10 +72,6 @@ void Mesh::ShadowPassDraw(Shader& shader) const
 
     glBindVertexArray(0);
 
-
-    // THIS IS THE LINE THAT FIXES IT BUT WHYYYYYY
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 // render the mesh
@@ -89,13 +85,10 @@ void Mesh::Draw(Shader& shader, bool hasTexture) const
     bool hasBindedSpecular = false;
     bool hasBindedNormal = false;
 
-
     if (hasTexture)
     {
-        for (unsigned int i = 0; i < textures.size(); i++) {
-
-
-
+        for (unsigned int i = 0; i < textures.size(); i++) 
+        {
             std::string number;
             std::string name = textures[i].type;
             GLint location;
@@ -131,7 +124,6 @@ void Mesh::Draw(Shader& shader, bool hasTexture) const
                 continue;
             }
             */
-
         }
     }
 
