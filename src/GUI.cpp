@@ -1,5 +1,18 @@
 #include "GUI.h"
 
+#include "Scene.h"
+#include "Sphere.h"
+#include "Cube.h"
+#include "Plane.h"
+#include "PhysicsWorld.h"
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
+
+#include <GLFW/glfw3.h>
+#include <iostream>
+
 bool GUI::isWindowHidden = true;
 int selectedItemIndex = -1;
 static float vec3a[3] = { 0.00f, 0.00f, 0.00f };

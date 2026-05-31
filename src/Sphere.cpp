@@ -40,36 +40,10 @@ Sphere::~Sphere()
 void Sphere::Draw(Shader& shader)
 {
     shader.use();
-    shader.setVec3("object.ambient", m_Ambient);
-    shader.setVec3("object.diffuse", m_Diffuse);
-    shader.setVec3("object.specular", m_Specular);
     shader.setMat4("model", m_Model);
-    shader.setBool("hasTexture", m_HasTexture);
 
-    //Bind texture and send texture to fragment shader
-    if (m_HasTexture)
-    {
-
-        glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-
-        glActiveTexture(GL_TEXTURE2); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-    }
-
-
-    //Bind Sphere
-    glBindVertexArray(m_vao);
-
-    //Choose render type - indices list(EBO)
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-    glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
-
-    // Unbind buffers and reset state
-    glBindVertexArray(0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);  // Unbind the EBO
-    glCheckError();
-
+    ApplyMaterialUniforms(shader);
+    DrawMesh();
 }
 
 void Sphere::ShadowPassDraw(Shader& shader)
@@ -77,17 +51,49 @@ void Sphere::ShadowPassDraw(Shader& shader)
     shader.use();
     shader.setMat4("model", m_Model);
 
-    //Bind Sphere
-    glBindVertexArray(m_vao);
+    DrawMesh();
+}
 
-    //Choose render type - indices list(EBO)
+void Sphere::DrawGeometryPass(Shader& shader)
+{
+    shader.use();
+    shader.setMat4("model", m_Model);
+
+    ApplyMaterialUniforms(shader);
+    DrawMesh();
+}
+
+void Sphere::ApplyMaterialUniforms(Shader& shader)
+{
+    shader.use();
+
+    shader.setBool("hasTexture", m_HasTexture);
+    shader.setVec3("object.ambient", m_Ambient);
+    shader.setVec3("object.diffuse", m_Diffuse);
+    shader.setVec3("object.specular", m_Specular);
+
+    if (m_HasTexture)
+    {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
+    }
+}
+
+void Sphere::DrawMesh()
+{
+    glBindVertexArray(m_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
     glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, nullptr);
 
-    // Unbind buffers and reset state
     glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
     glCheckError();
 }
+
 
 
 void Sphere::buildSphere()

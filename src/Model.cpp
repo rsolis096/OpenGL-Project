@@ -58,7 +58,6 @@ const aiScene* Model::CheckPath(std::string const& path)
     return scene;
 }
 
-
 void Model::processNode(aiNode* node, const aiScene* scene)
 
 {
@@ -240,19 +239,49 @@ void Model::ShadowPassDraw(Shader& shader)
     glCheckError();
 }
 
+void Model::DrawGeometryPass(Shader& shader)
+{
+    shader.use();
+    shader.setMat4("model", m_Model);
+
+    ApplyMaterialUniforms(shader);
+
+    for (unsigned int i = 0; i < meshes.size(); i++)
+    {
+        meshes[i].DrawGeometryPass(shader, m_HasTexture);
+    }
+
+    glCheckError();
+}
+
 void Model::Draw(Shader& shader)
 {
     shader.use();
     shader.setMat4("model", m_Model);
-    shader.setBool("hasTexture", m_HasTexture);
-    shader.setVec3("object.ambient", m_Ambient);
-    shader.setVec3("object.diffuse", m_Diffuse);
-    shader.setVec3("object.specular", m_Specular);
+
+    ApplyMaterialUniforms(shader);
 
     for (unsigned int i = 0; i < meshes.size(); i++)
     {
         meshes[i].Draw(shader, m_HasTexture);
     }
+
+    glCheckError();
+}
+
+void Model::ApplyMaterialUniforms(Shader& shader)
+{
+    shader.use();
+
+    shader.setBool("hasTexture", m_HasTexture);
+    shader.setVec3("object.ambient", m_Ambient);
+    shader.setVec3("object.diffuse", m_Diffuse);
+    shader.setVec3("object.specular", m_Specular);
+}
+
+void Model::DrawMesh()
+{
+    // doesnt do anything for Models since the mesh are what are drawn
 }
 
 unsigned int TextureFromFile(const char* path, const string& directory, bool gamma)

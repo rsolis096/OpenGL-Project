@@ -15,6 +15,7 @@ public:
     //Methods
     void Draw(Shader& shader) override;
     void ShadowPassDraw(Shader& shader) override;
+    void DrawGeometryPass(Shader& shader) override;
     ObjectType GetType() const override;
 
 
@@ -23,5 +24,9 @@ private:
     void buildCube();
     static unsigned int cubeCount;
     int updateTexture(std::vector<std::string> texturePaths) override;
+
+protected:
+    void ApplyMaterialUniforms(Shader& shader) override;
+    void DrawMesh() override;
 
 };

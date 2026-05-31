@@ -45,9 +45,15 @@ public:
     // render the mesh
     void Draw(Shader& shader, bool hasTexture) const;
     void ShadowPassDraw(Shader& shader) const;
+    void DrawGeometryPass(Shader& shader, bool hasTexture) const;
+
 private:
     // render data 
     unsigned int VAO, VBO, EBO;
     // initializes all the buffer objects/arrays
     void setupMesh();
+
+    void ApplyMaterialUniforms(Shader& shader, bool hasTexture) const;
+    void DrawMesh() const;
+
 };

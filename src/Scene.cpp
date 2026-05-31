@@ -13,6 +13,8 @@ Scene::Scene(Camera* mC)
 	mainCamera = mC;
 
 	cubeMapShader = new Shader("shaders/skyBoxShader.vert", "shaders/skyBoxShader.frag");
+	gBufferShader = new Shader("shaders/gBuffer.vert", "shaders/gBuffer.frag");
+	gBufferDebugShader = new Shader("shaders/gBufferDebug.vert", "shaders/gBufferDebug.frag");
 
 	//Enable this to use the main shader
 	lightingShader = new Shader("shaders/lightingShader.vert", "shaders/lightingShader.frag");
@@ -30,6 +32,8 @@ Scene::Scene(Camera* mC)
 	m_LightController = new LightController(lightingShader, pointLightShader, mainCamera, this);
 	m_ShadowMap = new ShadowMap(&m_SceneObjects, m_LightController);
 	m_SkyBox = new SkyBox(*cubeMapShader, mainCamera);
+
+	m_GBuffer = new GBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	glCheckError();
 }
@@ -121,42 +125,98 @@ void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
 {
 	glEnable(GL_DEPTH_TEST);
 
+	// Existing shadow maps stay.
 	m_ShadowMap->shadowPass();
 
-	// reset viewport after shadow pass
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// Update simulation once.
+	m_PhysicsWorld->step(static_cast<float>(glfwGetTime()), deltaTime);
 
-	//Draw Light Sources as white spheres
+	// Geometry pass: render camera-visible surfaces into G-buffer.
 	{
-		pointLightShader->use();
-		pointLightShader->setMat4("projection", proj);
-		pointLightShader->setMat4("view", view);
-		m_LightController->drawLighting();
-	}
+		m_GBuffer->BindForWriting();
 
-	// Draw main scene with lighting and update physics
-	{
-		lightingShader->use();
-		lightingShader->setMat4("projection", proj);
-		lightingShader->setMat4("view", view);
-		lightingShader->setVec3("viewPos", mainCamera->m_LookFrom);
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//Apply Textures to scene for shadow maps
-		m_ShadowMap->updateShaderUniforms(*lightingShader);
+		gBufferShader->use();
+		gBufferShader->setMat4("projection", proj);
+		gBufferShader->setMat4("view", view);
 
-		//Update physics
-		m_PhysicsWorld->step(static_cast<float>(glfwGetTime()), deltaTime);
-
-		//Draw Objects
-		for (Object* element : m_SceneObjects){
-			element->Draw(*lightingShader);
+		for (Object* element : m_SceneObjects)
+		{
+			element->DrawGeometryPass(*gBufferShader);
 		}
 
-		m_SkyBox->draw(proj);
-
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
-	
+
+	// Temporary debug pass: show G-buffer texture on screen.
+	{
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glDisable(GL_DEPTH_TEST);
+
+		gBufferDebugShader->use();
+		m_GBuffer->BindForReading(*gBufferDebugShader);
+
+		gBufferDebugShader->setInt("debugMode", 0); // albedo first
+		//gBufferDebugShader->setInt("debugMode", 1); // normals
+		//gBufferDebugShader->setInt("debugMode", 2); // world position
+		//gBufferDebugShader->setInt("debugMode", 3); // grayscale specular
+		//gBufferDebugShader->setInt("debugMode", 4); // distance-from-origin gradient
+
+		//gBufferDebugShader->setInt("debugMode", 2); // world position
+		gBufferDebugShader->setFloat("positionDebugScale", 20.0f);
+
+		RenderFullscreenQuad();
+
+		glEnable(GL_DEPTH_TEST);
+	}
+
+	// Optional: draw light source spheres after debug pass.
+	{
+		//pointLightShader->use();
+		//pointLightShader->setMat4("projection", proj);
+		//pointLightShader->setMat4("view", view);
+		//m_LightController->drawLighting();
+	}
 
 	glDisable(GL_DEPTH_TEST);
+}
+
+void Scene::RenderFullscreenQuad()
+{
+	if (quadVAO == 0)
+	{
+		float quadVertices[] =
+		{
+			// positions        // texCoords
+			-1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
+			 1.0f,  1.0f, 0.0f,  1.0f, 1.0f,
+			 1.0f, -1.0f, 0.0f,  1.0f, 0.0f
+		};
+
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+
+		glBindVertexArray(quadVAO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+
+		// position
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT,GL_FALSE, 5 * sizeof(float), (void*)0);
+
+		// texCoords
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+		glBindVertexArray(0);
+	}
+
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
 }

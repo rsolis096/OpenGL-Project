@@ -37,10 +37,34 @@ Plane::~Plane()
 void Plane::Draw(Shader& shader)
 {
     shader.use();
+    shader.setMat4("model", m_Model);
+
+    ApplyMaterialUniforms(shader);
+    DrawMesh();
+}
+
+void Plane::ShadowPassDraw(Shader& shader)
+{
+    shader.use();
+    shader.setMat4("model", m_Model);
+
+    DrawMesh();
+}
+
+void Plane::DrawGeometryPass(Shader& shader)
+{
+    shader.use();
+    shader.setMat4("model", m_Model);
+
+    ApplyMaterialUniforms(shader);
+    DrawMesh();
+}
+
+void Plane::ApplyMaterialUniforms(Shader& shader)
+{
     shader.setVec3("object.ambient", m_Ambient);
     shader.setVec3("object.diffuse", m_Diffuse);
     shader.setVec3("object.specular", m_Specular);
-    shader.setMat4("model", m_Model);
     shader.setBool("hasTexture", m_HasTexture);
 
     //Bind texture and send texture to fragment shader
@@ -53,23 +77,11 @@ void Plane::Draw(Shader& shader)
         glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
     }
     glCheckError();
-
-    //Bind Plane
-    glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-
-    // Unbind buffers and reset state
-    glBindVertexArray(0);
-
-    glCheckError();
 }
 
-void Plane::ShadowPassDraw(Shader& shader)
+void Plane::DrawMesh()
 {
-    shader.use();
-    shader.setMat4("model", m_Model);
-
-    //Bind Plane and render
+    //Bind Plane
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 

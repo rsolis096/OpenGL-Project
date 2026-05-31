@@ -78,8 +78,10 @@ public:
         //Draw the object. Each object type draws differently
         virtual void Draw(Shader& shader) = 0;
         virtual void ShadowPassDraw(Shader& shader) = 0;
+        virtual void DrawGeometryPass(Shader& shader) = 0;
         virtual int updateTexture(std::vector<std::string> texturePaths) = 0;
         virtual ObjectType GetType() const { return ObjectType::Object; }
+
 
     protected:
 
@@ -100,6 +102,8 @@ public:
 
         void buildInterleavedVerticesWithTexCoords();
         void buildInterleavedVertices();
-        
+
+        virtual void ApplyMaterialUniforms(Shader& shader);
+        virtual void DrawMesh();
 
 };

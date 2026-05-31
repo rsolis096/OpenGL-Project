@@ -14,10 +14,15 @@ public:
 
     void Draw(Shader& shader) override;
     void ShadowPassDraw(Shader& shader) override;
+    void DrawGeometryPass(Shader& shader) override;
     int updateTexture(std::vector<std::string> texturePaths) override;
     ObjectType GetType() const override;
 
 private:
     void buildPlane();
     static unsigned int planeCount;
+
+protected:
+    void ApplyMaterialUniforms(Shader& shader) override;
+    void DrawMesh() override;
 };

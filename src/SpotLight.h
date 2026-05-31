@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Shader.h"
+#include "GBuffer.h"
 #include "Sphere.h"
 
 //Flashlight should inherit from spotlight or find another way to continuously update camera position

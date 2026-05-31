@@ -2,29 +2,15 @@
 #include "DebugUtils.h"
 
 #include <iostream>
-#include <GLFW/glfw3.h> //Window functions
+#include <GLFW/glfw3.h>
 
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
-
-
-#include "PhysicsWorld.h"
-
-#include "Texture.h"
+#include "Scene.h"
 #include "GUI.h"
+#include "PhysicsWorld.h"
+#include "Texture.h"
 #include "ShadowMap.h"
 #include "Model.h"
-
-#include "Model.h"
-
-//Contains includes for all light types
 #include "LightController.h"
-
-//Matrix Multiplication
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 // settings
 unsigned int SCR_WIDTH = 1920;
@@ -275,6 +261,15 @@ void demoScene(Scene& demoScene)
     demoScene.m_SceneObjects[0]->setRotation(glm::vec3(0.0f, 180.0f, 0.0f));
 }
 
+float UpdateDeltaTime()
+{
+    //Use this to get framerate info
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+    return 1 / deltaTime;
+}
+
 int main()
 {
     //Initialize GLFW and create window
@@ -297,22 +292,16 @@ int main()
     //Main loop
     while (!glfwWindowShouldClose(window))
     {
-
         processInput(window);
 
         //Update Camera
         updateCamera(*myScene.lightingShader, view, projection);
 
-        //Use this to get framerate info
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-        myScene.fps = 1 / deltaTime;
-
         //Rendering Starts Here
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        myScene.fps = UpdateDeltaTime();
              
         // Start counting triangles
         /*
@@ -327,9 +316,7 @@ int main()
         /*
         glEndQuery(GL_PRIMITIVES_GENERATED);
         GLuint numPrimitives = 0;
-        glGetQueryObjectuiv(query,
-            GL_QUERY_RESULT,        
-            &numPrimitives);
+        glGetQueryObjectuiv(query, GL_QUERY_RESULT, &numPrimitives);
         std::cout << "Rendered " << numPrimitives << " triangles\n";
         */
 

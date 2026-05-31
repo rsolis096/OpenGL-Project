@@ -61,22 +61,26 @@ Mesh::~Mesh()
 
 void Mesh::ShadowPassDraw(Shader& shader) const
 {
-    glBindVertexArray(VAO);
+    DrawMesh();
+}
 
-    glDrawElements(
-        GL_TRIANGLES,
-        static_cast<GLsizei>(indices.size()),
-        GL_UNSIGNED_INT,
-        nullptr
-    );
-
-    glBindVertexArray(0);
-
+void Mesh::DrawGeometryPass(Shader& shader, bool hasTexture) const
+{
+    ApplyMaterialUniforms(shader, hasTexture);
+    DrawMesh();
 }
 
 // render the mesh
 void Mesh::Draw(Shader& shader, bool hasTexture) const
 {
+    ApplyMaterialUniforms(shader, hasTexture);
+    DrawMesh();
+}
+
+void Mesh::ApplyMaterialUniforms(Shader& shader, bool hasTexture) const
+{
+    shader.use();
+
     // bind appropriate textures
     unsigned int normalNr = 1;
     unsigned int heightNr = 1;
@@ -87,7 +91,7 @@ void Mesh::Draw(Shader& shader, bool hasTexture) const
 
     if (hasTexture)
     {
-        for (unsigned int i = 0; i < textures.size(); i++) 
+        for (unsigned int i = 0; i < textures.size(); i++)
         {
             std::string number;
             std::string name = textures[i].type;
@@ -126,14 +130,14 @@ void Mesh::Draw(Shader& shader, bool hasTexture) const
             */
         }
     }
+}
 
-    glCheckError();
-
+void Mesh::DrawMesh() const
+{
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
     glCheckError();
-
 }
 
 // From LearnOpenGL

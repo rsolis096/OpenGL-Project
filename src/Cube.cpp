@@ -41,49 +41,54 @@ void Cube::Draw(Shader& shader)
 {
     shader.use();
     shader.setMat4("model", m_Model);
-    shader.setVec3("object.ambient", m_Ambient);
-    shader.setVec3("object.diffuse", m_Diffuse);
-    shader.setVec3("object.specular", m_Specular);
-    shader.setBool("hasTexture", m_HasTexture);
 
-    //Bind texture and send texture to fragment shader
-    if (m_HasTexture)
-    {
-
-        glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
-
-        glActiveTexture(GL_TEXTURE2); // activate the texture unit first before binding texture (2 texture in frag shader)
-        glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
-
-    }
-   
-    //Bind Cube
-    glBindVertexArray(m_vao);
-
-    //Render
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    // Unbind buffers and reset state
-    glBindVertexArray(0);
-
-    glCheckError();
+    ApplyMaterialUniforms(shader);
+    DrawMesh();
 }
 
 void Cube::ShadowPassDraw(Shader& shader)
 {
     shader.use();
     shader.setMat4("model", m_Model);
+    DrawMesh();
+}
 
-    //Bind Cube and render
+void Cube::DrawGeometryPass(Shader& shader)
+{
+    shader.use();
+    shader.setMat4("model", m_Model);
+
+    ApplyMaterialUniforms(shader);
+    DrawMesh();
+}
+
+void Cube::ApplyMaterialUniforms(Shader& shader)
+{
+    shader.use();
+
+    shader.setBool("hasTexture", m_HasTexture);
+    shader.setVec3("object.ambient", m_Ambient);
+    shader.setVec3("object.diffuse", m_Diffuse);
+    shader.setVec3("object.specular", m_Specular);
+
+    if (m_HasTexture)
+    {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
+    }
+}
+
+void Cube::DrawMesh()
+{
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // Unbind buffers and reset state
     glBindVertexArray(0);
     glCheckError();
 }
-
 
 void Cube::buildCube()
 {

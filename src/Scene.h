@@ -3,15 +3,15 @@
 #include "PhysicsWorld.h"
 #include "Model.h"
 #include "SkyBox.h"
-
 #include "Camera.h"
-
 #include "LightController.h"
 #include "ShadowMap.h"
 
-#include "TextureManager.h"
 #include <typeinfo>
 #include <string>
+
+class GBuffer;
+
 
 class Scene
 {
@@ -24,12 +24,16 @@ public:
 
 	Camera* mainCamera;
 
+	GBuffer* m_GBuffer;
+
 	LightController* m_LightController;
 	PhysicsWorld* m_PhysicsWorld;
 
 	Shader* cubeMapShader; //skybox
 	Shader* lightingShader;
 	Shader* pointLightShader;
+	Shader* gBufferShader;
+	Shader* gBufferDebugShader;
 
 	ShadowMap* m_ShadowMap;
 	SkyBox* m_SkyBox;
@@ -55,5 +59,10 @@ public:
 
 	void drawScene(float, glm::mat4&, glm::mat4&);
 
+private:
+	unsigned int quadVAO = 0;
+	unsigned int quadVBO = 0;
+
+	void RenderFullscreenQuad();
 };
 

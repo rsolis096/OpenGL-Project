@@ -184,3 +184,6 @@ void Object::buildInterleavedVerticesWithTexCoords()
         m_InterleavedVertices.push_back(m_TexCoords[j + 1]);
     }
 }
+
+void Object::ApplyMaterialUniforms(Shader& shader) {}
+void Object::DrawMesh() {}

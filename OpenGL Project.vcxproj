@@ -153,6 +153,7 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Cube.cpp" />
     <ClCompile Include="src\DirectionalLight.cpp" />
+    <ClCompile Include="src\GBuffer.cpp" />
     <ClCompile Include="src\GUI.cpp" />
     <ClCompile Include="src\LightController.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -171,7 +172,6 @@
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\stb_image_write.cpp" />
     <ClCompile Include="src\Texture.cpp" />
-    <ClCompile Include="src\TextureManager.cpp" />
     <ClCompile Include="third party\includes\glad\glad.c" />
     <ClCompile Include="third party\includes\imgui\imgui.cpp" />
     <ClCompile Include="third party\includes\imgui\imgui_demo.cpp" />
@@ -186,6 +186,7 @@
     <ClInclude Include="src\Cube.h" />
     <ClInclude Include="src\DebugUtils.h" />
     <ClInclude Include="src\DirectionalLight.h" />
+    <ClInclude Include="src\GBuffer.h" />
     <ClInclude Include="src\GUI.h" />
     <ClInclude Include="src\LightController.h" />
     <ClInclude Include="src\Mesh.h" />
@@ -201,7 +202,6 @@
     <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\SpotLight.h" />
     <ClInclude Include="src\Texture.h" />
-    <ClInclude Include="src\TextureManager.h" />
     <ClInclude Include="third party\includes\imgui\imconfig.h" />
     <ClInclude Include="third party\includes\imgui\imgui.h" />
     <ClInclude Include="third party\includes\imgui\imgui_impl_glfw.h" />
@@ -214,6 +214,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\depthShader.gs" />
+    <None Include="shaders\gBuffer.frag" />
+    <None Include="shaders\gBuffer.vert" />
+    <None Include="shaders\gBufferDebug.frag" />
+    <None Include="shaders\gBufferDebug.vert" />
     <None Include="shaders\SkyBoxShader.frag" />
     <None Include="shaders\SkyBoxShader.vert" />
     <None Include="shaders\debug_quad.vert" />

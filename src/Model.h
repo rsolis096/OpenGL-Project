@@ -30,6 +30,7 @@ public:
     // draws the model, and thus all its meshes
     void Draw(Shader& shader) override;
     void ShadowPassDraw(Shader& shader) override;
+    void DrawGeometryPass(Shader& shader) override;
 
     static const aiScene* CheckPath(std::string const& path);
     ObjectType GetType() const override;
@@ -50,5 +51,9 @@ private:
     static unsigned int modelCount;
 
     static Assimp::Importer importer;
+
+protected:
+    void ApplyMaterialUniforms(Shader& shader) override;
+    void DrawMesh() override;
 
 };
