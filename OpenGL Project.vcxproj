@@ -213,6 +213,8 @@
     <ClInclude Include="third party\includes\imgui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\deferredLighting.frag" />
+    <None Include="shaders\deferredLighting.vert" />
     <None Include="shaders\depthShader.gs" />
     <None Include="shaders\gBuffer.frag" />
     <None Include="shaders\gBuffer.vert" />

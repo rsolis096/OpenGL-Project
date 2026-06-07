@@ -30,7 +30,7 @@ public:
 	PhysicsWorld* m_PhysicsWorld;
 
 	Shader* cubeMapShader; //skybox
-	Shader* lightingShader;
+	Shader* deferredLightingShader;
 	Shader* pointLightShader;
 	Shader* gBufferShader;
 	Shader* gBufferDebugShader;
@@ -45,7 +45,7 @@ public:
 	//Constructors
 	Scene(Camera*);
 
-	void InitLightingShaderSamplers(Shader& shader);
+	void InitDeferredLightingShaderSamplers(Shader& shader);
 
 
 	int addObject(Object* obj);

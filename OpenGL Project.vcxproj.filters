@@ -156,7 +156,7 @@
     <ClCompile Include="src\SpotLight.cpp">
       <Filter>Source Files\Lighting</Filter>
     </ClCompile>
-    <ClCompile Include="src\TextureManager.cpp">
+    <ClCompile Include="src\GBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -245,7 +245,7 @@
     <ClInclude Include="third party\includes\imgui\imstb_truetype.h">
       <Filter>Header Files\third-party</Filter>
     </ClInclude>
-    <ClInclude Include="src\TextureManager.h">
+    <ClInclude Include="src\GBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -297,6 +297,16 @@
     </None>
     <None Include="shaders\depthShader.gs">
       <Filter>Source Files\Shaders\Geometry</Filter>
+    </None>
+    <None Include="shaders\gBuffer.frag" />
+    <None Include="shaders\gBuffer.vert" />
+    <None Include="shaders\gBufferDebug.frag" />
+    <None Include="shaders\gBufferDebug.vert" />
+    <None Include="shaders\deferredLighting.vert">
+      <Filter>Source Files\Shaders\Vertex</Filter>
+    </None>
+    <None Include="shaders\deferredLighting.frag">
+      <Filter>Source Files\Shaders\Fragment</Filter>
     </None>
   </ItemGroup>
 </Project>

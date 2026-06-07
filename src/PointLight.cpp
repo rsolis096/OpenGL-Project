@@ -9,14 +9,15 @@ bool firstFrame = true;
 PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::vec3& pos) :
 	m_LightingShader(lightingShader), m_LightSourceShader(objectShader)
 {
-	m_LightShape = new Cube(); //Create the physical light object
-	setLightPos(pos); //Need to update light object too
-	m_LightShape->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
 	m_CubeMapTexture = 0;
 	m_LightID = m_PointLightCount;
 	m_DisplayName = "PointLight" + std::to_string(m_LightID);
 	m_PointLightCount++;
+
+	m_LightShape = new Cube(); //Create the physical light object
+	setLightPos(pos); //Need to update light object too
+	m_LightShape->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	m_LightShape->m_DisplayName = "PointLight" + std::to_string(m_LightID);
 
 	//Light Color Properties (How it casts light on objects)
@@ -46,7 +47,7 @@ PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::
 
 	//Set these properties in the lightingShader.frag for the corresponding light source at index m_LightID
 	m_LightingShader->use();
-	m_LightingShader->setInt("numberOfPointLightsFRAG", m_PointLightCount);
+	m_LightingShader->setInt("numberOfPointLights", m_PointLightCount);
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].ambient", m_Ambient);
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].diffuse", m_Diffuse);
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].specular", m_Specular);
@@ -74,6 +75,7 @@ void PointLight::Draw()
 	m_LightingShader->use();
 	m_LightingShader->setInt("lightType", 0);
 	m_LightShape->Draw(*m_LightSourceShader);
+	glCheckError();
 }
 
 void PointLight::updateLightSpaceMatrices()
@@ -194,7 +196,7 @@ void PointLight::setLinear(const float linear)
 {
 	m_Linear = linear;
 	m_LightingShader->use();
-	m_LightingShader->setFloat("pointLight[" + std::to_string(m_LightID) + "].linear", m_Linear);
+	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].linear", m_Linear);
 }
 
 void PointLight::setQuadratic(const float quadratic)

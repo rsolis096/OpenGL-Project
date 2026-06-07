@@ -262,7 +262,7 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
         glBindTexture(GL_TEXTURE_2D, m_LightController->m_DirectionalLight->getDepthMapTexture());
 
         shader.setInt("dirLight.shadowMap", unit);
-        shader.setMat4("directionalLightSpaceMatrix", directionalLightSpaceMatrix);
+        shader.setMat4("dirLight.directionalLightSpaceMatrix", directionalLightSpaceMatrix);
     }
 
     // Spot lights: sampler2D
