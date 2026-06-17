@@ -50,7 +50,7 @@ DirectionalLight::DirectionalLight(Shader* lightingShader, const glm::vec3& dir)
 DirectionalLight::~DirectionalLight()
 {
 	m_LightingShader->use();
-	m_LightingShader->setBool("hasDirLight", true);
+	m_LightingShader->setBool("hasDirLight", false);
 
 	m_LightingShader = nullptr;
 
@@ -126,6 +126,8 @@ void DirectionalLight::setYaw(const float i)
 	m_LightDirection.z = cos(pitch_rads) * sin(yaw_rads);
 	m_LightDirection = glm::normalize(m_LightDirection);
 
+	m_LightingShader->use();
+	m_LightingShader->setVec3("dirLight.direction", m_LightDirection);
 }
 
 void DirectionalLight::setPitch(const float i)
@@ -137,6 +139,9 @@ void DirectionalLight::setPitch(const float i)
 	m_LightDirection.y = sin(pitch_rads);
 	m_LightDirection.z = cos(pitch_rads) * sin(yaw_rads);
 	m_LightDirection = glm::normalize(m_LightDirection);
+
+	m_LightingShader->use();
+	m_LightingShader->setVec3("dirLight.direction", m_LightDirection);
 }
 
 

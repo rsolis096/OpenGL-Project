@@ -15,7 +15,7 @@ void LightController::addPointLight(const glm::vec3& pos)
 {
 	m_PointLights.push_back(new PointLight(m_LightingShader, m_LightSourceShader, pos));
 	PointLight* newPointLight = m_PointLights.back();
-	m_Scene->m_ShadowMap->addPointLightShadowMap(newPointLight->getCubeMapTexture());
+	m_Scene->m_shadowMap->addPointLightShadowMap(newPointLight->getCubeMapTexture());
 	glCheckError();
 }
 
@@ -27,7 +27,7 @@ void LightController::removePointLight()
 void LightController::addSpotLight(const glm::vec3 pos, const glm::vec3 dir)
 {
 	m_SpotLights.push_back(new SpotLight(m_LightingShader, m_LightSourceShader, pos, dir));
-	m_Scene->m_ShadowMap->addSpotLightShadowMap(m_SpotLights[m_SpotLights.size() - 1]->getDepthMapTexture());
+	m_Scene->m_shadowMap->addSpotLightShadowMap(m_SpotLights[m_SpotLights.size() - 1]->getDepthMapTexture());
 	glCheckError();
 }
 
@@ -46,7 +46,7 @@ void LightController::addDirectionalLight(const glm::vec3& dir)
 	m_DirectionalLight = new DirectionalLight(m_LightingShader, dir);
 
 	// Configure a directional shadow map
-	m_Scene->m_ShadowMap->addDirectionalShadowMap(m_DirectionalLight->getDepthMapTexture());
+	m_Scene->m_shadowMap->addDirectionalShadowMap(m_DirectionalLight->getDepthMapTexture());
 	glCheckError();
 }
 

@@ -222,10 +222,10 @@ void demoScene(Scene& demoScene)
 	demoScene.addObject(new Sphere("assets/textures/globe.jpg", "assets/textures/globe.jpg"));
     //demoScene.addObject(new Cube());
 
-    //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[0]);
-    //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[1]);
-    //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[2]);
-    //demoScene.m_PhysicsWorld->addObject(demoScene.m_SceneObjects[3]);
+    //demoScene.m_PhysicsWorld->addObject(demoScene.m_sceneObjects[0]);
+    //demoScene.m_PhysicsWorld->addObject(demoScene.m_sceneObjects[1]);
+    //demoScene.m_PhysicsWorld->addObject(demoScene.m_sceneObjects[2]);
+    //demoScene.m_PhysicsWorld->addObject(demoScene.m_sceneObjects[3]);
 
 
 
@@ -246,19 +246,19 @@ void demoScene(Scene& demoScene)
     //demoScene.m_LightController->addSpotLight(spotLightPos2, spotLightDir2);
     //demoScene.m_LightController->addSpotLight(spotLightPos3, spotLightDir3);
 
-	//demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 10.0f, 0.0f));
+	demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 5.0f, 0.0f));
     //demoScene.m_LightController->addPointLight(glm::vec3(0.0f, 9.0f, 0.0f));
     //demoScene.m_LightController->addPointLight(glm::vec3(10.0f, 5.0f, 10.0f));
 
 
-    //demoScene.m_SceneObjects[1]->setPosition(glm::vec3(4.0f, 3.0f, 0.0));
-    //demoScene.m_SceneObjects[1]->setScale(glm::vec3(1.0f, 1.0f, 1.0f));
-    //demoScene.m_SceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
-    demoScene.m_SceneObjects[0]->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    demoScene.m_SceneObjects[0]->setScale(glm::vec3(.01f));
-    demoScene.m_SceneObjects[1]->setPosition(glm::vec3(0.0f, 5.0f, 0.0f));
+    //demoScene.m_sceneObjects[1]->setPosition(glm::vec3(4.0f, 3.0f, 0.0));
+    //demoScene.m_sceneObjects[1]->setScale(glm::vec3(1.0f, 1.0f, 1.0f));
+    //demoScene.m_sceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
+    demoScene.m_sceneObjects[0]->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    demoScene.m_sceneObjects[0]->setScale(glm::vec3(.01f));
+    demoScene.m_sceneObjects[1]->setPosition(glm::vec3(0.0f, 5.0f, 0.0f));
 
-    demoScene.m_SceneObjects[0]->setRotation(glm::vec3(0.0f, 180.0f, 0.0f));
+    demoScene.m_sceneObjects[0]->setRotation(glm::vec3(0.0f, 180.0f, 0.0f));
 }
 
 float UpdateDeltaTime()
@@ -295,13 +295,13 @@ int main()
         processInput(window);
 
         //Update Camera
-        updateCamera(*myScene.deferredLightingShader, view, projection);
+        updateCamera(*myScene.m_deferredLightingShader, view, projection);
 
         //Rendering Starts Here
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //sets the clear color for the color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        myScene.fps = UpdateDeltaTime();
+        myScene.m_fps = UpdateDeltaTime();
              
         // Start counting triangles
         /*

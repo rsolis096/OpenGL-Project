@@ -67,6 +67,12 @@
     <Filter Include="Source Files\Shaders\Geometry">
       <UniqueIdentifier>{573aa751-e10c-404f-b9a4-a8f68ef0778d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\FBOs">
+      <UniqueIdentifier>{cd54530e-5558-42a1-8eeb-a079dc134841}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FBOs">
+      <UniqueIdentifier>{fabd62b2-1db3-4fa6-a10b-ea2bc2b6adab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -156,8 +162,17 @@
     <ClCompile Include="src\SpotLight.cpp">
       <Filter>Source Files\Lighting</Filter>
     </ClCompile>
-    <ClCompile Include="src\GBuffer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\FBOs\Framebuffer.cpp">
+      <Filter>Source Files\FBOs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FBOs\SSAOBlurBuffer.cpp">
+      <Filter>Source Files\FBOs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FBOs\SSAOBuffer.cpp">
+      <Filter>Source Files\FBOs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FBOs\GBuffer.cpp">
+      <Filter>Source Files\FBOs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -245,8 +260,17 @@
     <ClInclude Include="third party\includes\imgui\imstb_truetype.h">
       <Filter>Header Files\third-party</Filter>
     </ClInclude>
-    <ClInclude Include="src\GBuffer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\FBOs\Framebuffer.h">
+      <Filter>Header Files\FBOs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FBOs\SSAOBlurBuffer.h">
+      <Filter>Header Files\FBOs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FBOs\SSAOBuffer.h">
+      <Filter>Header Files\FBOs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FBOs\GBuffer.h">
+      <Filter>Header Files\FBOs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -298,15 +322,35 @@
     <None Include="shaders\depthShader.gs">
       <Filter>Source Files\Shaders\Geometry</Filter>
     </None>
-    <None Include="shaders\gBuffer.frag" />
-    <None Include="shaders\gBuffer.vert" />
-    <None Include="shaders\gBufferDebug.frag" />
-    <None Include="shaders\gBufferDebug.vert" />
     <None Include="shaders\deferredLighting.vert">
       <Filter>Source Files\Shaders\Vertex</Filter>
     </None>
     <None Include="shaders\deferredLighting.frag">
       <Filter>Source Files\Shaders\Fragment</Filter>
+    </None>
+    <None Include="shaders\ssao.frag">
+      <Filter>Source Files\Shaders\Fragment</Filter>
+    </None>
+    <None Include="shaders\ssaoBlur.frag">
+      <Filter>Source Files\Shaders\Fragment</Filter>
+    </None>
+    <None Include="shaders\ssao.vert">
+      <Filter>Source Files\Shaders\Vertex</Filter>
+    </None>
+    <None Include="shaders\ssaoBlur.vert">
+      <Filter>Source Files\Shaders\Vertex</Filter>
+    </None>
+    <None Include="shaders\gBuffer.frag">
+      <Filter>Source Files\Shaders\Fragment</Filter>
+    </None>
+    <None Include="shaders\gBufferDebug.frag">
+      <Filter>Source Files\Shaders\Fragment</Filter>
+    </None>
+    <None Include="shaders\gBuffer.vert">
+      <Filter>Source Files\Shaders\Vertex</Filter>
+    </None>
+    <None Include="shaders\gBufferDebug.vert">
+      <Filter>Source Files\Shaders\Vertex</Filter>
     </None>
   </ItemGroup>
 </Project>

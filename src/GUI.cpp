@@ -60,7 +60,7 @@ void GUI::displayWindow()
 
 		// Rendering
 		ImGui::Begin("OpenGL Project");
-		ImGui::Text("%.3f fps", myScene.fps);
+		ImGui::Text("%.3f fps", myScene.m_fps);
 		drawList();
 
 		ImGui::End();
@@ -84,10 +84,10 @@ void GUI::drawList()
 {
 
 	ImGui::Text("Player Position: x: %.2f, y: %.2f, z: %.2f", 
-		myScene.mainCamera->m_LookFrom[0],
-		myScene.mainCamera->m_LookFrom[1],
-		myScene.mainCamera->m_LookFrom[2]);
-	ImGui::Text("Object Count: %d", myScene.m_SceneObjects.size());
+		myScene.m_mainCamera->m_LookFrom[0],
+		myScene.m_mainCamera->m_LookFrom[1],
+		myScene.m_mainCamera->m_LookFrom[2]);
+	ImGui::Text("Object Count: %d", myScene.m_sceneObjects.size());
 
 	//Current Tab from left to right
 	static int currentTab = 1;
@@ -100,12 +100,12 @@ void GUI::drawList()
 	if (currentTab == 1) 
 	{
 		ImGui::BeginChild("object_list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
-		for (int i = 0; i < myScene.m_SceneObjects.size(); i++)
+		for (int i = 0; i < myScene.m_sceneObjects.size(); i++)
 		{
 			char label[128];
 			bool isSelected = (propertiesSelected == i);
 
-			sprintf_s(label, myScene.m_SceneObjects[i]->m_DisplayName.c_str(), i);
+			sprintf_s(label, myScene.m_sceneObjects[i]->m_DisplayName.c_str(), i);
 			if (ImGui::Selectable(label, isSelected))
 			{
 				propertiesSelected = i;
@@ -268,16 +268,16 @@ void GUI::drawList()
 	else if (currentTab == 3)
 	{
 		ImGui::BeginChild("skybox_list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
-		for (int i = 0; i < myScene.m_SkyBox->m_CubeMapNames.size(); i++)
+		for (int i = 0; i < myScene.m_skyBox->m_CubeMapNames.size(); i++)
 		{
 			char label[128];
 			bool isSelected = (skyBoxSelected == i);
 
-			sprintf_s(label, myScene.m_SkyBox->m_CubeMapNames[i].c_str(), i);
+			sprintf_s(label, myScene.m_skyBox->m_CubeMapNames[i].c_str(), i);
 			if (ImGui::Selectable(label, isSelected))
 			{
 				skyBoxSelected = i;
-				myScene.m_SkyBox->setCubeMapTexture(skyBoxSelected);
+				myScene.m_skyBox->setCubeMapTexture(skyBoxSelected);
 			}
 		}
 		ImGui::EndChild();
@@ -297,10 +297,10 @@ void GUI::drawList()
 			{
 				currentTab = 1;
 
-				if (myScene.m_SceneObjects.size() > 0)
+				if (myScene.m_sceneObjects.size() > 0)
 				{
 					//Update the selected item (default selected item is the 0th object)
-					Object* selectedObject = myScene.m_SceneObjects[propertiesSelected];
+					Object* selectedObject = myScene.m_sceneObjects[propertiesSelected];
 					//Display the Current selected object name
 					if (selectedObject != nullptr)
 						ImGui::Text("Selected Item: %s", selectedObject->m_DisplayName.c_str());
@@ -671,7 +671,7 @@ void GUI::drawList()
 								if (newShadowHeight != shadowHeight || newShadowWidth != shadowWidth) {
 									selectedSpotLight->setShadowHeight(newShadowHeight);
 									selectedSpotLight->setShadowWidth(newShadowHeight);
-									myScene.m_ShadowMap->updateShadowResolution(selectedSpotLight);
+									myScene.m_shadowMap->updateShadowResolution(selectedSpotLight);
 								}
 							}
 
@@ -682,7 +682,7 @@ void GUI::drawList()
 
 						if (renderDebugDepthMap && selectedSpotLight->getDepthMapTexture() != 0) {
 							ImGui::Text("Spotlight Depth Map:");
-							GLuint colorTexture = myScene.m_ShadowMap->renderDepthMapToGUI(
+							GLuint colorTexture = myScene.m_shadowMap->renderDepthMapToGUI(
 								selectedSpotLight->getDepthMapTexture(),
 								selectedSpotLight->getShadowHeight(),
 								selectedSpotLight->getShadowWidth()
@@ -912,7 +912,7 @@ void GUI::drawList()
 							if (newShadowHeight != shadowHeight || newShadowWidth != shadowWidth) {
 								dirLight->setShadowHeight(newShadowHeight);
 								dirLight->setShadowWidth(newShadowHeight);
-								myScene.m_ShadowMap->updateShadowResolution(dirLight);
+								myScene.m_shadowMap->updateShadowResolution(dirLight);
 							}
 						}
 
@@ -921,7 +921,7 @@ void GUI::drawList()
 					//Depth Map Window
 					{
 						ImGui::Text("Directional Depth Map:");
-						GLuint colorTexture = myScene.m_ShadowMap->renderDepthMapToGUI(dirLight->getDepthMapTexture(),
+						GLuint colorTexture = myScene.m_shadowMap->renderDepthMapToGUI(dirLight->getDepthMapTexture(),
 							dirLight->getShadowWidth(),
 							dirLight->getShadowHeight()
 						);
@@ -964,12 +964,12 @@ void GUI::drawList()
 			if (ImGui::BeginTabItem("SkyBox"))
 			{
 				currentTab = 3;
-				bool check = myScene.m_SkyBox->m_InvertedTexture;
-				ImGui::Text(myScene.m_SkyBox->m_CubeMapNames[skyBoxSelected].c_str());
+				bool check = myScene.m_skyBox->m_InvertedTexture;
+				ImGui::Text(myScene.m_skyBox->m_CubeMapNames[skyBoxSelected].c_str());
 				if(ImGui::Checkbox("Invert on Y ", &check))
 				{
-					myScene.m_SkyBox->m_InvertedTexture = !myScene.m_SkyBox->m_InvertedTexture;
-					myScene.m_SkyBox->setCubeMapTexture(skyBoxSelected);
+					myScene.m_skyBox->m_InvertedTexture = !myScene.m_skyBox->m_InvertedTexture;
+					myScene.m_skyBox->setCubeMapTexture(skyBoxSelected);
 				}
 
 				ImGui::SameLine(); HelpMarker(

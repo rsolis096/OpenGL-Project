@@ -113,7 +113,7 @@ void SkyBox::draw(glm::mat4& projection)
     m_CubeMapShader.setMat4("view", view);
     m_CubeMapShader.setMat4("projection", projection);
 
-    constexpr int SKYBOX_UNIT = 21;
+    constexpr int SKYBOX_UNIT = 22;
     glActiveTexture(GL_TEXTURE0 + SKYBOX_UNIT);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMap->ID);
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Cube.h"
-#include "GBuffer.h"
+#include "FBOs/GBuffer.h"
 
 class PointLight
 {

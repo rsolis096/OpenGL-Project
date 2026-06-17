@@ -29,26 +29,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -153,7 +153,10 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Cube.cpp" />
     <ClCompile Include="src\DirectionalLight.cpp" />
-    <ClCompile Include="src\GBuffer.cpp" />
+    <ClCompile Include="src\FBOs\Framebuffer.cpp" />
+    <ClCompile Include="src\FBOs\GBuffer.cpp" />
+    <ClCompile Include="src\FBOs\SSAOBlurBuffer.cpp" />
+    <ClCompile Include="src\FBOs\SSAOBuffer.cpp" />
     <ClCompile Include="src\GUI.cpp" />
     <ClCompile Include="src\LightController.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -186,7 +189,10 @@
     <ClInclude Include="src\Cube.h" />
     <ClInclude Include="src\DebugUtils.h" />
     <ClInclude Include="src\DirectionalLight.h" />
-    <ClInclude Include="src\GBuffer.h" />
+    <ClInclude Include="src\FBOs\Framebuffer.h" />
+    <ClInclude Include="src\FBOs\GBuffer.h" />
+    <ClInclude Include="src\FBOs\SSAOBlurBuffer.h" />
+    <ClInclude Include="src\FBOs\SSAOBuffer.h" />
     <ClInclude Include="src\GUI.h" />
     <ClInclude Include="src\LightController.h" />
     <ClInclude Include="src\Mesh.h" />
@@ -230,6 +236,10 @@
     <None Include="shaders\pointLightShader.vert" />
     <None Include="shaders\depthShader.frag" />
     <None Include="shaders\depthShader.vert" />
+    <None Include="shaders\ssao.frag" />
+    <None Include="shaders\ssao.vert" />
+    <None Include="shaders\ssaoBlur.frag" />
+    <None Include="shaders\ssaoBlur.vert" />
     <None Include="shaders\testShader.fs" />
     <None Include="shaders\testShader.vs" />
     <None Include="shaders\visualizeNormals.frag" />

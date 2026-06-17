@@ -7,12 +7,14 @@ in vec2 TexCoords;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
+uniform sampler2D gOther;
 
 // 0 = albedo
 // 1 = normal
 // 2 = world position
 // 3 = specular strength
 // 4 = position length/depth-ish
+// 5 = other
 uniform int debugMode;
 
 // Used only for visualizing world position.
@@ -24,6 +26,7 @@ void main()
     vec3 position = texture(gPosition, TexCoords).rgb;
     vec3 normal = normalize(texture(gNormal, TexCoords).rgb);
     vec4 albedoSpec = texture(gAlbedoSpec, TexCoords);
+    vec4 otherTex = texture(gOther, TexCoords);
 
     if (debugMode == 0)
     {
@@ -56,6 +59,10 @@ void main()
         float distanceFromOrigin = length(position);
         float visualDistance = distanceFromOrigin / positionDebugScale;
         FragColor = vec4(vec3(visualDistance), 1.0);
+    }
+    else if (debugMode == 5)
+    {
+        FragColor = vec4(otherTex.rgb, 1.0);
     }
     else
     {

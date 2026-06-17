@@ -8,7 +8,7 @@ unsigned int ShadowMap::quadVBO = 0;
 bool ShadowMap::quadInitialized = false;
 
 ShadowMap::ShadowMap(std::vector<Object*>* objects, LightController* lightController) :
-    m_SceneObjects(objects), m_LightController(lightController),
+    m_sceneObjects(objects), m_LightController(lightController),
     shadowPassShader(Shader("shaders/depthShader.vert", "shaders/depthShader.frag", "shaders/depthShader.gs")),
     debugDepthShader(Shader("shaders/debug_quad.vert", "shaders/debug_quad_depth.frag"))
 {
@@ -51,7 +51,7 @@ void ShadowMap::addDirectionalShadowMap(GLuint& depthMapTexture)
 void ShadowMap::addPointLightShadowMap(GLuint& cubeMapTexture)
 {
     //Create a new 3D Depth map for Point Lights
-    addCubeMap(cubeMapTexture);
+    AddCubeMap(cubeMapTexture);
 }
 
 void ShadowMap::addShadowMap(GLuint& depthMapTexture) const
@@ -86,7 +86,7 @@ void ShadowMap::addShadowMap(GLuint& depthMapTexture) const
     glCheckError();
 }
 
-void ShadowMap::addCubeMap(GLuint& cubeMapTexture) const
+void ShadowMap::AddCubeMap(GLuint& cubeMapTexture) const
 {
     glGenTextures(1, &cubeMapTexture);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTexture);
@@ -116,7 +116,7 @@ void ShadowMap::addCubeMap(GLuint& cubeMapTexture) const
 }
 
 // Generate shadow maps for spotlights and point lights.
-void ShadowMap::shadowPass()
+void ShadowMap::ShadowPass()
 {
     const int numberOfSpotLights = static_cast<int>(m_LightController->m_SpotLights.size());
     const int numberOfPointLights = static_cast<int>(m_LightController->m_PointLights.size());
@@ -128,9 +128,7 @@ void ShadowMap::shadowPass()
 
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 
-
         shadowPassShader.setInt("lightType", LightController::LightType::POINT_LIGHT);  // Set light type to point light
-
 
         for (int i = 0; i < static_cast<int>(numberOfPointLights); i++)
         {
@@ -153,7 +151,7 @@ void ShadowMap::shadowPass()
                     shadowPassShader.setMat4("shadowMatricesPoint[" + std::to_string(j) + "]", lightViews[j]);
                 }
 
-                for (Object* obj : *m_SceneObjects)
+                for (Object* obj : *m_sceneObjects)
                 {
                     obj->ShadowPassDraw(shadowPassShader);
                 }
@@ -187,7 +185,7 @@ void ShadowMap::shadowPass()
             glClear(GL_DEPTH_BUFFER_BIT);
 
             //Draw Scene (limited for shadow pass)
-            for (Object* obj : *m_SceneObjects) {
+            for (Object* obj : *m_sceneObjects) {
                 obj->ShadowPassDraw(shadowPassShader);
             }
 
@@ -234,7 +232,7 @@ void ShadowMap::shadowPass()
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // Render scene objects to shadow map
-        for (Object* obj : *m_SceneObjects) {
+        for (Object* obj : *m_sceneObjects) {
             obj->ShadowPassDraw(shadowPassShader);
         }
 
@@ -243,7 +241,7 @@ void ShadowMap::shadowPass()
 }
 
 // Updates Shadow Map shader uniforms for each light source
-void ShadowMap::updateShaderUniforms(Shader& shader) const
+void ShadowMap::UpdateShaderUniforms(Shader& shader) const
 {
     const int numberOfSpotLights = static_cast<int>(m_LightController->m_SpotLights.size());
     const int numberOfPointLights = static_cast<int>(m_LightController->m_PointLights.size());
@@ -256,7 +254,7 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
     // Directional light: sampler2D
     if (m_LightController->m_DirectionalLight)
     {
-        constexpr int unit = 4;
+        constexpr int unit = 5;
 
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_2D, m_LightController->m_DirectionalLight->getDepthMapTexture());
@@ -266,7 +264,7 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
     }
 
     // Spot lights: sampler2D
-    constexpr int spotStartUnit = 5;
+    constexpr int spotStartUnit = 6;
 
     for (int i = 0; i < numberOfSpotLights; i++)
     {
@@ -283,7 +281,7 @@ void ShadowMap::updateShaderUniforms(Shader& shader) const
     }
 
     // Point lights: samplerCube
-    constexpr int pointStartUnit = 13;
+    constexpr int pointStartUnit = 14;
 
     for (int i = 0; i < numberOfPointLights; i++)
     {

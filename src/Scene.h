@@ -9,43 +9,52 @@
 
 #include <typeinfo>
 #include <string>
+#include "FBOs/SSAOBuffer.h"
+#include "FBOs/SSAOBlurBuffer.h"
 
 class GBuffer;
-
 
 class Scene
 {
 public:
-	static unsigned int SCREEN_WIDTH;
-	static unsigned int SCREEN_HEIGHT;
-	//Total Objects in scene
-	unsigned short m_SceneObjectCount;
-	float fps;
+	static unsigned int s_SCREEN_WIDTH;
+	static unsigned int s_SCREEN_HEIGHT;
 
-	Camera* mainCamera;
+	unsigned short m_SceneObjectCount; 	//Total Objects in scene
+	float m_fps;
 
-	GBuffer* m_GBuffer;
+	Camera* m_mainCamera;
 
 	LightController* m_LightController;
 	PhysicsWorld* m_PhysicsWorld;
 
-	Shader* cubeMapShader; //skybox
-	Shader* deferredLightingShader;
-	Shader* pointLightShader;
-	Shader* gBufferShader;
-	Shader* gBufferDebugShader;
+	// Shaders
+	Shader* m_cubeMapShader; //skybox
+	Shader* m_pointLightShader;
 
-	ShadowMap* m_ShadowMap;
-	SkyBox* m_SkyBox;
+	Shader* m_deferredLightingShader;
+	Shader* m_gBufferShader;
+	Shader* m_gBufferDebugShader;
 
-	std::vector<Object*> m_SceneObjects;
+	Shader* m_SSAOShader;
+	Shader* m_SSAOBlurShader;
 
-	std::vector<Model*> sceneModels;
+	SkyBox* m_skyBox;
+	std::vector<Object*> m_sceneObjects;
+	std::vector<Model*> m_sceneModels;
+
+
+	// FBOs
+	GBuffer* m_gBuffer;
+	SSAOBuffer* m_SSAOBuffer;
+	SSAOBlurBuffer* m_SSAOBlurBuffer;
+	ShadowMap* m_shadowMap;
+
 
 	//Constructors
 	Scene(Camera*);
 
-	void InitDeferredLightingShaderSamplers(Shader& shader);
+	void InitializeDeferredRenderingShaders();
 
 
 	int addObject(Object* obj);
@@ -60,8 +69,8 @@ public:
 	void drawScene(float, glm::mat4&, glm::mat4&);
 
 private:
-	unsigned int quadVAO = 0;
-	unsigned int quadVBO = 0;
+	unsigned int m_quadVAO = 0;
+	unsigned int m_quadVBO = 0;
 
 	void RenderFullscreenQuad();
 };

@@ -26,8 +26,8 @@ public:
     void updateShadowResolution(SpotLight* light) const;
 
     //Main Loop Methods (Used during the rendering loop every frame)
-    void shadowPass();
-    void updateShaderUniforms(Shader& shader) const;
+    void ShadowPass();
+    void UpdateShaderUniforms(Shader& shader) const;
     GLuint renderDepthMapToGUI(GLuint texture, int height, int width);
     //GLuint renderCubeMapToGUI(PointLight* lightSource, unsigned int i);
 
@@ -54,7 +54,7 @@ private:
     glm::mat4 directionalLightSpaceMatrix;
 
     // Scene Pointers
-    std::vector<Object*>* m_SceneObjects;
+    std::vector<Object*>* m_sceneObjects;
     LightController* m_LightController;
 
 
@@ -68,7 +68,7 @@ private:
     static const unsigned short SHADOW_HEIGHT = 1024;
     
     void addShadowMap(GLuint& depthMapTexture) const;
-    void addCubeMap(GLuint& cubeMapTexture) const;
+    void AddCubeMap(GLuint& cubeMapTexture) const;
 
     // Private helper methods
     void generateGUIShadowMap();

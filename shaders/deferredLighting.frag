@@ -10,6 +10,7 @@ in vec2 TexCoords;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
+uniform sampler2D ssao;
 
 uniform vec3 viewPos;
 
@@ -96,7 +97,7 @@ uniform int numberOfSpotLights;
 Surface BuildSurface();
 LightingTerms ComputeBlinnPhong(vec3 normal, vec3 lightDir, vec3 viewDir, float shininess);
 
-float SpotLightShadowCalculation(vec4 fragPosLightSpace, SpotLight light);
+float SpotLightShadowCalculation(vec3 worldPos, SpotLight light);
 float DirectionalLightShadowCalculation(float dotLightNormal);
 float PointLightShadowCalculation(vec3 fragPos, PointLight light);
 
@@ -306,6 +307,7 @@ void main()
     FragColor = vec4(result, 1.0);
 }
 
+
 // Calculates the color when using a point light.
 vec3 EvaluatePointLight(Surface surface, vec3 viewDir, PointLight light)
 {
@@ -325,7 +327,9 @@ vec3 EvaluatePointLight(Surface surface, vec3 viewDir, PointLight light)
 
     float shadow = PointLightShadowCalculation(surface.position, light);
 
-    vec3 ambient = surface.ambient * light.ambient;
+    float AmbientOcclusion = texture(ssao, TexCoords).r;
+
+    vec3 ambient = surface.ambient * light.ambient * AmbientOcclusion;
     vec3 diffuse = surface.diffuse * light.diffuse * diff;
     vec3 specular = surface.specular * light.specular * spec;
 
@@ -347,7 +351,9 @@ vec3 EvaluateDirectionalLight(Surface surface, vec3 viewDir, DirLight light)
     float dotLightNormal = dot(lightDir, surface.normal);
     float shadow = DirectionalLightShadowCalculation(dotLightNormal, surface);
 
-    vec3 ambient = surface.ambient * light.ambient;
+    float AmbientOcclusion = texture(ssao, TexCoords).r;
+
+    vec3 ambient = surface.ambient * light.ambient * AmbientOcclusion;
     vec3 diffuse = surface.diffuse * light.diffuse * terms.diffuse;
     vec3 specular = surface.specular * light.specular * terms.specular;
 
@@ -367,28 +373,34 @@ vec3 EvaluateSpotLight(Surface surface, vec3 viewDir, SpotLight light, int light
         surface.shininess
     );
 
-    // Spotlight cone falloff
     float spotAngle = dot(-lightDir, spotDir);
+
     float spotFactor = smoothstep(light.outerCutOff, light.cutOff, spotAngle);
 
-    // Distance attenuation
     float distance = length(light.position - surface.position);
+
     float attenuation = 1.0 / (
         light.constant +
         light.linear * distance +
         light.quadratic * distance * distance
     );
 
-    float shadow = SpotLightShadowCalculation(surface.position, light);
+    float shadow = SpotLightShadowCalculation(
+        surface.position,
+        light
+    );
 
-    vec3 ambient = surface.ambient * light.ambient * spotFactor;
+    float AmbientOcclusion = texture(ssao, TexCoords).r;
+
+    vec3 ambient = surface.ambient * light.ambient * spotFactor * AmbientOcclusion;
+
     vec3 diffuse = surface.diffuse * light.diffuse * terms.diffuse * spotFactor;
+
     vec3 specular = surface.specular * light.specular * terms.specular * spotFactor;
 
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
 
-    //return ambient + (diffuse + specular);
     return ambient + (1.0 - shadow) * (diffuse + specular);
 }
