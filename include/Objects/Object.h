@@ -22,13 +22,9 @@ public:
         virtual ~Object();
 
         //Texture Properties
-        Texture* m_DiffuseMap;
-        Texture* m_SpecularMap;
-        bool m_HasTexture;
-
-        //Object World Attributes
         Transform m_Transform;
         EntityInfo m_EntityInfo;
+        Material m_Material;
 
         //Physics info (push to component later)
         glm::vec3 m_Force;
@@ -40,35 +36,16 @@ public:
         void setPhysics();
         void setVelocity(glm::vec3);
 
-        //Teleport to specified location 
-        void setPosition(glm::vec3 newPosition);                // Teleport object to a different position
-        void setScale(glm::vec3 newScale);                      // Change scale of object in 3 dimensions
-        void translatePosition(glm::vec3 newPosition);          // Translate by parameter (Used to move some diistance from current position)
-        void setRotation(glm::vec3);
-
-        //Change these properties to set color of object
-        void setAmbient(glm::vec3);
-        void setDiffuse(glm::vec3);
-        void setSpecular(glm::vec3);
-
-        glm::vec3 getAmbient() const;
-        glm::vec3 getDiffuse() const;
-        glm::vec3 getSpecular() const;
+        virtual void updateTexture(std::vector<std::string> texturePaths);
 
         //Draw the object. Each object type draws differently
         virtual void Draw(Shader& shader) = 0;
         virtual void ShadowPassDraw(Shader& shader) = 0;
         virtual void DrawGeometryPass(Shader& shader) = 0;
-        virtual int updateTexture(std::vector<std::string> texturePaths) = 0;
         virtual ObjectType GetType() const { return ObjectType::Object; }
 
 
     protected:
-
-        //Object color attributes
-        glm::vec3 m_Ambient;
-        glm::vec3 m_Diffuse;
-        glm::vec3 m_Specular;
 
         //Mesh Data
         std::vector<float>m_Vertices;

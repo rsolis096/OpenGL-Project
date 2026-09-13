@@ -163,6 +163,7 @@
     <ClCompile Include="src\Lighting\SpotLight.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Objects\Cube.cpp" />
+    <ClCompile Include="src\Objects\Material.cpp" />
     <ClCompile Include="src\Objects\Mesh.cpp" />
     <ClCompile Include="src\Objects\Model.cpp" />
     <ClCompile Include="src\Objects\Object.cpp" />
@@ -171,6 +172,7 @@
     <ClCompile Include="src\Objects\SkyBox.cpp" />
     <ClCompile Include="src\Objects\Sphere.cpp" />
     <ClCompile Include="src\Objects\Texture.cpp" />
+    <ClCompile Include="src\Objects\Transform.cpp" />
     <ClCompile Include="src\Physics\PhysicsWorld.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\stb_image_write.cpp" />
@@ -199,6 +201,7 @@
     <ClInclude Include="include\Lighting\ShadowMap.h" />
     <ClInclude Include="include\Lighting\SpotLight.h" />
     <ClInclude Include="include\Objects\Cube.h" />
+    <ClInclude Include="include\Objects\Material.h" />
     <ClInclude Include="include\Objects\Mesh.h" />
     <ClInclude Include="include\Objects\Model.h" />
     <ClInclude Include="include\Objects\Object.h" />
@@ -207,6 +210,7 @@
     <ClInclude Include="include\Objects\SkyBox.h" />
     <ClInclude Include="include\Objects\Sphere.h" />
     <ClInclude Include="include\Objects\Texture.h" />
+    <ClInclude Include="include\Objects\Transform.h" />
     <ClInclude Include="include\Objects\Vertex.h" />
     <ClInclude Include="include\Physics\PhysicsWorld.h" />
     <ClInclude Include="include\UI\GUI.h" />

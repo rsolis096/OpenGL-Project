@@ -2,8 +2,6 @@
 
 #include "DebugUtils.h"
 
-
-
 Shader::Shader(const char* vertex_path, const char* fragment_path, const char* geometry_path)
 {
     //Create Shader Program
@@ -19,10 +17,6 @@ Shader::Shader(const char* vertex_path, const char* fragment_path, const char* g
         compileShader(geometry_path, "GEOMETRY", m_ProgramId);
         filePaths.push_back(geometry_path);
     }
-
-
-
-
 }
 
 void Shader::compileShader(const char* shader_path, const char* type, unsigned int m_ProgramId)
@@ -161,6 +155,14 @@ void Shader::setVec3(const std::string& name, const glm::vec3& value) const
 void Shader::setVec3(const std::string& name, const float x, const float y, const float z) const
 {
     glUniform3f(checkUniformLocation(name), x, y, z);
+}
+
+void Shader::setMaterial(const Material& material)
+{
+    setBool("hasTexture", material.hasTextures());
+    setVec3("object.ambient", material.getAmbient());
+    setVec3("object.diffuse", material.getDiffuse());
+    setVec3("object.specular", material.getSpecular());
 }
 
 GLint Shader::checkUniformLocation(const std::string& name) const

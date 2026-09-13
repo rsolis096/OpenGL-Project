@@ -83,6 +83,7 @@ void Mesh::Draw(Shader& shader, bool hasTexture) const
 void Mesh::ApplyMaterialUniforms(Shader& shader, bool hasTexture) const
 {
     shader.use();
+    shader.setBool("hasTexture", hasTexture);
 
     // bind appropriate textures
     unsigned int normalNr = 1;

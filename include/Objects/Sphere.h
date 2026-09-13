@@ -13,7 +13,6 @@ public:
     void Draw(Shader& shader) override;
     void ShadowPassDraw(Shader& shader) override;    
     void DrawGeometryPass(Shader& shader) override;
-    int updateTexture(std::vector<std::string> texturePaths) override;
 
 
 private:

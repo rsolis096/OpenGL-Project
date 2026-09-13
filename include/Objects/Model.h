@@ -46,7 +46,7 @@ private:
     // checks all material textures of a given type and loads the textures if they're not loaded yet.
     // the required info is returned as a Texture struct.
     vector<ModelTexture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
-    int updateTexture(std::vector<std::string> texturePaths) override { return 1; }
+    void updateTexture(std::vector<std::string> texturePaths) override;
 
     static Assimp::Importer importer;
 

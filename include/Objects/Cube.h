@@ -18,7 +18,6 @@ public:
 private:
     //Used for construction of primitives
     void buildCube();
-    int updateTexture(std::vector<std::string> texturePaths) override;
 
 protected:
     void ApplyMaterialUniforms(Shader& shader) override;

@@ -22,7 +22,7 @@ m_LightingShader(lightingShader), m_LightSourceShader(objectShader)
 
 	m_LightShape = new Cube(); //Create the physical light object
 	setLightPos(pos); //Need to update light object too
-	m_LightShape->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	m_LightShape->m_Transform.setScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	m_LightShape->m_EntityInfo.displayName = "PointLight" + std::to_string(m_LightID);
 
 	//Light Color Properties (How it casts light on objects)
@@ -32,9 +32,9 @@ m_LightingShader(lightingShader), m_LightSourceShader(objectShader)
 	m_Intensity = 1.0f;
 
 	//Set the color for the light object
-	m_LightShape->setDiffuse(m_Diffuse);
-	m_LightShape->setAmbient(m_Ambient);
-	m_LightShape->setSpecular(m_Specular);
+	m_LightShape->m_Material.setDiffuse(m_Diffuse);
+	m_LightShape->m_Material.setAmbient(m_Ambient);
+	m_LightShape->m_Material.setSpecular(m_Specular);
 
 	//For attenuation
 	m_Constant = 1.0f;
@@ -110,7 +110,7 @@ void PointLight::updateLightSpaceMatrices()
 void PointLight::setLightPos(const glm::vec3 lightPos)
 {
 	m_LightPos = lightPos;
-	m_LightShape->setPosition(lightPos);
+	m_LightShape->m_Transform.setPosition(lightPos);
 	m_LightingShader->use();
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].position", m_LightPos);
 
@@ -122,7 +122,7 @@ void PointLight::setLightPos(const glm::vec3 lightPos)
 void PointLight::setAmbient(const glm::vec3 ambient)
 {
 	m_Ambient = ambient * m_Intensity;
-	m_LightShape->setAmbient(ambient);
+	m_LightShape->m_Material.setAmbient(ambient);
 	m_LightingShader->use();
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].ambient", m_Ambient);
 }
@@ -130,7 +130,7 @@ void PointLight::setAmbient(const glm::vec3 ambient)
 void PointLight::setDiffuse(const glm::vec3 diffuse)
 {
 	m_Diffuse = diffuse * m_Intensity;
-	m_LightShape->setDiffuse(diffuse);
+	m_LightShape->m_Material.setDiffuse(diffuse);
 	m_LightingShader->use();
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].diffuse", m_Diffuse);
 }
@@ -138,7 +138,7 @@ void PointLight::setDiffuse(const glm::vec3 diffuse)
 void PointLight::setSpecular(const glm::vec3 specular)
 {
 	m_Specular = specular * m_Intensity;
-	m_LightShape->setSpecular(specular);
+	m_LightShape->m_Material.setSpecular(specular);
 	m_LightingShader->use();
 	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].specular", m_Specular);
 }

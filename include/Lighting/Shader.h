@@ -11,7 +11,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include "../Objects/ObjectTypes.h"
 
 class Shader
 {
@@ -33,6 +33,7 @@ public:
     void setMat4Array(const std::string& name, const std::vector<glm::mat4>& value) const;
     void setVec3(const std::string& name, const glm::vec3& value) const;
     void setVec3(const std::string& name, float x, float y, float z) const;
+    void setMaterial(const Material& material);
 
 private:
     void checkCompileErrors(const unsigned int id, const std::string& type, const std::string& path);

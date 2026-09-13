@@ -323,14 +323,14 @@ void GUI::drawList()
 						// Position
 						{
 							//For transformation
-							glm::vec3 pos = selectedObject->m_Transform.position;
+							glm::vec3 pos = selectedObject->m_Transform.m_Position;
 							float vec4f[3] = { pos[0], pos[1], pos[2] };
 							ImGui::Text("Current Object Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
 
 							if (ImGui::DragFloat("x##position", &vec4f[0], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
 							{
 
-								selectedObject->setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+								selectedObject->m_Transform.setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
 								selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
 								selectedObject->startFall = glfwGetTime();
 							}
@@ -338,7 +338,7 @@ void GUI::drawList()
 							if (ImGui::DragFloat("y##position", &vec4f[1], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
 							{
 
-								selectedObject->setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+								selectedObject->m_Transform.setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
 								selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
 								selectedObject->startFall = glfwGetTime();
 							}
@@ -346,7 +346,7 @@ void GUI::drawList()
 							if (ImGui::DragFloat("z##position", &vec4f[2], 0.25f, -1000.0f, 1000.0f, "%.2f", 0))
 							{
 
-								selectedObject->setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
+								selectedObject->m_Transform.setPosition(glm::vec3(vec4f[0], vec4f[1], vec4f[2]));
 								selectedObject->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
 								selectedObject->startFall = glfwGetTime();
 							}
@@ -358,26 +358,26 @@ void GUI::drawList()
 							//For Scale
 							ImGui::Spacing();
 							ImGui::Text("Scaling");
-							float sX = selectedObject->m_Transform.scale[0];
-							float sY = selectedObject->m_Transform.scale[1];
-							float sZ = selectedObject->m_Transform.scale[2];
+							float sX = selectedObject->m_Transform.m_Scale[0];
+							float sY = selectedObject->m_Transform.m_Scale[1];
+							float sZ = selectedObject->m_Transform.m_Scale[2];
 							glm::vec3 currentScale = glm::vec3(sX, sY, sZ);
 
 							if (ImGui::DragFloat("x##scale", &sX, 0.1f, 0.0f, 360.0f, "%.2f", 0))
 							{
 
 								currentScale[0] = sX;
-								selectedObject->setScale(currentScale);
+								selectedObject->m_Transform.setScale(currentScale);
 							}
 							if (ImGui::DragFloat("y##scale", &sY, 0.1f, 0.0f, 360.0f, "%.2f", 0))
 							{
 								currentScale[1] = sY;
-								selectedObject->setScale(currentScale);
+								selectedObject->m_Transform.setScale(currentScale);
 							}
 							if (ImGui::DragFloat("z##scale", &sZ, 0.1f, 0.0f, 360.0f, "%.2f", 0))
 							{
 								currentScale[2] = sZ;
-								selectedObject->setScale(currentScale);
+								selectedObject->m_Transform.setScale(currentScale);
 							}
 
 
@@ -388,9 +388,9 @@ void GUI::drawList()
 							ImGui::Spacing();
 							ImGui::Text("Rotation");
 
-							float rX = selectedObject->m_Transform.position.x;
-							float rY = selectedObject->m_Transform.position.y;
-							float rZ = selectedObject->m_Transform.position.z;
+							float rX = selectedObject->m_Transform.m_Position.x;
+							float rY = selectedObject->m_Transform.m_Position.y;
+							float rZ = selectedObject->m_Transform.m_Position.z;
 
 							glm::vec3 currentRotation = glm::vec3(rX, rY, rZ);
 
@@ -398,17 +398,17 @@ void GUI::drawList()
 							{
 
 								currentRotation.x = rX;
-								selectedObject->setRotation(currentRotation);
+								selectedObject->m_Transform.setRotation(currentRotation);
 							}
 							if (ImGui::DragFloat("y##rotation", &rY, 0.5f, 0.0f, 360.0f, "%.2f", 0))
 							{
 								currentRotation.y = rY;
-								selectedObject->setRotation(currentRotation);
+								selectedObject->m_Transform.setRotation(currentRotation);
 							}
 							if (ImGui::DragFloat("z##rotation", &rZ, 0.5f, 0.0f, 360.0f, "%.2f", 0))
 							{
 								currentRotation.z = rZ;
-								selectedObject->setRotation(currentRotation);
+								selectedObject->m_Transform.setRotation(currentRotation);
 							}
 
 
@@ -417,32 +417,32 @@ void GUI::drawList()
 
 						// Color
 						{
-							glm::vec3 diffuse = selectedObject->getDiffuse();
-							glm::vec3 specular = selectedObject->getSpecular();
-							glm::vec3 ambient = selectedObject->getAmbient();
+							glm::vec3 diffuse = selectedObject->m_Material.getDiffuse();
+							glm::vec3 specular = selectedObject->m_Material.getSpecular();
+							glm::vec3 ambient = selectedObject->m_Material.getAmbient();
 
 							ImGui::Text("Object Color", "NULL");
 
 							//Only allow Diffuse changes if it does not have a diffuse map
-							if (selectedObject->m_DiffuseMap == nullptr) {
+							if (selectedObject->m_Material.m_DiffuseMap == nullptr) {
 								if (ImGui::ColorEdit3("Diffuse", &diffuse[0]))
 								{
-									selectedObject->setDiffuse(glm::vec3(diffuse));
+									selectedObject->m_Material.setDiffuse(glm::vec3(diffuse));
 
 								}
 							}
 							//Only allow Specular changes if it does not have a specular map
-							if (selectedObject->m_SpecularMap == nullptr)
+							if (selectedObject->m_Material.m_SpecularMap == nullptr)
 							{
 								if (ImGui::ColorEdit3("Specular", &specular[0]))
 								{
-									selectedObject->setSpecular(glm::vec3(specular));
+									selectedObject->m_Material.setSpecular(glm::vec3(specular));
 								}
 							}
 							//Yet to see an Ambient map so, it should be always available
 							if (ImGui::ColorEdit3("Ambient", &ambient[0]))
 							{
-								selectedObject->setAmbient(glm::vec3(ambient));
+								selectedObject->m_Material.setAmbient(glm::vec3(ambient));
 
 							}
 
@@ -464,12 +464,12 @@ void GUI::drawList()
 							static bool showSuccessText = false;
 
 							ImGui::Text("Texture Paths:");
-							if (selectedObject->m_HasTexture)
+							if (selectedObject->m_Material.hasTextures())
 							{
 								//Set textbox default values
-								if (selectedObject->m_DiffuseMap != nullptr)
+								if (selectedObject->m_Material.m_DiffuseMap != nullptr)
 								{
-									strcpy_s(diffuseBuffer, sizeof(diffuseBuffer), selectedObject->m_DiffuseMap->m_Path.c_str());
+									strcpy_s(diffuseBuffer, sizeof(diffuseBuffer), selectedObject->m_Material.m_DiffuseMap->m_Path.c_str());
 								}
 								else
 								{
@@ -477,9 +477,9 @@ void GUI::drawList()
 								}
 
 								//Set textbox default values
-								if (selectedObject->m_SpecularMap != nullptr)
+								if (selectedObject->m_Material.m_SpecularMap != nullptr)
 								{
-									strcpy_s(specularBuffer, sizeof(specularBuffer), selectedObject->m_DiffuseMap->m_Path.c_str());
+									strcpy_s(specularBuffer, sizeof(specularBuffer), selectedObject->m_Material.m_SpecularMap->m_Path.c_str());
 								}
 								else
 								{

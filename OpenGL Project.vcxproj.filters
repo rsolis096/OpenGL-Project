@@ -177,6 +177,12 @@
     <ClCompile Include="src\UI\GUI.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
+    <ClCompile Include="src\Objects\Transform.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Material.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third party\includes\imgui\imconfig.h">
@@ -280,6 +286,12 @@
     </ClInclude>
     <ClInclude Include="include\FBOs\SSAOBuffer.h">
       <Filter>Header Files\FBOs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\Transform.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\Material.h">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -9,24 +9,19 @@
 //Used for creating a Primitive with texture information
 Sphere::Sphere(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
-    //Set some rendering properties
-    m_HasTexture = true;
-
     m_EntityInfo.setInfo("Sphere" + std::to_string(objectCount), objectCount);
     objectCount++;
 
-    //Open and load diffuse map and specular map, save their Spheres
-    m_DiffuseMap = new Texture(texturePathDiffuse, false, "texture_diffuse");
-    m_SpecularMap = new Texture(texturePathSpecular, false, "texture_specular");
+    // Initialize the unique_ptrs using std::make_unique
+    m_Material.setTextures({ texturePathDiffuse , texturePathSpecular });
 
-    //Build the specified Sphere type
+    // Build the specified Sphere type
     buildSphere();
 }
 
 //Used for creating a primitive with no texture
 Sphere::Sphere() : Object()
 {
-    m_HasTexture = false;
     m_EntityInfo.setInfo("Sphere" + std::to_string(objectCount), objectCount);
     objectCount++;
     buildSphere();
@@ -61,19 +56,15 @@ void Sphere::DrawGeometryPass(Shader& shader)
 void Sphere::ApplyMaterialUniforms(Shader& shader)
 {
     shader.use();
+    shader.setMaterial(m_Material);
 
-    shader.setBool("hasTexture", m_HasTexture);
-    shader.setVec3("object.ambient", m_Ambient);
-    shader.setVec3("object.diffuse", m_Diffuse);
-    shader.setVec3("object.specular", m_Specular);
-
-    if (m_HasTexture)
+    if (m_Material.hasTextures())
     {
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
+        glBindTexture(GL_TEXTURE_2D, m_Material.m_DiffuseMap->ID);
 
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
+        glBindTexture(GL_TEXTURE_2D, m_Material.m_SpecularMap->ID);
     }
 }
 
@@ -88,8 +79,6 @@ void Sphere::DrawMesh()
 
     glCheckError();
 }
-
-
 
 void Sphere::buildSphere()
 {
@@ -213,62 +202,3 @@ void Sphere::buildSphere()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
-
-int Sphere::updateTexture(std::vector<std::string> texturePaths)
-{
-    // Three Scenarios
-    // 1. Updating a texture of an Object that already has textures
-    // 2. Updating a texture of an Object with no initial texture
-    // 3. Updating the texture of a model object
-
-    //Secenario 1
-    if (m_HasTexture == true)
-    {
-        //Success flags
-        int dSuccess = 1;
-        int sSuccess = 1;
-
-        if (texturePaths.size() == 2)
-        {
-            dSuccess = m_DiffuseMap->updateTexture(texturePaths[0].c_str(), false);
-            sSuccess = m_SpecularMap->updateTexture(texturePaths[1].c_str(), false);
-        }
-
-        if (dSuccess == 1 || sSuccess == 1)
-        {
-            //Texture failed to apply
-            //As of right now, all textures are deleted
-            delete m_DiffuseMap;
-            delete m_SpecularMap;
-            m_DiffuseMap = nullptr;
-            m_SpecularMap = nullptr;
-            m_HasTexture = false;
-            return 0;
-        }
-        else
-            std::cout << "Updated Texture successfully!" << std::endl;
-        return 1;
-    }
-    //Scenario 2
-    else if (m_HasTexture == false)
-    {
-        m_DiffuseMap = new Texture(texturePaths[0].c_str(), false, "texture_diffuse");
-        m_SpecularMap = new Texture(texturePaths[1].c_str(), false, "texture_specular");
-        if (m_DiffuseMap->ID == GL_INVALID_VALUE || m_SpecularMap->ID == GL_INVALID_VALUE)
-        {
-            //Texture failed to apply
-            delete m_DiffuseMap;
-            delete m_SpecularMap;
-            m_DiffuseMap = nullptr;
-            m_SpecularMap = nullptr;
-            m_HasTexture = false;
-            return 0;
-        }
-        else
-            m_HasTexture = true;
-        return 1;
-    }
-    return 0;
-}
-
-

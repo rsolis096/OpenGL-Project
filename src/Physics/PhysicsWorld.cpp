@@ -67,7 +67,7 @@ void PhysicsWorld::step(float totalTime, float deltaTime)
 				obj->m_Velocity[1] = 54;
 
 			//Calculate the change in position given the time between frames
-			obj->m_Transform.position += obj->m_Velocity * (deltaTime * 0.05f); // m/s * s = position
+			obj->m_Transform.m_Position += obj->m_Velocity * (deltaTime * 0.05f); // m/s * s = position
 			obj->m_Force = glm::vec3(0.0f, 0.0f, 0.0f);
 		}
 	}

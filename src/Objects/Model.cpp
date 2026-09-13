@@ -12,11 +12,8 @@ unsigned int TextureFromFile(const char* path, const string& directory, bool gam
 
 Model::Model(string const& path, bool gamma) : Object(), gammaCorrection(gamma)
 {
-
     m_EntityInfo.setInfo("Model" + std::to_string(objectCount), objectCount);
     objectCount++;
-
-    m_HasTexture = false;
     loadModel(path);
 }
 
@@ -35,7 +32,8 @@ void Model::loadModel(string const& path)
 {
     const aiScene* scene = Model::CheckPath(path);
 
-    if (scene == nullptr){
+    if (scene == nullptr)
+    {
         throw std::runtime_error("Failed to load model: scene is nullptr");
     }
 
@@ -185,10 +183,6 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     std::vector<ModelTexture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
-    if(diffuseMaps.size() > 0 || specularMaps.size() > 0){
-        m_HasTexture = true;
-    }
-
     // return a mesh object created from the extracted mesh data
     return Mesh(vertices, indices, textures);
 }
@@ -222,11 +216,6 @@ vector<ModelTexture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
             textures.push_back(texture);
             textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
         }
-
-        if (textures_loaded.size() == 0)
-        {
-            m_HasTexture = true;
-        }
     }
     return textures;
 }
@@ -251,7 +240,7 @@ void Model::DrawGeometryPass(Shader& shader)
 
     for (unsigned int i = 0; i < meshes.size(); i++)
     {
-        meshes[i].DrawGeometryPass(shader, m_HasTexture);
+        meshes[i].DrawGeometryPass(shader, !meshes[i].textures.empty());
     }
 
     glCheckError();
@@ -266,7 +255,7 @@ void Model::Draw(Shader& shader)
 
     for (unsigned int i = 0; i < meshes.size(); i++)
     {
-        meshes[i].Draw(shader, m_HasTexture);
+        meshes[i].Draw(shader, !meshes[i].textures.empty());
     }
 
     glCheckError();
@@ -276,10 +265,7 @@ void Model::ApplyMaterialUniforms(Shader& shader)
 {
     shader.use();
 
-    shader.setBool("hasTexture", m_HasTexture);
-    shader.setVec3("object.ambient", m_Ambient);
-    shader.setVec3("object.diffuse", m_Diffuse);
-    shader.setVec3("object.specular", m_Specular);
+    shader.setMaterial(m_Material);
 }
 
 void Model::DrawMesh()
@@ -328,4 +314,10 @@ unsigned int TextureFromFile(const char* path, const string& directory, bool gam
     }
 
     return textureID;
+}
+
+void Model::updateTexture(std::vector<std::string> texturePaths)
+{
+    // Not supported yet!
+    return;
 }

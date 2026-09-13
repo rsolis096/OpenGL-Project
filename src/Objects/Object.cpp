@@ -11,17 +11,14 @@ unsigned int Object::objectCount = 0;
 Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
 {
     //Set default Cube properties
-    m_Ambient = glm::vec3(0.0f);
-    m_Diffuse = glm::vec3(1.0f);
-    m_Specular = glm::vec3(0.0f);
+    m_Material.setAmbient(glm::vec3(0.0f));
+    m_Material.setDiffuse(glm::vec3(1.0f));
+    m_Material.setSpecular(glm::vec3(0.0f));
 
     m_Force = glm::vec3(0.0f);
     m_Velocity = glm::vec3(0.0f);
     m_Mass = glm::vec3(1.0f);
 
-    m_HasTexture = false;
-    m_DiffuseMap = nullptr;
-    m_SpecularMap = nullptr;
     enablePhysics = false;
     isPhysicsObject = false;
 
@@ -37,11 +34,6 @@ Object::~Object()
     m_vao = 0;
     m_vbo = 0;
     m_ebo = 0;
-    //Texture Properties
-    delete m_DiffuseMap;
-    m_DiffuseMap = nullptr;
-    delete m_SpecularMap;
-    m_SpecularMap = nullptr;
 
     // Clear vectors
     m_Vertices.clear();
@@ -56,68 +48,35 @@ Object::~Object()
     m_InterleavedVertices.shrink_to_fit();
 }
 
-void Object::setAmbient(glm::vec3 newAmbient)
-{
-    m_Ambient = newAmbient;
-}
 
-void Object::setDiffuse(glm::vec3 newDiffuse)
-{
-    m_Diffuse = newDiffuse;
-}
 
-void Object::setSpecular(glm::vec3 newSpecular)
+void Object::updateTexture(std::vector<std::string> texturePaths)
 {
-    m_Specular = newSpecular;
-}
+    // Three Scenarios
+    // 1. Updating a texture of an Object that already has textures
+    // 2. Updating a texture of an Object with no initial texture
+    // 3. Updating the texture of a model object
 
-glm::vec3 Object::getAmbient() const
-{
-    return m_Ambient;
+    MaterialPaths paths;
+    paths.diffuse = texturePaths[0];
+    paths.specular = texturePaths[1];
+    m_Material.setTextures(paths);
+    
 }
-
-glm::vec3 Object::getDiffuse() const
-{
-    return m_Diffuse;
-}
-
-glm::vec3 Object::getSpecular() const
-{
-    return m_Specular;
-}
-
 
 void Object::setPhysics()
 {
     if (enablePhysics)
+    {
         startFall = glfwGetTime();
+    }
+
     setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 void Object::setVelocity(glm::vec3 v)
 {
     m_Velocity = v;
-}
-
-void Object::setPosition(glm::vec3 newPosition)
-{
-    m_Transform.position = newPosition;
-}
-
-//Takes a glm::vec3 of x, y, z rotations in degrees, the 
-void Object::setRotation(glm::vec3 newRotation)
-{
-    m_Transform.rotation = newRotation;
-}
-
-void Object::setScale(glm::vec3 newScale)
-{
-    m_Transform.scale = newScale;
-}
-
-void Object::translatePosition(glm::vec3 newPosition)
-{
-    m_Transform.position += newPosition;
 }
 
 //Combines vertices and normals
@@ -162,4 +121,5 @@ void Object::buildInterleavedVerticesWithTexCoords()
 }
 
 void Object::ApplyMaterialUniforms(Shader& shader) {}
+
 void Object::DrawMesh() {}

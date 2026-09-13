@@ -9,11 +9,8 @@
 //Used for creating a Primtive with texture information
 Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
-    //Set some rendering properties
-    m_HasTexture = true;
     //Open and load diffuse map and specular map, save their Cubes
-    m_DiffuseMap = new Texture(texturePathDiffuse, false, "material.diffuse");
-    m_SpecularMap = new Texture(texturePathSpecular, false, "material.diffuse");
+    m_Material.setTextures({ texturePathDiffuse , texturePathSpecular });
 
     m_EntityInfo.setInfo("Cube" + std::to_string(objectCount), objectCount);
     objectCount++;
@@ -25,7 +22,6 @@ Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Ob
 //Used for creating a primitive with no texture
 Cube::Cube() : Object()
 {
-    m_HasTexture = false;
 
     m_EntityInfo.setInfo("Cube" + std::to_string(objectCount), objectCount);
     objectCount++;
@@ -62,18 +58,16 @@ void Cube::ApplyMaterialUniforms(Shader& shader)
 {
     shader.use();
 
-    shader.setBool("hasTexture", m_HasTexture);
-    shader.setVec3("object.ambient", m_Ambient);
-    shader.setVec3("object.diffuse", m_Diffuse);
-    shader.setVec3("object.specular", m_Specular);
+    shader.setMaterial(m_Material);
 
-    if (m_HasTexture)
+
+    if (m_Material.hasTextures())
     {
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, m_DiffuseMap->ID);
+        glBindTexture(GL_TEXTURE_2D, m_Material.m_DiffuseMap->ID);
 
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, m_SpecularMap->ID);
+        glBindTexture(GL_TEXTURE_2D, m_Material.m_SpecularMap->ID);
     }
 }
 
@@ -252,62 +246,3 @@ void Cube::buildCube()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
-
-int Cube::updateTexture(std::vector<std::string> texturePaths)
-{
-    // Three Scenarios
-    // 1. Updating a texture of an Object that already has textures
-    // 2. Updating a texture of an Object with no initial texture
-    // 3. Updating the texture of a model object (do nothing)
-
-    //Secenario 1
-    if (m_HasTexture == true)
-    {
-        //Success flags
-        int dSuccess = 1;
-        int sSuccess = 1;
-
-        if (texturePaths.size() == 2)
-        {
-            //If vector contains two strings, attempt to load their textures
-            dSuccess = m_DiffuseMap->updateTexture(texturePaths[0].c_str(), false);
-            sSuccess = m_SpecularMap->updateTexture(texturePaths[1].c_str(), false);
-        }
-
-        if (dSuccess == 1 || sSuccess == 1)
-        {
-            //If 1 or the other texture from the previous if statements failes to load,
-            //delete the current textures and set the object to have no texture
-            delete m_DiffuseMap;
-            delete m_SpecularMap;
-            m_DiffuseMap = nullptr;
-            m_SpecularMap = nullptr;
-            m_HasTexture = false;
-            return 0;
-        }
-        else
-            std::cout << "Updated Texture successfully!" << std::endl;
-        return 1;
-    }
-    //Scenario 2
-    else if (m_HasTexture == false)
-    {
-        m_DiffuseMap = new Texture(texturePaths[0].c_str(), false, "texture_diffuse");
-        m_SpecularMap = new Texture(texturePaths[1].c_str(), false, "texture_specular");
-        if (m_DiffuseMap->ID == GL_INVALID_VALUE || m_SpecularMap->ID == GL_INVALID_VALUE)
-        {
-            delete m_DiffuseMap;
-            delete m_SpecularMap;
-            m_DiffuseMap = nullptr;
-            m_SpecularMap = nullptr;
-            m_HasTexture = false;
-            return 0;
-        }
-        else
-            m_HasTexture = true;
-        return 1;
-    }
-    return 0;
-}
-
-
