@@ -1,6 +1,9 @@
-#include "SSAOBlurBuffer.h"
+#include "FBOs/SSAOBlurBuffer.h"
 
-#include"../Shader.h"
+#include "DebugUtils.h"
+#include "Lighting/Shader.h"
+
+#include <random>
 
 SSAOBlurBuffer::SSAOBlurBuffer(int width, int height)
 {

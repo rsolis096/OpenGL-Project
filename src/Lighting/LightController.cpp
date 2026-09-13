@@ -1,0 +1,76 @@
+#include "Lighting/LightController.h"
+
+#include "DebugUtils.h"
+#include "Lighting/DirectionalLight.h"
+#include "Lighting/PointLight.h"
+#include "Lighting/ShadowMap.h"
+#include "Lighting/SpotLight.h"
+#include "World/Scene.h"
+
+LightController::LightController
+(Shader* lightingShader, Shader* objectShader, Camera* cam, Scene* s): m_Scene(s)
+{
+	m_LightingShader = lightingShader;
+	m_LightSourceShader = objectShader;
+	m_DirectionalLight = nullptr;
+	m_PlayerCamera = cam;
+	glCheckError();
+}
+
+void LightController::addPointLight(const glm::vec3& pos)
+{
+	m_PointLights.push_back(new PointLight(m_LightingShader, m_LightSourceShader, pos));
+	PointLight* newPointLight = m_PointLights.back();
+	m_Scene->m_shadowMap->addPointLightShadowMap(newPointLight->getCubeMapTexture());
+	glCheckError();
+}
+
+void LightController::removePointLight()
+{
+	//TODO:  LightController::removePointLight()
+}
+
+void LightController::addSpotLight(const glm::vec3 pos, const glm::vec3 dir)
+{
+	m_SpotLights.push_back(new SpotLight(m_LightingShader, m_LightSourceShader, pos, dir));
+	m_Scene->m_shadowMap->addSpotLightShadowMap(m_SpotLights[m_SpotLights.size() - 1]->getDepthMapTexture());
+	glCheckError();
+}
+
+void LightController::removeSpotLight()
+{
+	//TODO:  LightController::removeSpotLight()
+}
+
+void LightController::addDirectionalLight(const glm::vec3& dir)
+{
+	//Only one directional light can exist
+	if(m_DirectionalLight != nullptr){
+		delete m_DirectionalLight;
+		m_DirectionalLight = nullptr;
+	}
+	m_DirectionalLight = new DirectionalLight(m_LightingShader, dir);
+
+	// Configure a directional shadow map
+	m_Scene->m_shadowMap->addDirectionalShadowMap(m_DirectionalLight->getDepthMapTexture());
+	glCheckError();
+}
+
+void LightController::removeDirectionalLight()
+{
+	if (m_DirectionalLight != nullptr) {
+		delete m_DirectionalLight;
+		m_DirectionalLight = nullptr;
+	}
+}
+
+void LightController::drawLighting() const
+{
+	for (PointLight* pointLight : m_PointLights) {
+		pointLight->Draw();
+	}
+	for (SpotLight* spotLights : m_SpotLights) {
+		spotLights->Draw();
+	}
+	//m_WordLight->renderLight();
+}

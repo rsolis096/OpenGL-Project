@@ -31,12 +31,6 @@
     <Filter Include="Header Files\World">
       <UniqueIdentifier>{8631d001-8659-4bd6-8c74-7e7aa5f1995a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\GUI">
-      <UniqueIdentifier>{f8882871-c361-49aa-9cce-4327afcdc373}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\GUI">
-      <UniqueIdentifier>{38df8013-15b5-4b65-999f-505ff97cbc21}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\World">
       <UniqueIdentifier>{db8d41c2-a0b3-48a7-8fa6-3b2731be9d02}</UniqueIdentifier>
     </Filter>
@@ -48,9 +42,6 @@
     </Filter>
     <Filter Include="Source Files\third-party\STB Image">
       <UniqueIdentifier>{2daf179a-046c-4364-990e-75967b1c8906}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\GUI\ImGui">
-      <UniqueIdentifier>{4b50ff9f-7ca0-4dc5-a8d1-27dc56004d3f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\third-party">
       <UniqueIdentifier>{a8afb3d3-9c63-467e-a192-47b9259afab5}</UniqueIdentifier>
@@ -73,13 +64,19 @@
     <Filter Include="Source Files\FBOs">
       <UniqueIdentifier>{fabd62b2-1db3-4fa6-a10b-ea2bc2b6adab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\UI">
+      <UniqueIdentifier>{38df8013-15b5-4b65-999f-505ff97cbc21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI">
+      <UniqueIdentifier>{f8882871-c361-49aa-9cce-4327afcdc373}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI\ImGui">
+      <UniqueIdentifier>{4b50ff9f-7ca0-4dc5-a8d1-27dc56004d3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Shader.cpp">
-      <Filter>Source Files\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="src\stb_image.cpp">
       <Filter>Source Files\third-party\STB Image</Filter>
@@ -87,80 +84,32 @@
     <ClCompile Include="src\stb_image_write.cpp">
       <Filter>Source Files\third-party\STB Image</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Cube.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Mesh.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Model.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Object.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Plane.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Sphere.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PhysicsWorld.cpp">
-      <Filter>Source Files\Physics</Filter>
-    </ClCompile>
     <ClCompile Include="src\Camera.cpp">
       <Filter>Source Files\World</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene.cpp">
-      <Filter>Source Files\World</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SkyBox.cpp">
-      <Filter>Source Files\World</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Texture.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="third party\includes\glad\glad.c">
       <Filter>Source Files\third-party</Filter>
     </ClCompile>
     <ClCompile Include="third party\includes\imgui\imgui.cpp">
-      <Filter>Source Files\GUI\ImGui</Filter>
+      <Filter>Source Files\UI\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="third party\includes\imgui\imgui_demo.cpp">
-      <Filter>Source Files\GUI\ImGui</Filter>
+      <Filter>Source Files\UI\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="third party\includes\imgui\imgui_draw.cpp">
-      <Filter>Source Files\GUI\ImGui</Filter>
+      <Filter>Source Files\UI\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="third party\includes\imgui\imgui_impl_glfw.cpp">
-      <Filter>Source Files\GUI\ImGui</Filter>
+      <Filter>Source Files\UI\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="third party\includes\imgui\imgui_impl_opengl3.cpp">
-      <Filter>Source Files\GUI\ImGui</Filter>
+      <Filter>Source Files\UI\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="third party\includes\imgui\imgui_tables.cpp">
-      <Filter>Source Files\GUI\ImGui</Filter>
+      <Filter>Source Files\UI\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="third party\includes\imgui\imgui_widgets.cpp">
-      <Filter>Source Files\GUI\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DirectionalLight.cpp">
-      <Filter>Source Files\Lighting</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LightController.cpp">
-      <Filter>Source Files\Lighting</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PointLight.cpp">
-      <Filter>Source Files\Lighting</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ShadowMap.cpp">
-      <Filter>Source Files\Lighting</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SpotLight.cpp">
-      <Filter>Source Files\Lighting</Filter>
+      <Filter>Source Files\UI\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\FBOs\Framebuffer.cpp">
       <Filter>Source Files\FBOs</Filter>
@@ -174,65 +123,62 @@
     <ClCompile Include="src\FBOs\GBuffer.cpp">
       <Filter>Source Files\FBOs</Filter>
     </ClCompile>
+    <ClCompile Include="src\Lighting\DirectionalLight.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Lighting\LightController.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Lighting\PointLight.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Lighting\Shader.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Lighting\ShadowMap.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Lighting\SpotLight.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Cube.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Mesh.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Model.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Object.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\ObjectTypes.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Plane.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\SkyBox.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Sphere.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Texture.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysicsWorld.cpp">
+      <Filter>Source Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\World\Scene.cpp">
+      <Filter>Source Files\World</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\GUI.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Cube.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mesh.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Model.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Object.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Plane.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Sphere.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DirectionalLight.h">
-      <Filter>Header Files\Lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="src\LightController.h">
-      <Filter>Header Files\Lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PointLight.h">
-      <Filter>Header Files\Lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ShadowMap.h">
-      <Filter>Header Files\Lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SpotLight.h">
-      <Filter>Header Files\Lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PhysicsWorld.h">
-      <Filter>Header Files\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Camera.h">
-      <Filter>Header Files\World</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene.h">
-      <Filter>Header Files\World</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SkyBox.h">
-      <Filter>Header Files\World</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DebugUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="third party\includes\imgui\imconfig.h">
       <Filter>Header Files\third-party</Filter>
     </ClInclude>
@@ -260,16 +206,79 @@
     <ClInclude Include="third party\includes\imgui\imstb_truetype.h">
       <Filter>Header Files\third-party</Filter>
     </ClInclude>
-    <ClInclude Include="src\FBOs\Framebuffer.h">
+    <ClInclude Include="include\UI\GUI.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Lighting\DirectionalLight.h">
+      <Filter>Header Files\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Lighting\LightController.h">
+      <Filter>Header Files\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Lighting\PointLight.h">
+      <Filter>Header Files\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Lighting\ShadowMap.h">
+      <Filter>Header Files\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Lighting\SpotLight.h">
+      <Filter>Header Files\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\Cube.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\Mesh.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\Model.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\Object.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\ObjectTypes.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\Plane.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\SkyBox.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\Sphere.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\Texture.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\Vertex.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Physics\PhysicsWorld.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\World\Scene.h">
+      <Filter>Header Files\World</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Lighting\Shader.h">
+      <Filter>Header Files\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DebugUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FBOs\Framebuffer.h">
       <Filter>Header Files\FBOs</Filter>
     </ClInclude>
-    <ClInclude Include="src\FBOs\SSAOBlurBuffer.h">
+    <ClInclude Include="include\FBOs\GBuffer.h">
       <Filter>Header Files\FBOs</Filter>
     </ClInclude>
-    <ClInclude Include="src\FBOs\SSAOBuffer.h">
+    <ClInclude Include="include\FBOs\SSAOBlurBuffer.h">
       <Filter>Header Files\FBOs</Filter>
     </ClInclude>
-    <ClInclude Include="src\FBOs\GBuffer.h">
+    <ClInclude Include="include\FBOs\SSAOBuffer.h">
       <Filter>Header Files\FBOs</Filter>
     </ClInclude>
   </ItemGroup>

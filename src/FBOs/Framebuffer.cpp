@@ -1,6 +1,9 @@
-#include "Framebuffer.h"
+#include "FBOs/Framebuffer.h"
 
-#include "../Shader.h"
+#include "DebugUtils.h"
+#include "Lighting/Shader.h"
+
+#include <iostream>
 
 Framebuffer::Framebuffer(int width, int height)
 	: m_width(width),

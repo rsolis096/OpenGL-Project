@@ -1,6 +1,6 @@
-#include "GBuffer.h"
+#include "FBOs/GBuffer.h"
 
-#include "../Shader.h"
+#include "Lighting/Shader.h"
 
 GBuffer::GBuffer(int w, int h)
 {

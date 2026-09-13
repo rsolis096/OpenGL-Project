@@ -114,7 +114,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)third party\includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third party\includes;$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -135,7 +135,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)third party\includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third party\includes;$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -151,30 +151,31 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="src\Cube.cpp" />
-    <ClCompile Include="src\DirectionalLight.cpp" />
     <ClCompile Include="src\FBOs\Framebuffer.cpp" />
     <ClCompile Include="src\FBOs\GBuffer.cpp" />
     <ClCompile Include="src\FBOs\SSAOBlurBuffer.cpp" />
     <ClCompile Include="src\FBOs\SSAOBuffer.cpp" />
-    <ClCompile Include="src\GUI.cpp" />
-    <ClCompile Include="src\LightController.cpp" />
+    <ClCompile Include="src\Lighting\DirectionalLight.cpp" />
+    <ClCompile Include="src\Lighting\LightController.cpp" />
+    <ClCompile Include="src\Lighting\PointLight.cpp" />
+    <ClCompile Include="src\Lighting\Shader.cpp" />
+    <ClCompile Include="src\Lighting\ShadowMap.cpp" />
+    <ClCompile Include="src\Lighting\SpotLight.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Mesh.cpp" />
-    <ClCompile Include="src\Model.cpp" />
-    <ClCompile Include="src\Object.cpp" />
-    <ClCompile Include="src\PhysicsWorld.cpp" />
-    <ClCompile Include="src\Plane.cpp" />
-    <ClCompile Include="src\PointLight.cpp" />
-    <ClCompile Include="src\Scene.cpp" />
-    <ClCompile Include="src\Shader.cpp" />
-    <ClCompile Include="src\ShadowMap.cpp" />
-    <ClCompile Include="src\SkyBox.cpp" />
-    <ClCompile Include="src\Sphere.cpp" />
-    <ClCompile Include="src\SpotLight.cpp" />
+    <ClCompile Include="src\Objects\Cube.cpp" />
+    <ClCompile Include="src\Objects\Mesh.cpp" />
+    <ClCompile Include="src\Objects\Model.cpp" />
+    <ClCompile Include="src\Objects\Object.cpp" />
+    <ClCompile Include="src\Objects\ObjectTypes.cpp" />
+    <ClCompile Include="src\Objects\Plane.cpp" />
+    <ClCompile Include="src\Objects\SkyBox.cpp" />
+    <ClCompile Include="src\Objects\Sphere.cpp" />
+    <ClCompile Include="src\Objects\Texture.cpp" />
+    <ClCompile Include="src\Physics\PhysicsWorld.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\stb_image_write.cpp" />
-    <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\UI\GUI.cpp" />
+    <ClCompile Include="src\World\Scene.cpp" />
     <ClCompile Include="third party\includes\glad\glad.c" />
     <ClCompile Include="third party\includes\imgui\imgui.cpp" />
     <ClCompile Include="third party\includes\imgui\imgui_demo.cpp" />
@@ -185,29 +186,31 @@
     <ClCompile Include="third party\includes\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Camera.h" />
-    <ClInclude Include="src\Cube.h" />
-    <ClInclude Include="src\DebugUtils.h" />
-    <ClInclude Include="src\DirectionalLight.h" />
-    <ClInclude Include="src\FBOs\Framebuffer.h" />
-    <ClInclude Include="src\FBOs\GBuffer.h" />
-    <ClInclude Include="src\FBOs\SSAOBlurBuffer.h" />
-    <ClInclude Include="src\FBOs\SSAOBuffer.h" />
-    <ClInclude Include="src\GUI.h" />
-    <ClInclude Include="src\LightController.h" />
-    <ClInclude Include="src\Mesh.h" />
-    <ClInclude Include="src\Model.h" />
-    <ClInclude Include="src\Object.h" />
-    <ClInclude Include="src\PhysicsWorld.h" />
-    <ClInclude Include="src\Plane.h" />
-    <ClInclude Include="src\PointLight.h" />
-    <ClInclude Include="src\Scene.h" />
-    <ClInclude Include="src\Shader.h" />
-    <ClInclude Include="src\ShadowMap.h" />
-    <ClInclude Include="src\SkyBox.h" />
-    <ClInclude Include="src\Sphere.h" />
-    <ClInclude Include="src\SpotLight.h" />
-    <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="include\Camera.h" />
+    <ClInclude Include="include\DebugUtils.h" />
+    <ClInclude Include="include\FBOs\Framebuffer.h" />
+    <ClInclude Include="include\FBOs\GBuffer.h" />
+    <ClInclude Include="include\FBOs\SSAOBlurBuffer.h" />
+    <ClInclude Include="include\FBOs\SSAOBuffer.h" />
+    <ClInclude Include="include\Lighting\DirectionalLight.h" />
+    <ClInclude Include="include\Lighting\LightController.h" />
+    <ClInclude Include="include\Lighting\PointLight.h" />
+    <ClInclude Include="include\Lighting\Shader.h" />
+    <ClInclude Include="include\Lighting\ShadowMap.h" />
+    <ClInclude Include="include\Lighting\SpotLight.h" />
+    <ClInclude Include="include\Objects\Cube.h" />
+    <ClInclude Include="include\Objects\Mesh.h" />
+    <ClInclude Include="include\Objects\Model.h" />
+    <ClInclude Include="include\Objects\Object.h" />
+    <ClInclude Include="include\Objects\ObjectTypes.h" />
+    <ClInclude Include="include\Objects\Plane.h" />
+    <ClInclude Include="include\Objects\SkyBox.h" />
+    <ClInclude Include="include\Objects\Sphere.h" />
+    <ClInclude Include="include\Objects\Texture.h" />
+    <ClInclude Include="include\Objects\Vertex.h" />
+    <ClInclude Include="include\Physics\PhysicsWorld.h" />
+    <ClInclude Include="include\UI\GUI.h" />
+    <ClInclude Include="include\World\Scene.h" />
     <ClInclude Include="third party\includes\imgui\imconfig.h" />
     <ClInclude Include="third party\includes\imgui\imgui.h" />
     <ClInclude Include="third party\includes\imgui\imgui_impl_glfw.h" />

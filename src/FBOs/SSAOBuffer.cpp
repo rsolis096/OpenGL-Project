@@ -1,6 +1,6 @@
-#include "SSAOBuffer.h"
+#include "FBOs/SSAOBuffer.h"
 
-#include "../Shader.h"
+#include "Lighting/Shader.h"
 
 SSAOBuffer::SSAOBuffer(int width, int height)
 {

@@ -4,13 +4,18 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 
-#include "Scene.h"
-#include "GUI.h"
-#include "PhysicsWorld.h"
-#include "Texture.h"
-#include "ShadowMap.h"
-#include "Model.h"
-#include "LightController.h"
+#include "Camera.h"
+#include "Lighting/LightController.h"
+#include "Lighting/Shader.h"
+#include "Objects/Model.h"
+#include "Objects/Sphere.h"
+#include "Physics/PhysicsWorld.h"
+#include "UI/GUI.h"
+#include "World/Scene.h"
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
 
 // settings
 unsigned int SCR_WIDTH = 1920;

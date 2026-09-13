@@ -1,5 +1,10 @@
 #include "Camera.h"
 
+#include "DebugUtils.h"
+
+#include <GLFW/glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
+
 //Default Camera Values
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
