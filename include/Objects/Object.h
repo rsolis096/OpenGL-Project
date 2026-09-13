@@ -4,6 +4,8 @@
 
 #include <glm/glm.hpp>
 
+#include "ObjectTypes.h"
+
 class Shader;
 class Texture;
 
@@ -12,14 +14,8 @@ class Texture;
 class Object
 {
 public:
-	    enum class ObjectType
-	    {
-	        Cube,
-	        Model,
-	        Sphere,
-	        Plane,
-            Object,
-	    };
+
+        static unsigned int objectCount;
 
         //Initializes the basic attributes for all objects
         Object();
@@ -31,13 +27,8 @@ public:
         bool m_HasTexture;
 
         //Object World Attributes
-        glm::vec3 m_Position;
-        glm::vec3 m_Scale;
-        glm::mat4 m_Model;
-        glm::vec3 m_Rotation; //in degrees
-        //glm::vec3 m_RotationAxis;
-        //int m_RotationIndex;
-
+        Transform m_Transform;
+        EntityInfo m_EntityInfo;
 
         //Physics info (push to component later)
         glm::vec3 m_Force;
@@ -49,16 +40,10 @@ public:
         void setPhysics();
         void setVelocity(glm::vec3);
 
-        //Type
-        unsigned int m_ObjectID;
-        std::string m_DisplayName;
-
-
         //Teleport to specified location 
         void setPosition(glm::vec3 newPosition);                // Teleport object to a different position
         void setScale(glm::vec3 newScale);                      // Change scale of object in 3 dimensions
         void translatePosition(glm::vec3 newPosition);          // Translate by parameter (Used to move some diistance from current position)
-        void updateObject();
         void setRotation(glm::vec3);
 
         //Change these properties to set color of object

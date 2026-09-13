@@ -4,47 +4,38 @@
 #include "Lighting/Shader.h"
 #include "Objects/Texture.h"
 #define PI 3.141592653589793238462643383279502884197
-unsigned int Sphere::sphereCount = 0;
 
-Sphere::ObjectType Sphere::GetType() const { return ObjectType::Sphere; }
 
 //Used for creating a Primitive with texture information
 Sphere::Sphere(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
     //Set some rendering properties
     m_HasTexture = true;
-    m_DisplayName = "Sphere" + std::to_string(sphereCount);
-    m_ObjectID = sphereCount;
+
+    m_EntityInfo.setInfo("Sphere" + std::to_string(objectCount), objectCount);
+    objectCount++;
+
     //Open and load diffuse map and specular map, save their Spheres
     m_DiffuseMap = new Texture(texturePathDiffuse, false, "texture_diffuse");
     m_SpecularMap = new Texture(texturePathSpecular, false, "texture_specular");
 
     //Build the specified Sphere type
     buildSphere();
-    sphereCount++;
 }
 
 //Used for creating a primitive with no texture
 Sphere::Sphere() : Object()
 {
     m_HasTexture = false;
-    m_DisplayName = "Sphere" + std::to_string(sphereCount);
-    m_ObjectID = sphereCount;
-    sphereCount++;
+    m_EntityInfo.setInfo("Sphere" + std::to_string(objectCount), objectCount);
+    objectCount++;
     buildSphere();
 }
-
-Sphere::~Sphere()
-{
-    std::cout << "Sphere Deleted\n";
-    sphereCount -= 1;
-}
-
 
 void Sphere::Draw(Shader& shader)
 {
     shader.use();
-    shader.setMat4("model", m_Model);
+    shader.setMat4("model", m_Transform.matrix());
 
     ApplyMaterialUniforms(shader);
     DrawMesh();
@@ -53,7 +44,7 @@ void Sphere::Draw(Shader& shader)
 void Sphere::ShadowPassDraw(Shader& shader)
 {
     shader.use();
-    shader.setMat4("model", m_Model);
+    shader.setMat4("model", m_Transform.matrix());
 
     DrawMesh();
 }
@@ -61,7 +52,7 @@ void Sphere::ShadowPassDraw(Shader& shader)
 void Sphere::DrawGeometryPass(Shader& shader)
 {
     shader.use();
-    shader.setMat4("model", m_Model);
+    shader.setMat4("model", m_Transform.matrix());
 
     ApplyMaterialUniforms(shader);
     DrawMesh();

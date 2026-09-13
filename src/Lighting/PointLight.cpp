@@ -12,7 +12,7 @@ bool firstFrame = true;
 
 //Create Point Light with positon (default = 0,10,0)
 PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::vec3& pos) :
-	m_LightingShader(lightingShader), m_LightSourceShader(objectShader)
+m_LightingShader(lightingShader), m_LightSourceShader(objectShader)
 {
 
 	m_CubeMapTexture = 0;
@@ -23,7 +23,7 @@ PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::
 	m_LightShape = new Cube(); //Create the physical light object
 	setLightPos(pos); //Need to update light object too
 	m_LightShape->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	m_LightShape->m_DisplayName = "PointLight" + std::to_string(m_LightID);
+	m_LightShape->m_EntityInfo.displayName = "PointLight" + std::to_string(m_LightID);
 
 	//Light Color Properties (How it casts light on objects)
 	m_Ambient = glm::vec3(0.05f, 0.05f, 0.05f); //Dark ambient

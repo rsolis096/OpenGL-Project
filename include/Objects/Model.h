@@ -20,7 +20,7 @@ class Model : public Object
 public:
     // Model data 
     vector<ModelTexture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
-    vector<Mesh>    meshes;
+    vector<Mesh> meshes;
     string directory;
     bool gammaCorrection;
 
@@ -33,7 +33,6 @@ public:
     void DrawGeometryPass(Shader& shader) override;
 
     static const aiScene* CheckPath(std::string const& path);
-    ObjectType GetType() const override;
 
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
@@ -48,7 +47,6 @@ private:
     // the required info is returned as a Texture struct.
     vector<ModelTexture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
     int updateTexture(std::vector<std::string> texturePaths) override { return 1; }
-    static unsigned int modelCount;
 
     static Assimp::Importer importer;
 

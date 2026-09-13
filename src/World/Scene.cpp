@@ -101,8 +101,7 @@ void Scene::InitializeDeferredRenderingShaders()
 
 //Add an object to the scene (only objects part of a scene are rendered)
 int Scene::addObject(Object* obj)
-{
-	
+{	
 	if (obj == nullptr)
 		return 1;
 	
@@ -125,7 +124,7 @@ int Scene::removeObject(Object* obj)
 	}
 
 	// Print debug information before removal
-	std::cout << "Removing object: " << obj->m_DisplayName << std::endl;
+	std::cout << "Removing object: " << obj->m_EntityInfo.displayName << std::endl;
 	std::cout << "Vector size before removal: " << m_sceneObjects.size() << std::endl;
 
 	auto removeIterator = std::find(m_sceneObjects.begin(), m_sceneObjects.end(), obj);
@@ -140,7 +139,7 @@ int Scene::removeObject(Object* obj)
 		return 0;
 	}
 
-	std::cout << "Scene: " << obj->m_ObjectID << " is not part of the scene!" << std::endl;
+	std::cout << "Scene: " << obj->m_EntityInfo.displayName << " is not part of the scene!" << std::endl;
 	return 1;
 }
 

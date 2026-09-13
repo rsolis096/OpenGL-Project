@@ -1,23 +1,19 @@
 #include "Objects/Object.h"
 
 #include "Lighting/Shader.h"
-#include "Objects/Texture.h"
 
 #include <GLFW/glfw3.h>
-#include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
+
+unsigned int Object::objectCount = 0;
+
 Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
 {
     //Set default Cube properties
     m_Ambient = glm::vec3(0.0f);
     m_Diffuse = glm::vec3(1.0f);
     m_Specular = glm::vec3(0.0f);
-    m_Position = glm::vec3(0.0f);
-    m_Rotation = glm::vec3(0.0f);
-    m_Scale = glm::vec3(1.0f);
-    m_Model = glm::mat4(1.0f);
-    m_ObjectID = 0;
 
     m_Force = glm::vec3(0.0f);
     m_Velocity = glm::vec3(0.0f);
@@ -30,13 +26,11 @@ Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
     isPhysicsObject = false;
 
     startFall = 0.0f;
-
-    updateObject();
 }
 
 Object::~Object()
 {
-    std::cout << "Destructor called on " << m_ObjectID << std::endl;
+    std::cout << "Destructor called on " << m_EntityInfo.id << std::endl;
     glDeleteVertexArrays(1, &m_vao);
     glDeleteBuffers(1, &m_vbo);
     glDeleteBuffers(1, &m_ebo);
@@ -77,7 +71,6 @@ void Object::setSpecular(glm::vec3 newSpecular)
     m_Specular = newSpecular;
 }
 
-
 glm::vec3 Object::getAmbient() const
 {
     return m_Ambient;
@@ -108,49 +101,24 @@ void Object::setVelocity(glm::vec3 v)
 
 void Object::setPosition(glm::vec3 newPosition)
 {
-    m_Position = newPosition;
-    updateObject();
+    m_Transform.position = newPosition;
 }
 
 //Takes a glm::vec3 of x, y, z rotations in degrees, the 
 void Object::setRotation(glm::vec3 newRotation)
 {
-    m_Rotation = newRotation;
-    updateObject();
+    m_Transform.rotation = newRotation;
 }
 
 void Object::setScale(glm::vec3 newScale)
 {
-    m_Scale = newScale;
-    updateObject();
+    m_Transform.scale = newScale;
 }
 
 void Object::translatePosition(glm::vec3 newPosition)
 {
-    m_Position += newPosition;
-    updateObject();
+    m_Transform.position += newPosition;
 }
-
-void Object::updateObject()
-{
-    m_Model = glm::mat4(1.0f);
-    // Apply translation transformation
-    m_Model = glm::translate(m_Model, m_Position);
-    // Apply scaling transformation
-    m_Model = glm::scale(m_Model, m_Scale);
-
-    // Apply Rotation
-    float theta_x = glm::radians(m_Rotation[0]);
-    float theta_y = glm::radians(m_Rotation[1]);
-    float theta_z = glm::radians(m_Rotation[2]);
-
-    //GLM Rotation
-    m_Model = glm::rotate(m_Model, theta_x, glm::vec3(1.0f, 0.0f, 0.0f));
-    m_Model = glm::rotate(m_Model, theta_y, glm::vec3(0.0f, 1.0f, 0.0f));
-    m_Model = glm::rotate(m_Model, theta_z, glm::vec3(0.0f, 0.0f, 1.0f));
-
-}
-
 
 //Combines vertices and normals
 void Object::buildInterleavedVertices()

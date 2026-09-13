@@ -6,18 +6,16 @@
 
 #include <stb_image/stb_image.h>
 
-unsigned int Model::modelCount = 0;
 Assimp::Importer Model::importer;
 
 unsigned int TextureFromFile(const char* path, const string& directory, bool gamma = false);
 
-Model::ObjectType Model::GetType() const {return ObjectType::Model;}
-
 Model::Model(string const& path, bool gamma) : Object(), gammaCorrection(gamma)
 {
-    m_DisplayName= "Model" + to_string(modelCount);
-    m_ObjectID = modelCount;
-    modelCount++;
+
+    m_EntityInfo.setInfo("Model" + std::to_string(objectCount), objectCount);
+    objectCount++;
+
     m_HasTexture = false;
     loadModel(path);
 }
@@ -236,7 +234,7 @@ vector<ModelTexture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 void Model::ShadowPassDraw(Shader& shader)
 {
     shader.use();
-    shader.setMat4("model", m_Model);
+    shader.setMat4("model", m_Transform.matrix());
 
     for (unsigned int i = 0; i < meshes.size(); i++)
         meshes[i].ShadowPassDraw(shader);
@@ -247,7 +245,7 @@ void Model::ShadowPassDraw(Shader& shader)
 void Model::DrawGeometryPass(Shader& shader)
 {
     shader.use();
-    shader.setMat4("model", m_Model);
+    shader.setMat4("model", m_Transform.matrix());
 
     ApplyMaterialUniforms(shader);
 
@@ -262,7 +260,7 @@ void Model::DrawGeometryPass(Shader& shader)
 void Model::Draw(Shader& shader)
 {
     shader.use();
-    shader.setMat4("model", m_Model);
+    shader.setMat4("model", m_Transform.matrix());
 
     ApplyMaterialUniforms(shader);
 

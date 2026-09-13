@@ -232,8 +232,6 @@ void demoScene(Scene& demoScene)
     //demoScene.m_PhysicsWorld->addObject(demoScene.m_sceneObjects[2]);
     //demoScene.m_PhysicsWorld->addObject(demoScene.m_sceneObjects[3]);
 
-
-
     glm::vec3 spotLightPos1 = glm::vec3(3.0f, 3.0f, -1.0f);
     glm::vec3 spotLightDir1 = glm::vec3(-7.0f, 0.0f, 0.0f);
     spotLightDir1 = glm::normalize(spotLightDir1 - spotLightPos1);

@@ -6,10 +6,6 @@
 
 #include <glm/gtx/string_cast.hpp>
 
-unsigned int Cube::cubeCount = 0;
-
-Cube::ObjectType Cube::GetType() const { return ObjectType::Cube; }
-
 //Used for creating a Primtive with texture information
 Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
@@ -18,9 +14,10 @@ Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Ob
     //Open and load diffuse map and specular map, save their Cubes
     m_DiffuseMap = new Texture(texturePathDiffuse, false, "material.diffuse");
     m_SpecularMap = new Texture(texturePathSpecular, false, "material.diffuse");
-    m_DisplayName = "Cube" + std::to_string(cubeCount);
-    m_ObjectID = cubeCount;
-    cubeCount++;
+
+    m_EntityInfo.setInfo("Cube" + std::to_string(objectCount), objectCount);
+    objectCount++;
+
     //Build the specified Cube type
     buildCube();
 }
@@ -29,22 +26,17 @@ Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Ob
 Cube::Cube() : Object()
 {
     m_HasTexture = false;
-    m_DisplayName = "Cube" + std::to_string(cubeCount);
-    m_ObjectID = cubeCount;
-    buildCube();
-    cubeCount++;
-}
 
-Cube::~Cube()
-{
-    std::cout << "Cube Deleted\n";
-    cubeCount -= 1;
+    m_EntityInfo.setInfo("Cube" + std::to_string(objectCount), objectCount);
+    objectCount++;
+
+    buildCube();
 }
 
 void Cube::Draw(Shader& shader)
 {
     shader.use();
-    shader.setMat4("model", m_Model);
+    shader.setMat4("model", m_Transform.matrix());
 
     ApplyMaterialUniforms(shader);
     DrawMesh();
@@ -53,14 +45,14 @@ void Cube::Draw(Shader& shader)
 void Cube::ShadowPassDraw(Shader& shader)
 {
     shader.use();
-    shader.setMat4("model", m_Model);
+    shader.setMat4("model", m_Transform.matrix());
     DrawMesh();
 }
 
 void Cube::DrawGeometryPass(Shader& shader)
 {
     shader.use();
-    shader.setMat4("model", m_Model);
+    shader.setMat4("model", m_Transform.matrix());
 
     ApplyMaterialUniforms(shader);
     DrawMesh();

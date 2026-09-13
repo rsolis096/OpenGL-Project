@@ -115,7 +115,7 @@ void GUI::drawList()
 			char label[128];
 			bool isSelected = (propertiesSelected == i);
 
-			sprintf_s(label, myScene.m_sceneObjects[i]->m_DisplayName.c_str(), i);
+			sprintf_s(label, myScene.m_sceneObjects[i]->m_EntityInfo.displayName.c_str(), i);
 			if (ImGui::Selectable(label, isSelected))
 			{
 				propertiesSelected = i;
@@ -313,7 +313,7 @@ void GUI::drawList()
 					Object* selectedObject = myScene.m_sceneObjects[propertiesSelected];
 					//Display the Current selected object name
 					if (selectedObject != nullptr)
-						ImGui::Text("Selected Item: %s", selectedObject->m_DisplayName.c_str());
+						ImGui::Text("Selected Item: %s", selectedObject->m_EntityInfo.displayName.c_str());
 					else
 						ImGui::Text("Selected Item: %s", "NULL");
 
@@ -323,7 +323,7 @@ void GUI::drawList()
 						// Position
 						{
 							//For transformation
-							glm::vec3 pos = selectedObject->m_Position;
+							glm::vec3 pos = selectedObject->m_Transform.position;
 							float vec4f[3] = { pos[0], pos[1], pos[2] };
 							ImGui::Text("Current Object Position:\tx: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
 
@@ -358,9 +358,9 @@ void GUI::drawList()
 							//For Scale
 							ImGui::Spacing();
 							ImGui::Text("Scaling");
-							float sX = selectedObject->m_Scale[0];
-							float sY = selectedObject->m_Scale[1];
-							float sZ = selectedObject->m_Scale[2];
+							float sX = selectedObject->m_Transform.scale[0];
+							float sY = selectedObject->m_Transform.scale[1];
+							float sZ = selectedObject->m_Transform.scale[2];
 							glm::vec3 currentScale = glm::vec3(sX, sY, sZ);
 
 							if (ImGui::DragFloat("x##scale", &sX, 0.1f, 0.0f, 360.0f, "%.2f", 0))
@@ -388,9 +388,9 @@ void GUI::drawList()
 							ImGui::Spacing();
 							ImGui::Text("Rotation");
 
-							float rX = selectedObject->m_Rotation.x;
-							float rY = selectedObject->m_Rotation.y;
-							float rZ = selectedObject->m_Rotation.z;
+							float rX = selectedObject->m_Transform.position.x;
+							float rY = selectedObject->m_Transform.position.y;
+							float rZ = selectedObject->m_Transform.position.z;
 
 							glm::vec3 currentRotation = glm::vec3(rX, rY, rZ);
 
@@ -464,18 +464,27 @@ void GUI::drawList()
 							static bool showSuccessText = false;
 
 							ImGui::Text("Texture Paths:");
-							if (selectedObject->m_HasTexture && selectedObject->GetType() != Object::ObjectType::Model)
+							if (selectedObject->m_HasTexture)
 							{
 								//Set textbox default values
-								if (diffuseText == "")
-									strcpy_s(diffuseBuffer, selectedObject->m_DiffuseMap->m_Path.c_str());
+								if (selectedObject->m_DiffuseMap != nullptr)
+								{
+									strcpy_s(diffuseBuffer, sizeof(diffuseBuffer), selectedObject->m_DiffuseMap->m_Path.c_str());
+								}
 								else
-									strcpy_s(diffuseBuffer, diffuseText.c_str()); //dest, src
+								{
+									strcpy_s(diffuseBuffer, sizeof(diffuseBuffer), "");
+								}
 
-								if (specularText == "")
-									strcpy_s(specularBuffer, selectedObject->m_SpecularMap->m_Path.c_str());
+								//Set textbox default values
+								if (selectedObject->m_SpecularMap != nullptr)
+								{
+									strcpy_s(specularBuffer, sizeof(specularBuffer), selectedObject->m_DiffuseMap->m_Path.c_str());
+								}
 								else
-									strcpy_s(specularBuffer, specularText.c_str());
+								{
+									strcpy_s(specularBuffer, sizeof(specularBuffer), "");
+								}
 							}
 							else
 							{
@@ -539,7 +548,7 @@ void GUI::drawList()
 						// Delete Item
 						if (ImGui::Button("Delete Object"))
 						{
-							std::cout << "Selected To Delete " << selectedObject->m_DisplayName << "\n";
+							std::cout << "Selected To Delete " << selectedObject->m_EntityInfo.displayName << "\n";
 							myScene.removeObject(selectedObject);
 							propertiesSelected -= 1;
 							if(propertiesSelected < 0)

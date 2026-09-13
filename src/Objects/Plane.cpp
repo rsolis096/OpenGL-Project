@@ -4,10 +4,6 @@
 #include "Lighting/Shader.h"
 #include "Objects/Texture.h"
 
-unsigned int Plane::planeCount = 0;
-
-Plane ::ObjectType Plane::GetType() const { return ObjectType::Plane; }
-
 Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
     //Set some rendering properties
@@ -15,9 +11,10 @@ Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : 
     //Open and load diffuse map and specular map, save their Planes
     m_DiffuseMap = new Texture(texturePathDiffuse, false, "texture_diffuse");
     m_SpecularMap = new Texture(texturePathSpecular, false, "texture_specular");
-    m_DisplayName = "Plane" + std::to_string(planeCount);
-    m_ObjectID = planeCount;
-    planeCount++;
+
+    m_EntityInfo.setInfo("Plane" + std::to_string(objectCount), objectCount);
+    objectCount++;
+
     //Build the specified Plane type
     buildPlane();
 }
@@ -26,22 +23,17 @@ Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : 
 Plane::Plane() : Object()
 {
     m_HasTexture = false;
-    m_DisplayName = "Plane" + std::to_string(planeCount);
-    m_ObjectID = planeCount;
-    planeCount++;
-    buildPlane();
-}
 
-Plane::~Plane()
-{
-    std::cout << "Plane Deleted\n";
-    planeCount -= 1;
+    m_EntityInfo.setInfo("Plane" + std::to_string(objectCount), objectCount);
+    objectCount++;
+
+    buildPlane();
 }
 
 void Plane::Draw(Shader& shader)
 {
     shader.use();
-    shader.setMat4("model", m_Model);
+    shader.setMat4("model", m_Transform.matrix());
 
     ApplyMaterialUniforms(shader);
     DrawMesh();
@@ -50,7 +42,7 @@ void Plane::Draw(Shader& shader)
 void Plane::ShadowPassDraw(Shader& shader)
 {
     shader.use();
-    shader.setMat4("model", m_Model);
+    shader.setMat4("model", m_Transform.matrix());
 
     DrawMesh();
 }
@@ -58,7 +50,7 @@ void Plane::ShadowPassDraw(Shader& shader)
 void Plane::DrawGeometryPass(Shader& shader)
 {
     shader.use();
-    shader.setMat4("model", m_Model);
+    shader.setMat4("model", m_Transform.matrix());
 
     ApplyMaterialUniforms(shader);
     DrawMesh();
@@ -152,7 +144,9 @@ int Plane::updateTexture(std::vector<std::string> texturePaths)
             //Textures failed to apply
             //As of right now, remove all textures if an invalid texture is applied
             delete m_DiffuseMap;
+            m_DiffuseMap = nullptr;
             delete m_SpecularMap;
+            m_SpecularMap = nullptr;
             m_HasTexture = false;
             return 0;
         }

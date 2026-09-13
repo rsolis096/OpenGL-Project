@@ -19,7 +19,7 @@ int PhysicsWorld::addObject(Object* obj)
 	{
 		m_PhysicsObjects.push_back(obj);
 		obj->isPhysicsObject = true;
-		std::cout << "Added " << obj->m_ObjectID << " to physics world." << std::endl;
+		std::cout << "Added " << obj->m_EntityInfo.id << " to physics world." << std::endl;
 		return 0;
 	}
 	std::cout << "Object already in physics world!" << std::endl;
@@ -32,14 +32,14 @@ int PhysicsWorld::removeObject(Object* obj)
 	std::vector<Object*>::iterator removeIterator = std::remove(m_PhysicsObjects.begin(), m_PhysicsObjects.end(), obj);
 	if (removeIterator == m_PhysicsObjects.end())
 	{
-		std::cout << "Physics World: " << obj->m_ObjectID << " is not part of the Physics world!" << std::endl;
+		std::cout << "Physics World: " << obj->m_EntityInfo.id << " is not part of the Physics world!" << std::endl;
 		return 1;
 	}
 	else
 	{
 		m_PhysicsObjects.erase(removeIterator, m_PhysicsObjects.end());
 		obj->isPhysicsObject = false;
-		std::cout << "Physics World: Removed " << obj->m_ObjectID << std::endl;
+		std::cout << "Physics World: Removed " << obj->m_EntityInfo.id << std::endl;
 		return 0;
 	}
 }
@@ -67,10 +67,8 @@ void PhysicsWorld::step(float totalTime, float deltaTime)
 				obj->m_Velocity[1] = 54;
 
 			//Calculate the change in position given the time between frames
-			obj->m_Position += obj->m_Velocity * (deltaTime * 0.05f); // m/s * s = position
+			obj->m_Transform.position += obj->m_Velocity * (deltaTime * 0.05f); // m/s * s = position
 			obj->m_Force = glm::vec3(0.0f, 0.0f, 0.0f);
-
-			obj->updateObject();
 		}
 	}
 }
