@@ -22,12 +22,6 @@
     <Filter Include="Header Files\Objects">
       <UniqueIdentifier>{2677f4e8-914b-4740-8024-e394906497cf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Physics">
-      <UniqueIdentifier>{3cc2a307-e172-47c3-8709-f1af105dba78}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Physics">
-      <UniqueIdentifier>{3e9b003d-378e-4bfb-94df-04f983ce80bd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\World">
       <UniqueIdentifier>{8631d001-8659-4bd6-8c74-7e7aa5f1995a}</UniqueIdentifier>
     </Filter>
@@ -126,6 +120,9 @@
     <ClCompile Include="src\Lighting\DirectionalLight.cpp">
       <Filter>Source Files\Lighting</Filter>
     </ClCompile>
+    <ClCompile Include="src\Lighting\Light.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
     <ClCompile Include="src\Lighting\LightController.cpp">
       <Filter>Source Files\Lighting</Filter>
     </ClCompile>
@@ -168,13 +165,19 @@
     <ClCompile Include="src\Objects\Texture.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="src\Physics\PhysicsWorld.cpp">
-      <Filter>Source Files\Physics</Filter>
-    </ClCompile>
     <ClCompile Include="src\World\Scene.cpp">
       <Filter>Source Files\World</Filter>
     </ClCompile>
     <ClCompile Include="src\UI\GUI.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\LightingPanel.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\SceneObjectsPanel.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\SkyBoxPanel.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
     <ClCompile Include="src\Objects\Transform.cpp">
@@ -215,7 +218,22 @@
     <ClInclude Include="include\UI\GUI.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="include\UI\LightingPanel.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UI\SceneObjectsPanel.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UI\SkyBoxPanel.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UI\UIContext.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
     <ClInclude Include="include\Lighting\DirectionalLight.h">
+      <Filter>Header Files\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Lighting\Light.h">
       <Filter>Header Files\Lighting</Filter>
     </ClInclude>
     <ClInclude Include="include\Lighting\LightController.h">
@@ -259,9 +277,6 @@
     </ClInclude>
     <ClInclude Include="include\Objects\Vertex.h">
       <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Physics\PhysicsWorld.h">
-      <Filter>Header Files\Physics</Filter>
     </ClInclude>
     <ClInclude Include="include\World\Scene.h">
       <Filter>Header Files\World</Filter>

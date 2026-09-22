@@ -1,4 +1,10 @@
 #pragma once
+
+#include "UI/LightingPanel.h"
+#include "UI/SceneObjectsPanel.h"
+#include "UI/SkyBoxPanel.h"
+#include "UI/UIContext.h"
+
 // Forward Declarations
 class Scene;
 struct GLFWwindow;
@@ -6,11 +12,24 @@ struct GLFWwindow;
 class GUI
 {
 public:
-	Scene& myScene;
 	static bool isWindowHidden;
-	GLFWwindow* window;
 	GUI(GLFWwindow* windowParam, Scene& scene);
 	void displayWindow();
+
 private:
-	void drawList();
+	enum class ActivePanel
+	{
+		Objects,
+		Lighting,
+		SkyBox
+	};
+
+	void drawWorkspace();
+
+	GLFWwindow* m_Window;
+	UIContext m_Context;
+	SceneObjectsPanel m_SceneObjectsPanel;
+	LightingPanel m_LightingPanel;
+	SkyBoxPanel m_SkyBoxPanel;
+	ActivePanel m_ActivePanel = ActivePanel::Objects;
 };

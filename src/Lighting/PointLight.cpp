@@ -12,29 +12,23 @@ bool firstFrame = true;
 
 //Create Point Light with positon (default = 0,10,0)
 PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::vec3& pos) :
-m_LightingShader(lightingShader), m_LightSourceShader(objectShader)
+	Light(
+		lightingShader,
+		"PointLight" + std::to_string(m_PointLightCount),
+		glm::vec3(0.05f),
+		glm::vec3(1.0f),
+		glm::vec3(0.7f)),
+	m_LightSourceShader(objectShader)
 {
 
 	m_CubeMapTexture = 0;
 	m_LightID = m_PointLightCount;
-	m_DisplayName = "PointLight" + std::to_string(m_LightID);
 	m_PointLightCount++;
 
 	m_LightShape = new Cube(); //Create the physical light object
 	setLightPos(pos); //Need to update light object too
 	m_LightShape->m_Transform.setScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	m_LightShape->m_EntityInfo.displayName = "PointLight" + std::to_string(m_LightID);
-
-	//Light Color Properties (How it casts light on objects)
-	m_Ambient = glm::vec3(0.05f, 0.05f, 0.05f); //Dark ambient
-	m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f); //Grey light color
-	m_Specular = glm::vec3(0.7f, 0.7f, 0.7f); //"Shine" color
-	m_Intensity = 1.0f;
-
-	//Set the color for the light object
-	m_LightShape->m_Material.setDiffuse(m_Diffuse);
-	m_LightShape->m_Material.setAmbient(m_Ambient);
-	m_LightShape->m_Material.setSpecular(m_Specular);
 
 	//For attenuation
 	m_Constant = 1.0f;
@@ -53,9 +47,7 @@ m_LightingShader(lightingShader), m_LightSourceShader(objectShader)
 	//Set these properties in the lightingShader.frag for the corresponding light source at index m_LightID
 	m_LightingShader->use();
 	m_LightingShader->setInt("numberOfPointLights", m_PointLightCount);
-	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].ambient", m_Ambient);
-	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].diffuse", m_Diffuse);
-	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].specular", m_Specular);
+	updateCommonShaderUniforms();
 	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].constant", m_Constant);
 	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].linear", m_Linear);
 	m_LightingShader->setFloat("pointLights[" + std::to_string(m_LightID) + "].quadratic", m_Quadratic);
@@ -68,7 +60,6 @@ m_LightingShader(lightingShader), m_LightSourceShader(objectShader)
 PointLight::~PointLight()
 {
 	//TODO: Implement Rule of 3 and 5 if you want
-	m_LightingShader = nullptr;
 	m_LightSourceShader = nullptr;
 	delete m_LightShape;
 	m_LightShape = nullptr;
@@ -119,30 +110,6 @@ void PointLight::setLightPos(const glm::vec3 lightPos)
 	glCheckError();
 }
 
-void PointLight::setAmbient(const glm::vec3 ambient)
-{
-	m_Ambient = ambient * m_Intensity;
-	m_LightShape->m_Material.setAmbient(ambient);
-	m_LightingShader->use();
-	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].ambient", m_Ambient);
-}
-
-void PointLight::setDiffuse(const glm::vec3 diffuse)
-{
-	m_Diffuse = diffuse * m_Intensity;
-	m_LightShape->m_Material.setDiffuse(diffuse);
-	m_LightingShader->use();
-	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].diffuse", m_Diffuse);
-}
-
-void PointLight::setSpecular(const glm::vec3 specular)
-{
-	m_Specular = specular * m_Intensity;
-	m_LightShape->m_Material.setSpecular(specular);
-	m_LightingShader->use();
-	m_LightingShader->setVec3("pointLights[" + std::to_string(m_LightID) + "].specular", m_Specular);
-}
-
 void PointLight::setNearPlane(const float& n)
 {
 	m_NearPlane = n;
@@ -170,11 +137,6 @@ void PointLight::setShadowFOV(const float& fov)
 	m_ShadowFOV = fov;
 
 	updateLightSpaceMatrices();
-}
-
-void PointLight::setIntensity(const float& i)
-{
-	m_Intensity = i;
 }
 
 void PointLight::setShadowPassUpdate(bool val)
@@ -220,21 +182,6 @@ glm::vec3 PointLight::getLightPos() const
 	return m_LightPos;
 }
 
-glm::vec3 PointLight::getAmbient() const
-{
-	return m_Ambient;
-}
-
-glm::vec3 PointLight::getDiffuse() const
-{
-	return m_Diffuse;
-}
-
-glm::vec3 PointLight::getSpecular() const
-{
-	return m_Specular;
-}
-
 GLuint& PointLight::getCubeMapTexture() 
 {
 	return m_CubeMapTexture;
@@ -265,11 +212,6 @@ float PointLight::getShadowFOV() const
 	return m_ShadowFOV;
 }
 
-float PointLight::getIntensity() const
-{
-	return m_Intensity;
-}
-
 bool PointLight::getShadowPassUpdate() const
 {
 	return m_ShadowPassUpdate;
@@ -278,4 +220,28 @@ bool PointLight::getShadowPassUpdate() const
 float PointLight::getShadowBias() const
 {
 	return m_ShadowBias;
+}
+
+void PointLight::updateCommonShaderUniforms()
+{
+	if (m_LightingShader == nullptr)
+		return;
+
+	const glm::vec3 ambient = getAmbient();
+	const glm::vec3 diffuse = getDiffuse();
+	const glm::vec3 specular = getSpecular();
+	const float intensity = getIntensity();
+	const std::string prefix = "pointLights[" + std::to_string(m_LightID) + "]";
+
+	m_LightingShader->use();
+	m_LightingShader->setVec3(prefix + ".ambient", ambient * intensity);
+	m_LightingShader->setVec3(prefix + ".diffuse", diffuse * intensity);
+	m_LightingShader->setVec3(prefix + ".specular", specular * intensity);
+
+	if (m_LightShape != nullptr)
+	{
+		m_LightShape->m_Material.setAmbient(ambient);
+		m_LightShape->m_Material.setDiffuse(diffuse);
+		m_LightShape->m_Material.setSpecular(specular);
+	}
 }

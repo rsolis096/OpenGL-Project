@@ -9,7 +9,6 @@
 #include "Lighting/Shader.h"
 #include "Objects/Model.h"
 #include "Objects/Sphere.h"
-#include "Physics/PhysicsWorld.h"
 #include "UI/GUI.h"
 #include "World/Scene.h"
 
@@ -82,7 +81,7 @@ void processInput(GLFWwindow* window)
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
                 //Set mouse to center
                 glfwSetCursorPos(window, SCR_WIDTH / 2, SCR_HEIGHT / 2);
-
+                    
             }
         }
         lastKeyPressTime = currentTime;
@@ -227,11 +226,6 @@ void demoScene(Scene& demoScene)
 	demoScene.addObject(new Sphere("assets/textures/globe.jpg", "assets/textures/globe.jpg"));
     //demoScene.addObject(new Cube());
 
-    //demoScene.m_PhysicsWorld->addObject(demoScene.m_sceneObjects[0]);
-    //demoScene.m_PhysicsWorld->addObject(demoScene.m_sceneObjects[1]);
-    //demoScene.m_PhysicsWorld->addObject(demoScene.m_sceneObjects[2]);
-    //demoScene.m_PhysicsWorld->addObject(demoScene.m_sceneObjects[3]);
-
     glm::vec3 spotLightPos1 = glm::vec3(3.0f, 3.0f, -1.0f);
     glm::vec3 spotLightDir1 = glm::vec3(-7.0f, 0.0f, 0.0f);
     spotLightDir1 = glm::normalize(spotLightDir1 - spotLightPos1);
@@ -313,7 +307,7 @@ int main()
         glBeginQuery(GL_PRIMITIVES_GENERATED, query);
         */
 
-        myScene.drawScene(deltaTime, projection, view);
+        myScene.drawScene(projection, view);
 
         // Get triangle count
         /*
@@ -333,7 +327,6 @@ int main()
     }
 
     //Delete everything
-    myScene.m_PhysicsWorld->removeAllObjects();
     myScene.removeAllObjects();
 
     //imgui: terminate

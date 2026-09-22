@@ -8,7 +8,12 @@
 bool firstFrame1 = true;
 
 DirectionalLight::DirectionalLight(Shader* lightingShader, const glm::vec3& dir)
-: m_LightingShader(lightingShader)
+: Light(
+	lightingShader,
+	"Directional Light",
+	glm::vec3(0.1f),
+	glm::vec3(0.9f),
+	glm::vec3(0.7f))
 {
 	//Used for rendering but not explicitly needed, just a GLM technicality
 	m_LightPosition = glm::vec3( 20.0f, 20.0f, 0.0f);
@@ -24,13 +29,6 @@ DirectionalLight::DirectionalLight(Shader* lightingShader, const glm::vec3& dir)
 	m_LightDirection = glm::normalize(m_LightDirection);
 
 	m_DepthMapTexture = 0;
-	m_DisplayName = "Directional Light";
-
-	//Light color properties
-	m_Ambient = glm::vec3(0.1f, 0.1f, 0.1f);
-	m_Diffuse = glm::vec3(0.9f, 0.9f, 0.9f);
-	m_Specular = glm::vec3(0.7f, 0.7f, 0.7f);
-	m_Intensity = 1.0f;
 	m_NearPlane = 0.1f;
 	m_FarPlane = 50.0;
 	m_Radius = 10.0f;
@@ -43,9 +41,7 @@ DirectionalLight::DirectionalLight(Shader* lightingShader, const glm::vec3& dir)
 	m_LightingShader->use();		
 	m_LightingShader->setVec3("dirLight.position", m_LightPosition);
 	m_LightingShader->setVec3("dirLight.direction", m_LightDirection);
-	m_LightingShader->setVec3("dirLight.ambient", m_Ambient);
-	m_LightingShader->setVec3("dirLight.diffuse", m_Diffuse);
-	m_LightingShader->setVec3("dirLight.specular", m_Specular);
+	updateCommonShaderUniforms();
 	m_LightingShader->setBool("hasDirLight", true);
 	m_LightingShader->setBool("dirLight.showShadowArea", m_ShowShadowArea);
 
@@ -57,8 +53,6 @@ DirectionalLight::~DirectionalLight()
 	m_LightingShader->use();
 	m_LightingShader->setBool("hasDirLight", false);
 
-	m_LightingShader = nullptr;
-
 	// Delete the depth map texture
 	if (m_DepthMapTexture != 0) {
 		glDeleteTextures(1, &m_DepthMapTexture);
@@ -69,28 +63,6 @@ DirectionalLight::~DirectionalLight()
 * ###     SETTER FUNCTIONS        ###
 ###################################*/
 
-void DirectionalLight::setAmbient(glm::vec3 ambient)
-{
-	m_Ambient = ambient;
-	m_LightingShader->use();
-	m_LightingShader->setVec3("dirLight.ambient", m_Ambient);
-
-}
-
-void DirectionalLight::setDiffuse(glm::vec3 diffuse)
-{
-	m_Diffuse = diffuse;
-	m_LightingShader->use();
-	m_LightingShader->setVec3("dirLight.diffuse", m_Diffuse);
-}
-
-void DirectionalLight::setSpecular(glm::vec3 specular)
-{
-	m_Specular = specular;
-	m_LightingShader->use();
-	m_LightingShader->setVec3("dirLight.specular", m_Specular);
-}
-
 void DirectionalLight::setShadowHeight(int h) 
 {
 	m_ShadowHeight = h;
@@ -99,11 +71,6 @@ void DirectionalLight::setShadowHeight(int h)
 void DirectionalLight::setShadowWidth(int w) 
 {
 	m_ShadowWidth = w;
-}
-
-void DirectionalLight::setIntensity(const float i)
-{
-	m_Intensity = i;
 }
 
 void DirectionalLight::setNearPlane(const float i)
@@ -184,26 +151,6 @@ GLuint& DirectionalLight::getDepthMapTexture()
 	return m_DepthMapTexture;
 }
 
-glm::vec3 DirectionalLight::getAmbient() const
-{
-	return m_Ambient;
-}
-
-glm::vec3 DirectionalLight::getDiffuse() const
-{
-	return m_Diffuse;
-}
-
-glm::vec3 DirectionalLight::getSpecular() const
-{
-	return m_Specular;
-}
-
-float DirectionalLight::getIntensity() const
-{
-	return m_Intensity;
-}
-
 float DirectionalLight::getNearPlane() const
 {
 	return m_NearPlane;
@@ -227,4 +174,16 @@ float DirectionalLight::getFarPlane() const
 float DirectionalLight::getRadius() const
 {
 	return m_Radius;
+}
+
+void DirectionalLight::updateCommonShaderUniforms()
+{
+	if (m_LightingShader == nullptr)
+		return;
+
+	const float intensity = getIntensity();
+	m_LightingShader->use();
+	m_LightingShader->setVec3("dirLight.ambient", getAmbient() * intensity);
+	m_LightingShader->setVec3("dirLight.diffuse", getDiffuse() * intensity);
+	m_LightingShader->setVec3("dirLight.specular", getSpecular() * intensity);
 }

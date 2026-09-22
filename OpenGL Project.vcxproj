@@ -156,6 +156,7 @@
     <ClCompile Include="src\FBOs\SSAOBlurBuffer.cpp" />
     <ClCompile Include="src\FBOs\SSAOBuffer.cpp" />
     <ClCompile Include="src\Lighting\DirectionalLight.cpp" />
+    <ClCompile Include="src\Lighting\Light.cpp" />
     <ClCompile Include="src\Lighting\LightController.cpp" />
     <ClCompile Include="src\Lighting\PointLight.cpp" />
     <ClCompile Include="src\Lighting\Shader.cpp" />
@@ -173,10 +174,12 @@
     <ClCompile Include="src\Objects\Sphere.cpp" />
     <ClCompile Include="src\Objects\Texture.cpp" />
     <ClCompile Include="src\Objects\Transform.cpp" />
-    <ClCompile Include="src\Physics\PhysicsWorld.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\stb_image_write.cpp" />
     <ClCompile Include="src\UI\GUI.cpp" />
+    <ClCompile Include="src\UI\LightingPanel.cpp" />
+    <ClCompile Include="src\UI\SceneObjectsPanel.cpp" />
+    <ClCompile Include="src\UI\SkyBoxPanel.cpp" />
     <ClCompile Include="src\World\Scene.cpp" />
     <ClCompile Include="third party\includes\glad\glad.c" />
     <ClCompile Include="third party\includes\imgui\imgui.cpp" />
@@ -195,6 +198,7 @@
     <ClInclude Include="include\FBOs\SSAOBlurBuffer.h" />
     <ClInclude Include="include\FBOs\SSAOBuffer.h" />
     <ClInclude Include="include\Lighting\DirectionalLight.h" />
+    <ClInclude Include="include\Lighting\Light.h" />
     <ClInclude Include="include\Lighting\LightController.h" />
     <ClInclude Include="include\Lighting\PointLight.h" />
     <ClInclude Include="include\Lighting\Shader.h" />
@@ -212,8 +216,11 @@
     <ClInclude Include="include\Objects\Texture.h" />
     <ClInclude Include="include\Objects\Transform.h" />
     <ClInclude Include="include\Objects\Vertex.h" />
-    <ClInclude Include="include\Physics\PhysicsWorld.h" />
     <ClInclude Include="include\UI\GUI.h" />
+    <ClInclude Include="include\UI\LightingPanel.h" />
+    <ClInclude Include="include\UI\SceneObjectsPanel.h" />
+    <ClInclude Include="include\UI\SkyBoxPanel.h" />
+    <ClInclude Include="include\UI\UIContext.h" />
     <ClInclude Include="include\World\Scene.h" />
     <ClInclude Include="third party\includes\imgui\imconfig.h" />
     <ClInclude Include="third party\includes\imgui\imgui.h" />

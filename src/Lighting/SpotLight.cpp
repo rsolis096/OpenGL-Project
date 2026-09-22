@@ -11,11 +11,16 @@ bool firstFrame2 = true;
 unsigned short SpotLight::m_SpotLightCount = 0;
 
 SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec3 pos, glm::vec3 dir) :
-	m_LightingShader(lightingShader), m_LightSourceShader(lightSourceShader),
+	Light(
+		lightingShader,
+		"SpotLight" + std::to_string(m_SpotLightCount),
+		glm::vec3(1.0f),
+		glm::vec3(1.0f),
+		glm::vec3(1.0f)),
+	m_LightSourceShader(lightSourceShader),
 	m_LightPos(pos), m_NearPlane(0.5f), m_FarPlane(70.0f)
 {
 	m_SpotLightID = m_SpotLightCount;
-	m_DisplayName = "SpotLight" + std::to_string(m_SpotLightID);
 	m_SpotLightCount+= 1;
 
 
@@ -33,12 +38,6 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_LightShape = new Sphere();
 	m_LightShape->m_Transform.setPosition(pos);
 	m_LightShape->m_Transform.setScale(glm::vec3(0.2f));
-
-	//Light color properties
-	m_Intensity = 1.0f;
-	m_Ambient = glm::vec3(1.0f, 1.0f, 1.0f) ;
-	m_Diffuse = glm::vec3(1.0f, 1.0f, 1.0f) ;
-	m_Specular = glm::vec3(1.0f, 1.0f, 1.0f) ;
 
 	//Shadow Properties
 	m_ShadowFOV = 45.0f;
@@ -59,9 +58,7 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 	m_LightingShader->setInt("numberOfSpotLights", m_SpotLightCount);
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].position", m_LightPos);
 	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].direction", m_LightDirection);
-	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].ambient", m_Ambient);
-	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].diffuse", m_Diffuse);
-	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].specular", m_Specular);
+	updateCommonShaderUniforms();
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].far_plane", m_FarPlane);
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].constant", m_Constant);
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].linear", m_Linear);
@@ -76,7 +73,6 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 SpotLight::~SpotLight()
 {
 	//TODO: Implement Rule of 3 and 5 if you want
-	m_LightingShader = nullptr;
 	m_LightSourceShader = nullptr;
 	delete m_LightShape;
 	m_LightShape = nullptr;
@@ -112,31 +108,6 @@ void SpotLight::updateLightSpaceMatrix()
 /*###################################
 * ###     SETTER FUNCTIONS        ###
 ###################################*/
-
-void SpotLight::setAmbient(const glm::vec3& ambient)
-{
-	m_Ambient = ambient * m_Intensity;
-	m_LightShape->m_Material.setAmbient(m_Ambient);
-	m_LightingShader->use();
-	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].ambient", m_Ambient);
-
-}
-
-void SpotLight::setDiffuse(const glm::vec3& diffuse)
-{
-	m_Diffuse = diffuse * m_Intensity;
-	m_LightShape->m_Material.setDiffuse(m_Diffuse);
-	m_LightingShader->use();
-	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].diffuse", m_Diffuse);
-}
-
-void SpotLight::setSpecular(const glm::vec3& specular)
-{
-	m_Specular = specular * m_Intensity;
-	m_LightShape->m_Material.setSpecular(m_Specular);
-	m_LightingShader->use();
-	m_LightingShader->setVec3("spotLights[" + std::to_string(m_SpotLightID) + "].specular", m_Specular);
-}
 
 void SpotLight::setLightPos(const glm::vec3& lightPos)
 {
@@ -181,11 +152,6 @@ void SpotLight::setQuadratic(const float quadratic)
 	m_Quadratic = quadratic;
 	m_LightingShader->use();
 	m_LightingShader->setFloat("spotLights[" + std::to_string(m_SpotLightID) + "].quadratic", m_Quadratic);
-}
-
-void SpotLight::setIntensity(const float i)
-{
-	m_Intensity = i;
 }
 
 void SpotLight::setShadowHeight(int h)
@@ -265,26 +231,6 @@ glm::vec3 SpotLight::getLightDirection() const
 	return 	m_LightDirection;
 }
 
-glm::vec3 SpotLight::getAmbient() const
-{
-	return m_Ambient;
-}
-
-glm::vec3 SpotLight::getDiffuse() const
-{
-	return m_Diffuse;
-}
-
-glm::vec3 SpotLight::getSpecular() const
-{
-	return m_Specular;
-}
-
-float SpotLight::getIntensity() const
-{
-	return m_Intensity;
-}
-
 float SpotLight::getNearPlane() const
 {
 	return m_NearPlane;
@@ -339,4 +285,28 @@ float SpotLight::getPitch() const
 bool SpotLight::getShadowPassUpdate() const
 {
 	return m_ShadowPassUpdate;
+}
+
+void SpotLight::updateCommonShaderUniforms()
+{
+	if (m_LightingShader == nullptr)
+		return;
+
+	const glm::vec3 ambient = getAmbient();
+	const glm::vec3 diffuse = getDiffuse();
+	const glm::vec3 specular = getSpecular();
+	const float intensity = getIntensity();
+	const std::string prefix = "spotLights[" + std::to_string(m_SpotLightID) + "]";
+
+	m_LightingShader->use();
+	m_LightingShader->setVec3(prefix + ".ambient", ambient * intensity);
+	m_LightingShader->setVec3(prefix + ".diffuse", diffuse * intensity);
+	m_LightingShader->setVec3(prefix + ".specular", specular * intensity);
+
+	if (m_LightShape != nullptr)
+	{
+		m_LightShape->m_Material.setAmbient(ambient);
+		m_LightShape->m_Material.setDiffuse(diffuse);
+		m_LightShape->m_Material.setSpecular(specular);
+	}
 }

@@ -2,8 +2,6 @@
 
 #include "Lighting/Shader.h"
 
-#include <GLFW/glfw3.h>
-
 #include <iostream>
 
 unsigned int Object::objectCount = 0;
@@ -15,14 +13,6 @@ Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
     m_Material.setDiffuse(glm::vec3(1.0f));
     m_Material.setSpecular(glm::vec3(0.0f));
 
-    m_Force = glm::vec3(0.0f);
-    m_Velocity = glm::vec3(0.0f);
-    m_Mass = glm::vec3(1.0f);
-
-    enablePhysics = false;
-    isPhysicsObject = false;
-
-    startFall = 0.0f;
 }
 
 Object::~Object()
@@ -48,8 +38,6 @@ Object::~Object()
     m_InterleavedVertices.shrink_to_fit();
 }
 
-
-
 void Object::updateTexture(std::vector<std::string> texturePaths)
 {
     // Three Scenarios
@@ -62,21 +50,6 @@ void Object::updateTexture(std::vector<std::string> texturePaths)
     paths.specular = texturePaths[1];
     m_Material.setTextures(paths);
     
-}
-
-void Object::setPhysics()
-{
-    if (enablePhysics)
-    {
-        startFall = glfwGetTime();
-    }
-
-    setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
-}
-
-void Object::setVelocity(glm::vec3 v)
-{
-    m_Velocity = v;
 }
 
 //Combines vertices and normals

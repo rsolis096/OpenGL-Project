@@ -10,7 +10,6 @@
 #include "Lighting/ShadowMap.h"
 #include "Objects/Object.h"
 #include "Objects/SkyBox.h"
-#include "Physics/PhysicsWorld.h"
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
@@ -19,9 +18,6 @@
 //Static members
 unsigned int Scene::s_SCREEN_HEIGHT = 1080;
 unsigned int Scene::s_SCREEN_WIDTH = 1920;
-//Forward Declarations
-class PhysicsWorld;
-
 Scene::Scene(Camera* mC)
 {
 	m_SceneObjectCount = 0;
@@ -46,7 +42,6 @@ Scene::Scene(Camera* mC)
 	//lightingShader = new Shader("shaders/testShader.vs", "shaders/testShader.fs");
 
 	m_pointLightShader = new Shader("shaders/pointLightShader.vert", "shaders/pointLightShader.frag");
-	m_PhysicsWorld = new PhysicsWorld();
 
 	m_LightController = new LightController(m_deferredLightingShader, m_pointLightShader, m_mainCamera, this);
 	m_shadowMap = new ShadowMap(&m_sceneObjects, m_LightController);
@@ -164,14 +159,11 @@ void Scene::removeLightController()
 
 }
 
-void Scene::drawScene(float deltaTime, glm::mat4& proj, glm::mat4& view)
+void Scene::drawScene(glm::mat4& proj, glm::mat4& view)
 {
 	glEnable(GL_DEPTH_TEST);
 
 	m_shadowMap->ShadowPass();
-
-	// Update simulation once.
-	m_PhysicsWorld->step(static_cast<float>(glfwGetTime()), deltaTime);
 
 	glCheckError();
 

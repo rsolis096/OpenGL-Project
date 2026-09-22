@@ -26,16 +26,6 @@ public:
         EntityInfo m_EntityInfo;
         Material m_Material;
 
-        //Physics info (push to component later)
-        glm::vec3 m_Force;
-        glm::vec3 m_Velocity;
-        glm::vec3 m_Mass;
-        float startFall;
-        bool enablePhysics;
-        bool isPhysicsObject;
-        void setPhysics();
-        void setVelocity(glm::vec3);
-
         virtual void updateTexture(std::vector<std::string> texturePaths);
 
         //Draw the object. Each object type draws differently

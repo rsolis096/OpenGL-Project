@@ -9,7 +9,6 @@ class GBuffer;
 class LightController;
 class Model;
 class Object;
-class PhysicsWorld;
 class Shader;
 class ShadowMap;
 class SkyBox;
@@ -28,8 +27,6 @@ public:
 	Camera* m_mainCamera;
 
 	LightController* m_LightController;
-	PhysicsWorld* m_PhysicsWorld;
-
 	// Shaders
 	Shader* m_cubeMapShader; //skybox
 	Shader* m_pointLightShader;
@@ -68,7 +65,7 @@ public:
 
 	//void addShader(Shader&);
 
-	void drawScene(float, glm::mat4&, glm::mat4&);
+	void drawScene(glm::mat4&, glm::mat4&);
 
 private:
 	unsigned int m_quadVAO = 0;

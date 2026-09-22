@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Lighting/Light.h"
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
@@ -11,12 +13,12 @@ class Sphere;
 //Flashlight should inherit from spotlight or find another way to continuously update camera position
 //Flashlights arent typically at eye sight anyways so i may be better to lower is position relative to cam
 
-class SpotLight
+class SpotLight : public Light
 {
 public:
 
 	SpotLight(Shader*, Shader* , glm::vec3 , glm::vec3 );
-	~SpotLight();
+	~SpotLight() override;
 
 	//Methods
 	void Draw() const;
@@ -24,13 +26,9 @@ public:
 
 	//Setters for light properties
 	void setLightPos(const glm::vec3&);
-	void setAmbient(const glm::vec3& ambient);
-	void setDiffuse(const glm::vec3& diffuse);
-	void setSpecular(const glm::vec3& specular);
 	void setConstant(const float constant);
 	void setLinear(const float linear);
 	void setQuadratic(const float quadratic);
-	void setIntensity(const float i);
 	void setNearPlane(const float&);
 	void setFarPlane(const float&);
 	void setShadowHeight(int);
@@ -45,10 +43,6 @@ public:
 	//Getters for light properties
 	glm::vec3 getLightPos() const;
 	glm::vec3 getLightDirection() const;
-	glm::vec3 getAmbient() const;
-	glm::vec3 getDiffuse() const;
-	glm::vec3 getSpecular() const;
-	float getIntensity() const;
 	float getNearPlane() const;
 	float getFarPlane() const;
 	GLuint& getDepthMapTexture();
@@ -63,14 +57,12 @@ public:
 
 
 	//Private Variables
-	std::string m_DisplayName;
 	unsigned short m_SpotLightID;
 	static unsigned short m_SpotLightCount;
 
 private:
 
 	//Shaders (for lighting and for light source itself)
-	Shader* m_LightingShader;
 	Shader* m_LightSourceShader;
 
 	//Light Object (light is not invisible)
@@ -79,15 +71,11 @@ private:
 	//Light properties
 	glm::vec3 m_LightPos;
 	glm::vec3 m_LightDirection; //Unique to spotlight
-	glm::vec3 m_Ambient;
-	glm::vec3 m_Diffuse;
-	glm::vec3 m_Specular;
 
 	//For Attenuation
 	float m_Constant;
 	float m_Linear;
 	float m_Quadratic;
-	float m_Intensity;
 	float m_Yaw;
 	float m_Pitch;
 
@@ -103,4 +91,6 @@ private:
 	glm::mat4 m_LightViewMatrix;
 	bool m_ShadowPassUpdate;
 	float m_ShadowFOV;
+
+	void updateCommonShaderUniforms() override;
 };
