@@ -7,8 +7,12 @@
 #include "Camera.h"
 #include "Lighting/LightController.h"
 #include "Lighting/Shader.h"
+
 #include "Objects/Model.h"
 #include "Objects/Sphere.h"
+#include "Objects/Cube.h"
+#include "Objects/Plane.h"
+
 #include "UI/GUI.h"
 #include "World/Scene.h"
 
@@ -220,11 +224,10 @@ GLFWwindow* setupWindow()
 void demoScene(Scene& demoScene)
 {
     //GENERATE INITIAL SCENE (ALL OF THESE CAN BE CHANGED IN REAL TIME)
-    demoScene.addObject(new Model("assets/models/sponza/sponza.obj"));
-	//demoScene.addObject(new Cube("assets/textures/container2.png", "assets/textures/container2_specular.png"));
-    //demoScene.addObject(new Plane());
-	demoScene.addObject(new Sphere("assets/textures/globe.jpg", "assets/textures/globe.jpg"));
-    //demoScene.addObject(new Cube());
+    demoScene.createEntity<Model>("assets/models/sponza/sponza.obj");
+	demoScene.createEntity<Cube>("assets/textures/container2.png", "assets/textures/container2_specular.png");
+	demoScene.createEntity<Sphere>("assets/textures/globe.jpg", "assets/textures/globe.jpg");
+    demoScene.createEntity<Plane>();
 
     glm::vec3 spotLightPos1 = glm::vec3(3.0f, 3.0f, -1.0f);
     glm::vec3 spotLightDir1 = glm::vec3(-7.0f, 0.0f, 0.0f);
@@ -248,14 +251,14 @@ void demoScene(Scene& demoScene)
     //demoScene.m_LightController->addPointLight(glm::vec3(10.0f, 5.0f, 10.0f));
 
 
-    //demoScene.m_sceneObjects[1]->setPosition(glm::vec3(4.0f, 3.0f, 0.0));
-    //demoScene.m_sceneObjects[1]->setScale(glm::vec3(1.0f, 1.0f, 1.0f));
-    //demoScene.m_sceneObjects[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
-    demoScene.m_sceneObjects[0]->m_Transform.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    demoScene.m_sceneObjects[0]->m_Transform.setScale(glm::vec3(.01f));
-    demoScene.m_sceneObjects[1]->m_Transform.setPosition(glm::vec3(0.0f, 5.0f, 0.0f));
+    //demoScene.m_Entities[1]->setPosition(glm::vec3(4.0f, 3.0f, 0.0));
+    //demoScene.m_Entities[1]->setScale(glm::vec3(1.0f, 1.0f, 1.0f));
+    //demoScene.m_Entities[2]->setPosition(glm::vec3(-2.0f, 0.5f, -1.0f));
+    demoScene.m_Entities[0]->m_Transform.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    demoScene.m_Entities[0]->m_Transform.setScale(glm::vec3(.01f));
+    demoScene.m_Entities[1]->m_Transform.setPosition(glm::vec3(0.0f, 5.0f, 0.0f));
 
-    demoScene.m_sceneObjects[0]->m_Transform.setRotation(glm::vec3(0.0f, 180.0f, 0.0f));
+    demoScene.m_Entities[0]->m_Transform.setRotation(glm::vec3(0.0f, 180.0f, 0.0f));
 }
 
 float UpdateDeltaTime()

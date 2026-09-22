@@ -20,7 +20,6 @@ unsigned int Scene::s_SCREEN_HEIGHT = 1080;
 unsigned int Scene::s_SCREEN_WIDTH = 1920;
 Scene::Scene(Camera* mC)
 {
-	m_SceneObjectCount = 0;
 	m_fps = 0;
 	m_mainCamera = mC;
 
@@ -44,7 +43,7 @@ Scene::Scene(Camera* mC)
 	m_pointLightShader = new Shader("shaders/pointLightShader.vert", "shaders/pointLightShader.frag");
 
 	m_LightController = new LightController(m_deferredLightingShader, m_pointLightShader, m_mainCamera, this);
-	m_shadowMap = new ShadowMap(&m_sceneObjects, m_LightController);
+	m_shadowMap = new ShadowMap(&m_Entities, m_LightController);
 	m_skyBox = new SkyBox(*m_cubeMapShader, m_mainCamera);
 
 	m_gBuffer = new GBuffer(s_SCREEN_WIDTH, s_SCREEN_HEIGHT);
@@ -94,56 +93,11 @@ void Scene::InitializeDeferredRenderingShaders()
 	}
 }
 
-//Add an object to the scene (only objects part of a scene are rendered)
-int Scene::addObject(Object* obj)
-{	
-	if (obj == nullptr)
-		return 1;
-	
-	std::vector<Object*>::iterator it = std::find(m_sceneObjects.begin(), m_sceneObjects.end(), obj);
-	if (it == m_sceneObjects.end())
-	{
-		m_sceneObjects.push_back(obj);
-		return 0;
-	}
-	std::cout << "Object already in scene!" << std::endl;
-	return 1;
-}
-
-//Remove an object from the scene
-int Scene::removeObject(Object* obj)
-{
-	if (obj == nullptr) {
-		std::cout << "Invalid object pointer!" << std::endl;
-		return 1;
-	}
-
-	// Print debug information before removal
-	std::cout << "Removing object: " << obj->m_EntityInfo.displayName << std::endl;
-	std::cout << "Vector size before removal: " << m_sceneObjects.size() << std::endl;
-
-	auto removeIterator = std::find(m_sceneObjects.begin(), m_sceneObjects.end(), obj);
-
-	if (removeIterator != m_sceneObjects.end()) {
-		std::cout << "Object found in vector, deleting it." << std::endl;
-		delete* removeIterator; // Delete the object
-		m_sceneObjects.erase(removeIterator); // Erase the element from the vector
-
-		// Verify removal
-		std::cout << "Vector size after removal: " << m_sceneObjects.size() << std::endl;
-		return 0;
-	}
-
-	std::cout << "Scene: " << obj->m_EntityInfo.displayName << " is not part of the scene!" << std::endl;
-	return 1;
-}
-
 //Remove all objects from the scene
 void Scene::removeAllObjects()
 {
-	for (auto it = m_sceneObjects.begin(); it != m_sceneObjects.end(); ++it)
-		delete* it;
-	m_sceneObjects.clear();
+	m_EntityLookup.clear();
+	m_Entities.clear();
 }
 
 //Add a LightController to the scene
@@ -178,7 +132,7 @@ void Scene::drawScene(glm::mat4& proj, glm::mat4& view)
 		m_gBufferShader->setMat4("projection", proj);
 		m_gBufferShader->setMat4("view", view);
 
-		for (Object* element : m_sceneObjects)
+		for (const auto& element : m_Entities)
 		{
 			element->DrawGeometryPass(*m_gBufferShader);
 		}
@@ -353,4 +307,65 @@ void Scene::RenderFullscreenQuad()
 
 	glCheckError();
 
+}
+
+bool Scene::destroyEntity(EntityId id)
+{
+	// Iterate over m_Entities to find based on id
+	const auto entityIt = std::find_if(
+		m_Entities.begin(),
+		m_Entities.end(),
+		[id](const std::unique_ptr<Object>& entity)
+		{
+			return entity->m_EntityInfo.id == id;
+		}
+	);
+
+	if (entityIt == m_Entities.end())
+	{
+		return false;
+	}
+
+	// Given the iterator of the id to remove, remove it
+	m_EntityLookup.erase(id);
+	m_Entities.erase(entityIt);
+
+	return true;
+}
+
+Object* Scene::findEntity(EntityId id)
+{
+	auto it = m_EntityLookup.find(id);
+	if (it == m_EntityLookup.end())
+	{
+		return nullptr;
+	}
+
+	return it->second;
+}
+
+const Object* Scene::findEntity(EntityId id) const
+{
+	auto it = m_EntityLookup.find(id);
+	if (it == m_EntityLookup.end())
+	{
+		return nullptr;
+	}
+
+	return it->second;
+}
+
+std::string Scene::makeDefaultName(const Object& entity, EntityId id) const
+{
+	switch (entity.GetType())
+	{
+	case ObjectType::Model:
+		return "Model " + std::to_string(id);
+
+	case ObjectType::Sphere:
+		return "Sphere " + std::to_string(id);
+
+	default:
+		return "Entity " + std::to_string(id);
+	}
 }

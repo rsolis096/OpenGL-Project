@@ -15,42 +15,44 @@ class Object
 {
 public:
 
-        static unsigned int objectCount;
+    //Initializes the basic attributes for all objects
+    Object();
+    virtual ~Object();
 
-        //Initializes the basic attributes for all objects
-        Object();
-        virtual ~Object();
+    //Texture Properties
+    Transform m_Transform;
+    Material m_Material;
 
-        //Texture Properties
-        Transform m_Transform;
-        EntityInfo m_EntityInfo;
-        Material m_Material;
+    virtual void updateTexture(std::vector<std::string> texturePaths);
 
-        virtual void updateTexture(std::vector<std::string> texturePaths);
+    //Draw the object. Each object type draws differently
+    virtual void Draw(Shader& shader) = 0;
+    virtual void ShadowPassDraw(Shader& shader) = 0;
+    virtual void DrawGeometryPass(Shader& shader) = 0;
+    virtual ObjectType GetType() const { return ObjectType::Object; }
 
-        //Draw the object. Each object type draws differently
-        virtual void Draw(Shader& shader) = 0;
-        virtual void ShadowPassDraw(Shader& shader) = 0;
-        virtual void DrawGeometryPass(Shader& shader) = 0;
-        virtual ObjectType GetType() const { return ObjectType::Object; }
+    EntityInfo m_EntityInfo;
+    void assignIdentity(EntityId id, std::string name);
 
+    EntityId id() const;
+    const std::string& displayName() const;
 
-    protected:
+protected:
 
-        //Mesh Data
-        std::vector<float>m_Vertices;
-        std::vector<float>m_TexCoords;
-        std::vector<float>m_Normals;
-        std::vector<unsigned int>m_Indices;
-        std::vector<float>m_InterleavedVertices;
+    //Mesh Data
+    std::vector<float>m_Vertices;
+    std::vector<float>m_TexCoords;
+    std::vector<float>m_Normals;
+    std::vector<unsigned int>m_Indices;
+    std::vector<float>m_InterleavedVertices;
 
-        //Rendering info
-        unsigned int m_vao, m_vbo, m_ebo;
+    //Rendering info
+    unsigned int m_vao, m_vbo, m_ebo;
 
-        void buildInterleavedVerticesWithTexCoords();
-        void buildInterleavedVertices();
+    void buildInterleavedVerticesWithTexCoords();
+    void buildInterleavedVertices();
 
-        virtual void ApplyMaterialUniforms(Shader& shader);
-        virtual void DrawMesh();
+    virtual void ApplyMaterialUniforms(Shader& shader);
+    virtual void DrawMesh();
 
 };

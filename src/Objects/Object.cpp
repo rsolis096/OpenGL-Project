@@ -4,15 +4,12 @@
 
 #include <iostream>
 
-unsigned int Object::objectCount = 0;
-
 Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
 {
     //Set default Cube properties
     m_Material.setAmbient(glm::vec3(0.0f));
     m_Material.setDiffuse(glm::vec3(1.0f));
-    m_Material.setSpecular(glm::vec3(0.0f));
-
+    m_Material.setSpecular(glm::vec3(0.0f)); 
 }
 
 Object::~Object()
@@ -50,6 +47,21 @@ void Object::updateTexture(std::vector<std::string> texturePaths)
     paths.specular = texturePaths[1];
     m_Material.setTextures(paths);
     
+}
+
+void Object::assignIdentity(EntityId id, std::string name)
+{
+    m_EntityInfo.setInfo(name, id);
+}
+
+EntityId Object::id() const
+{
+    return m_EntityInfo.id;
+}
+
+const std::string& Object::displayName() const
+{
+    return m_EntityInfo.displayName;
 }
 
 //Combines vertices and normals

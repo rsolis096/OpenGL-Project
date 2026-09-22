@@ -12,8 +12,6 @@ unsigned int TextureFromFile(const char* path, const string& directory, bool gam
 
 Model::Model(string const& path, bool gamma) : Object(), gammaCorrection(gamma)
 {
-    m_EntityInfo.setInfo("Model" + std::to_string(objectCount), objectCount);
-    objectCount++;
     loadModel(path);
 }
 

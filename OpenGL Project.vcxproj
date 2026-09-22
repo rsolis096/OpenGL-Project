@@ -168,7 +168,6 @@
     <ClCompile Include="src\Objects\Mesh.cpp" />
     <ClCompile Include="src\Objects\Model.cpp" />
     <ClCompile Include="src\Objects\Object.cpp" />
-    <ClCompile Include="src\Objects\ObjectTypes.cpp" />
     <ClCompile Include="src\Objects\Plane.cpp" />
     <ClCompile Include="src\Objects\SkyBox.cpp" />
     <ClCompile Include="src\Objects\Sphere.cpp" />

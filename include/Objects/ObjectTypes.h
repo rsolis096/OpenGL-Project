@@ -7,9 +7,12 @@
 #include "Transform.h"
 
 using EntityId = std::uint64_t;
+constexpr EntityId InvalidEntityId = 0;
+
 using PlayerId = std::uint32_t;
 
-struct EntityInfo {
+struct EntityInfo 
+{
     EntityId id = 0;
     std::string displayName;
 

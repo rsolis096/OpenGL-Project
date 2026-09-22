@@ -15,8 +15,8 @@ unsigned int ShadowMap::quadVAO = 0;
 unsigned int ShadowMap::quadVBO = 0;
 bool ShadowMap::quadInitialized = false;
 
-ShadowMap::ShadowMap(std::vector<Object*>* objects, LightController* lightController) :
-    m_sceneObjects(objects), m_LightController(lightController),
+ShadowMap::ShadowMap(const std::vector<std::unique_ptr<Object>>* entities, LightController* lightController) :
+    m_Entities(entities), m_LightController(lightController),
     shadowPassShader(Shader("shaders/depthShader.vert", "shaders/depthShader.frag", "shaders/depthShader.gs")),
     debugDepthShader(Shader("shaders/debug_quad.vert", "shaders/debug_quad_depth.frag"))
 {
@@ -159,9 +159,9 @@ void ShadowMap::ShadowPass()
                     shadowPassShader.setMat4("shadowMatricesPoint[" + std::to_string(j) + "]", lightViews[j]);
                 }
 
-                for (Object* obj : *m_sceneObjects)
+                for (const auto& entity : *m_Entities)
                 {
-                    obj->ShadowPassDraw(shadowPassShader);
+                    entity->ShadowPassDraw(shadowPassShader);
                 }
             }
 
@@ -193,8 +193,8 @@ void ShadowMap::ShadowPass()
             glClear(GL_DEPTH_BUFFER_BIT);
 
             //Draw Scene (limited for shadow pass)
-            for (Object* obj : *m_sceneObjects) {
-                obj->ShadowPassDraw(shadowPassShader);
+            for (const auto& entity : *m_Entities) {
+                entity->ShadowPassDraw(shadowPassShader);
             }
 
         }      
@@ -240,8 +240,8 @@ void ShadowMap::ShadowPass()
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // Render scene objects to shadow map
-        for (Object* obj : *m_sceneObjects) {
-            obj->ShadowPassDraw(shadowPassShader);
+        for (const auto& entity : *m_Entities) {
+            entity->ShadowPassDraw(shadowPassShader);
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

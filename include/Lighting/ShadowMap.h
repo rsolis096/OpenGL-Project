@@ -5,6 +5,7 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <memory>
 #include <vector>
 
 class DirectionalLight;
@@ -22,7 +23,7 @@ public:
     Shader debugDepthShader;
 
     // Constructor
-    ShadowMap(std::vector<Object*>* objects, LightController* lightController);
+    ShadowMap(const std::vector<std::unique_ptr<Object>>* entities, LightController* lightController);
 
     // Public methods
     void addSpotLightShadowMap(GLuint& depthMapTexture) ;
@@ -60,7 +61,7 @@ private:
     glm::mat4 directionalLightSpaceMatrix;
 
     // Scene Pointers
-    std::vector<Object*>* m_sceneObjects;
+    const std::vector<std::unique_ptr<Object>>* m_Entities;
     LightController* m_LightController;
 
 

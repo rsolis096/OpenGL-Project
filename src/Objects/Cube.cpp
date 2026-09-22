@@ -12,9 +12,6 @@ Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Ob
     //Open and load diffuse map and specular map, save their Cubes
     m_Material.setTextures({ texturePathDiffuse , texturePathSpecular });
 
-    m_EntityInfo.setInfo("Cube" + std::to_string(objectCount), objectCount);
-    objectCount++;
-
     //Build the specified Cube type
     buildCube();
 }
@@ -22,10 +19,6 @@ Cube::Cube(const char* texturePathDiffuse, const char* texturePathSpecular) : Ob
 //Used for creating a primitive with no texture
 Cube::Cube() : Object()
 {
-
-    m_EntityInfo.setInfo("Cube" + std::to_string(objectCount), objectCount);
-    objectCount++;
-
     buildCube();
 }
 

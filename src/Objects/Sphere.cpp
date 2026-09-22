@@ -9,9 +9,6 @@
 //Used for creating a Primitive with texture information
 Sphere::Sphere(const char* texturePathDiffuse, const char* texturePathSpecular) : Object()
 {
-    m_EntityInfo.setInfo("Sphere" + std::to_string(objectCount), objectCount);
-    objectCount++;
-
     // Initialize the unique_ptrs using std::make_unique
     m_Material.setTextures({ texturePathDiffuse , texturePathSpecular });
 
@@ -22,8 +19,6 @@ Sphere::Sphere(const char* texturePathDiffuse, const char* texturePathSpecular) 
 //Used for creating a primitive with no texture
 Sphere::Sphere() : Object()
 {
-    m_EntityInfo.setInfo("Sphere" + std::to_string(objectCount), objectCount);
-    objectCount++;
     buildSphere();
 }
 

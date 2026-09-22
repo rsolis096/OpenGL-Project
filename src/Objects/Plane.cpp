@@ -9,9 +9,6 @@ Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : 
     //Set some rendering properties
     m_Material.setTextures({ texturePathDiffuse , texturePathSpecular });
 
-    m_EntityInfo.setInfo("Plane" + std::to_string(objectCount), objectCount);
-    objectCount++;
-
     //Build the specified Plane type
     buildPlane();
 }
@@ -19,9 +16,6 @@ Plane::Plane(const char* texturePathDiffuse, const char* texturePathSpecular) : 
 //Used for creating a primitive with no texture
 Plane::Plane() : Object()
 {
-    m_EntityInfo.setInfo("Plane" + std::to_string(objectCount), objectCount);
-    objectCount++;
-
     buildPlane();
 }
 

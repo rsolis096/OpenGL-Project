@@ -43,7 +43,7 @@ SceneObjectsPanel::SceneObjectsPanel(UIContext& context)
 
 Object* SceneObjectsPanel::selectedObject()
 {
-    auto& objects = m_Context.scene.m_sceneObjects;
+    auto& objects = m_Context.scene.m_Entities;
     if (objects.empty())
     {
         m_SelectedIndex = 0;
@@ -51,7 +51,7 @@ Object* SceneObjectsPanel::selectedObject()
     }
 
     m_SelectedIndex = std::max(0, std::min(m_SelectedIndex, static_cast<int>(objects.size()) - 1));
-    return objects[m_SelectedIndex];
+    return objects[m_SelectedIndex].get();
 }
 
 void SceneObjectsPanel::syncTexturePaths(Object* object)
@@ -89,10 +89,10 @@ void SceneObjectsPanel::drawModelDialog()
         }
         else
         {
-            m_Context.scene.addObject(new Model(path));
+            m_Context.scene.createEntity<Model>(path);
             m_ModelLoadFailed = false;
             m_ShowModelDialog = false;
-            m_SelectedIndex = static_cast<int>(m_Context.scene.m_sceneObjects.size()) - 1;
+            m_SelectedIndex = static_cast<int>(m_Context.scene.m_Entities.size()) - 1;
         }
     }
 
@@ -110,9 +110,9 @@ void SceneObjectsPanel::drawSidebar()
     auto& scene = m_Context.scene;
     ImGui::BeginChild("object_list", ImVec2(150, ImGui::GetWindowHeight() * 0.5f), true);
 
-    for (int index = 0; index < static_cast<int>(scene.m_sceneObjects.size()); ++index)
+    for (int index = 0; index < static_cast<int>(scene.m_Entities.size()); ++index)
     {
-        Object* object = scene.m_sceneObjects[index];
+        Object* object = scene.m_Entities[index].get();
         if (object != nullptr && ImGui::Selectable(object->m_EntityInfo.displayName.c_str(), m_SelectedIndex == index))
             m_SelectedIndex = index;
     }
@@ -120,11 +120,11 @@ void SceneObjectsPanel::drawSidebar()
     ImGui::EndChild();
 
     if (ImGui::Button("Add Cube"))
-        scene.addObject(new Cube());
+        scene.createEntity<Cube>();
     if (ImGui::Button("Add Sphere"))
-        scene.addObject(new Sphere());
+        scene.createEntity<Sphere>();
     if (ImGui::Button("Add Plane"))
-        scene.addObject(new Plane());
+        scene.createEntity<Plane>();
 
     if (ImGui::Button(m_ShowModelDialog ? "Cancel" : "Add Model"))
     {
@@ -203,7 +203,7 @@ void SceneObjectsPanel::drawInspector()
     if (ImGui::Button("Delete Object"))
     {
         std::cout << "Selected To Delete " << object->m_EntityInfo.displayName << '\n';
-        m_Context.scene.removeObject(object);
+        m_Context.scene.destroyEntity(object->id());
         m_SelectedIndex = std::max(0, m_SelectedIndex - 1);
         m_TexturePathObject = nullptr;
     }
