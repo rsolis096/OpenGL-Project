@@ -9,6 +9,7 @@
 using EntityId = std::uint64_t;
 constexpr EntityId InvalidEntityId = 0;
 
+
 using PlayerId = std::uint32_t;
 
 struct EntityInfo 

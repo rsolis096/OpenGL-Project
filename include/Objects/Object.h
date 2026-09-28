@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 #include <string>
 
 #include <glm/glm.hpp>
@@ -38,19 +37,8 @@ public:
     const std::string& displayName() const;
 
 protected:
-
-    //Mesh Data
-    std::vector<float>m_Vertices;
-    std::vector<float>m_TexCoords;
-    std::vector<float>m_Normals;
-    std::vector<unsigned int>m_Indices;
-    std::vector<float>m_InterleavedVertices;
-
     //Rendering info
     unsigned int m_vao, m_vbo, m_ebo;
-
-    void buildInterleavedVerticesWithTexCoords();
-    void buildInterleavedVertices();
 
     virtual void ApplyMaterialUniforms(Shader& shader);
     virtual void DrawMesh();

@@ -12,8 +12,8 @@ public:
     Framebuffer() = default;
     Framebuffer(int width, int height);
 
-    Framebuffer(Framebuffer&& other) noexcept;
-    Framebuffer& operator=(Framebuffer&& other) noexcept;
+    Framebuffer(Framebuffer&& other);
+    Framebuffer& operator=(Framebuffer&& other);
 
     // Do Not Implement
     Framebuffer(const Framebuffer&) = delete;

@@ -19,6 +19,7 @@ public:
 private:
     //Used for construction of primitives
     void buildCube();
+    unsigned int m_IndexCount = 0;
 
 protected:
     void ApplyMaterialUniforms(Shader& shader) override;

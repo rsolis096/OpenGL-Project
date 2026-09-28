@@ -24,7 +24,7 @@ Framebuffer::~Framebuffer()
 	m_height = 0;
 }
 
-Framebuffer::Framebuffer(Framebuffer&& other) noexcept
+Framebuffer::Framebuffer(Framebuffer&& other)
 {
 	if (this == &other)
 	{
@@ -37,7 +37,7 @@ Framebuffer::Framebuffer(Framebuffer&& other) noexcept
 
 }
 
-Framebuffer& Framebuffer::operator=(Framebuffer&& other) noexcept
+Framebuffer& Framebuffer::operator=(Framebuffer&& other)
 {
 	if (this == &other)
 	{

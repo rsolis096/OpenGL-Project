@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+
 Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
 {
     //Set default Cube properties
@@ -21,18 +22,6 @@ Object::~Object()
     m_vao = 0;
     m_vbo = 0;
     m_ebo = 0;
-
-    // Clear vectors
-    m_Vertices.clear();
-    m_Vertices.shrink_to_fit();
-    m_TexCoords.clear();
-    m_TexCoords.shrink_to_fit();
-    m_Normals.clear();
-    m_Normals.shrink_to_fit();
-    m_Indices.clear();
-    m_Indices.shrink_to_fit();
-    m_InterleavedVertices.clear();
-    m_InterleavedVertices.shrink_to_fit();
 }
 
 void Object::updateTexture(const MaterialPaths& paths)
@@ -58,47 +47,6 @@ EntityId Object::id() const
 const std::string& Object::displayName() const
 {
     return m_EntityInfo.displayName;
-}
-
-//Combines vertices and normals
-void Object::buildInterleavedVertices()
-{
-    std::vector<float>().swap(m_InterleavedVertices);
-
-    std::size_t i, j;
-    std::size_t count = m_Vertices.size();
-    for (i = 0, j = 0; i < count; i += 3)
-    {
-        m_InterleavedVertices.push_back(m_Vertices[i]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 1]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 2]);
-
-        m_InterleavedVertices.push_back(m_Normals[i]);
-        m_InterleavedVertices.push_back(m_Normals[i + 1]);
-        m_InterleavedVertices.push_back(m_Normals[i + 2]);
-
-    }
-}
-
-void Object::buildInterleavedVerticesWithTexCoords()
-{
-    std::vector<float>().swap(m_InterleavedVertices);
-
-    std::size_t i, j;
-    std::size_t count = m_Vertices.size();
-    for (i = 0, j = 0; i < count; i += 3, j += 2)
-    {
-        m_InterleavedVertices.push_back(m_Vertices[i]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 1]);
-        m_InterleavedVertices.push_back(m_Vertices[i + 2]);
-
-        m_InterleavedVertices.push_back(m_Normals[i]);
-        m_InterleavedVertices.push_back(m_Normals[i + 1]);
-        m_InterleavedVertices.push_back(m_Normals[i + 2]);
-
-        m_InterleavedVertices.push_back(m_TexCoords[j]);
-        m_InterleavedVertices.push_back(m_TexCoords[j + 1]);
-    }
 }
 
 void Object::ApplyMaterialUniforms(Shader& shader) {}

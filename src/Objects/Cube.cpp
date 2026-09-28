@@ -2,8 +2,10 @@
 
 #include "DebugUtils.h"
 #include "Lighting/Shader.h"
+#include "Objects/Mesh.h"
 #include "Objects/Texture.h"
 
+#include <cstddef>
 #include <glm/gtx/string_cast.hpp>
 
 //Used for creating a Primtive with texture information
@@ -67,7 +69,7 @@ void Cube::ApplyMaterialUniforms(Shader& shader)
 void Cube::DrawMesh()
 {
     glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_IndexCount), GL_UNSIGNED_INT, nullptr);
 
     glBindVertexArray(0);
     glCheckError();
@@ -75,167 +77,38 @@ void Cube::DrawMesh()
 
 void Cube::buildCube()
 {
-    //Pre Defined cube vertices, normals, and TexCoords
-    m_Vertices = {
-        // Back face
-        -0.5f, -0.5f, -0.5f, // Bottom-left
-         0.5f,  0.5f, -0.5f, // top-right
-         0.5f, -0.5f, -0.5f,  // bottom-right         
-         0.5f,  0.5f, -0.5f, // top-right
-        -0.5f, -0.5f, -0.5f,   // bottom-left
-        -0.5f,  0.5f, -0.5f,  // top-left
-        // Front face
-        -0.5f, -0.5f,  0.5f, // bottom-left
-         0.5f, -0.5f,  0.5f,   // bottom-right
-         0.5f,  0.5f,  0.5f,  // top-right
-         0.5f,  0.5f,  0.5f,   // top-right
-        -0.5f,  0.5f,  0.5f,   // top-left
-        -0.5f, -0.5f,  0.5f,   // bottom-left
-        // Left face
-        -0.5f,  0.5f,  0.5f,   // top-right
-        -0.5f,  0.5f, -0.5f,   // top-left
-        -0.5f, -0.5f, -0.5f, // bottom-left
-        -0.5f, -0.5f, -0.5f,   // bottom-left
-        -0.5f, -0.5f,  0.5f, // bottom-right
-        -0.5f,  0.5f,  0.5f,  // top-right
-        // Right face
-         0.5f,  0.5f,  0.5f, // top-left
-         0.5f, -0.5f, -0.5f,   // bottom-right
-         0.5f,  0.5f, -0.5f,   // top-right         
-         0.5f, -0.5f, -0.5f,   // bottom-right
-         0.5f,  0.5f,  0.5f,   // top-left
-         0.5f, -0.5f,  0.5f, // bottom-left     
-         // Bottom face
-         -0.5f, -0.5f, -0.5f,   // top-right
-          0.5f, -0.5f, -0.5f,   // top-left
-          0.5f, -0.5f,  0.5f,  // bottom-left
-          0.5f, -0.5f,  0.5f,   // bottom-left
-         -0.5f, -0.5f,  0.5f, // bottom-right
-         -0.5f, -0.5f, -0.5f,   // top-right
-         // Top face
-         -0.5f,  0.5f, -0.5f,  // top-left
-          0.5f,  0.5f,  0.5f,  // bottom-right
-          0.5f,  0.5f, -0.5f,   // top-right     
-          0.5f,  0.5f,  0.5f,  // bottom-right
-         -0.5f,  0.5f, -0.5f,   // top-left
-         -0.5f,  0.5f,  0.5f  // bottom-left  
-    };
+    const MeshData meshData = buildCubeMesh();
+    m_IndexCount = static_cast<unsigned int>(meshData.indices.size());
 
-    m_Normals = {
-        0.0f,  0.0f, -1.0f,
-        0.0f,  0.0f, -1.0f,
-        0.0f,  0.0f, -1.0f,
-        0.0f,  0.0f, -1.0f,
-        0.0f,  0.0f, -1.0f,
-        0.0f,  0.0f, -1.0f,
-
-        0.0f,  0.0f,  1.0f,
-        0.0f,  0.0f,  1.0f,
-        0.0f,  0.0f,  1.0f,
-        0.0f,  0.0f,  1.0f,
-        0.0f,  0.0f,  1.0f,
-        0.0f,  0.0f,  1.0f,
-
-        -1.0f,  0.0f,  0.0f,
-        -1.0f,  0.0f,  0.0f,
-        -1.0f,  0.0f,  0.0f,
-        -1.0f,  0.0f,  0.0f,
-        -1.0f,  0.0f,  0.0f,
-        -1.0f,  0.0f,  0.0f,
-
-         1.0f,  0.0f,  0.0f,
-         1.0f,  0.0f,  0.0f,
-         1.0f,  0.0f,  0.0f,
-         1.0f,  0.0f,  0.0f,
-         1.0f,  0.0f,  0.0f,
-         1.0f,  0.0f,  0.0f,
-
-         0.0f, -1.0f,  0.0f,
-         0.0f, -1.0f,  0.0f,
-         0.0f, -1.0f,  0.0f,
-         0.0f, -1.0f,  0.0f,
-         0.0f, -1.0f,  0.0f,
-         0.0f, -1.0f,  0.0f,
-
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f
-    };
-
-    m_TexCoords = {
-        // Back face
-        0.0f, 0.0f, // Bottom-left
-        1.0f, 1.0f, // top-right
-        1.0f, 0.0f, // bottom-right         
-        1.0f, 1.0f, // top-right
-        0.0f, 0.0f, // bottom-left
-        0.0f, 1.0f, // top-left
-        // Front face
-        0.0f, 0.0f, // bottom-left
-        1.0f, 0.0f, // bottom-right
-        1.0f, 1.0f, // top-right
-        1.0f, 1.0f, // top-right
-        0.0f, 1.0f, // top-left
-        0.0f, 0.0f, // bottom-left
-        // Left face
-        1.0f, 0.0f, // top-right
-        1.0f, 1.0f, // top-left
-        0.0f, 1.0f, // bottom-left
-        0.0f, 1.0f, // bottom-left
-        0.0f, 0.0f, // bottom-right
-        1.0f, 0.0f, // top-right
-        // Right face
-        1.0f, 0.0f, // top-left
-        0.0f, 1.0f, // bottom-right
-        1.0f, 1.0f, // top-right         
-        0.0f, 1.0f, // bottom-right
-        1.0f, 0.0f, // top-left
-        0.0f, 0.0f, // bottom-left     
-         // Bottom face
-        0.0f, 1.0f, // top-right
-        1.0f, 1.0f, // top-left
-        1.0f, 0.0f, // bottom-left
-        1.0f, 0.0f, // bottom-left
-        0.0f, 0.0f, // bottom-right
-        0.0f, 1.0f, // top-right
-         // Top face
-        0.0f, 1.0f, // top-left
-        1.0f, 0.0f, // bottom-right
-        1.0f, 1.0f, // top-right     
-        1.0f, 0.0f, // bottom-right
-        0.0f, 1.0f, // top-left
-        0.0f, 0.0f  // bottom-left   
-    };
-
-    //Combine above mesh data
-    buildInterleavedVerticesWithTexCoords();
-
-    //Generate VAO and VBO
     glGenVertexArrays(1, &m_vao);
     glGenBuffers(1, &m_vbo);
+    glGenBuffers(1, &m_ebo);
 
-    //Assign vertices to Cube
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_InterleavedVertices.size(), m_InterleavedVertices.data(), GL_STATIC_DRAW);
-
-    // Set up vertex attribute pointers (vertices, normals, texcoords)
     glBindVertexArray(m_vao);
-    //Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
-    //Normal Attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 3));
-    //TexCoord Attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(float), (void*)(sizeof(float) * 6));
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        sizeof(Vertex) * meshData.vertices.size(),
+        meshData.vertices.data(),
+        GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        sizeof(unsigned int) * meshData.indices.size(),
+        meshData.indices.data(),
+        GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, Normal)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, TexCoords)));
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
 
 
-    // unbind VAO and VBOs
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }

@@ -16,33 +16,41 @@ struct ModelTexture {
 };
 
 struct Vertex {
-    // position
     glm::vec3 Position;
-    // normal
     glm::vec3 Normal;
-    // texCoords
     glm::vec2 TexCoords;
-    // tangent
     glm::vec3 Tangent;
-    // bitangent
     glm::vec3 Bitangent;
+
     //bone indexes which will influence this vertex
     int m_BoneIDs[MAX_BONE_INFLUENCE];
     //weights from each bone
     float m_Weights[MAX_BONE_INFLUENCE];
 };
 
+struct MeshData {
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+};
+
+MeshData buildCubeMesh();
+MeshData buildSphereMesh();
+MeshData buildPlaneMesh();
+
 class Mesh {
 public:
     // mesh Data
-    vector<Vertex>       vertices;
+    vector<Vertex> vertices;
     vector<unsigned int> indices;
-    vector<ModelTexture>      textures;
+    vector<ModelTexture> textures;
 
     Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<ModelTexture> textures);
-    Mesh(Mesh&& other) noexcept;
-    Mesh& operator=(Mesh&& other) noexcept;
+    Mesh(const Mesh&) = delete;
+    Mesh& operator=(const Mesh&) = delete;
+    Mesh(Mesh&& other);
+    Mesh& operator=(Mesh&& other) ;
     ~Mesh();
+
     // render the mesh
     void Draw(Shader& shader, bool hasTexture) const;
     void ShadowPassDraw(Shader& shader) const;
@@ -50,9 +58,12 @@ public:
 
 private:
     // render data 
-    unsigned int VAO, VBO, EBO;
+    unsigned int VAO = 0;
+    unsigned int VBO = 0;
+    unsigned int EBO = 0;
     // initializes all the buffer objects/arrays
     void setupMesh();
+    void releaseGpuResources();
 
     void ApplyMaterialUniforms(Shader& shader, bool hasTexture) const;
     void DrawMesh() const;
