@@ -2,7 +2,7 @@
 
 #include "DebugUtils.h"
 #include "Lighting/Shader.h"
-#include "Objects/Mesh.h"
+#include "Objects/MeshBuilder.h"
 #include "Objects/Texture.h"
 
 #include <cstddef>
@@ -77,7 +77,7 @@ void Cube::DrawMesh()
 
 void Cube::buildCube()
 {
-    const MeshData meshData = buildCubeMesh();
+    const MeshData meshData = MeshBuilder::build(PrimitiveKind::Cube);
     m_IndexCount = static_cast<unsigned int>(meshData.indices.size());
 
     glGenVertexArrays(1, &m_vao);

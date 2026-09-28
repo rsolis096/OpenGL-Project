@@ -169,6 +169,7 @@
     <ClCompile Include="src\Objects\Model.cpp" />
     <ClCompile Include="src\Objects\Object.cpp" />
     <ClCompile Include="src\Objects\Plane.cpp" />
+    <ClCompile Include="src\Objects\MeshBuilder.cpp" />
     <ClCompile Include="src\Objects\SkyBox.cpp" />
     <ClCompile Include="src\Objects\Sphere.cpp" />
     <ClCompile Include="src\Objects\Texture.cpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="include\Objects\Object.h" />
     <ClInclude Include="include\Objects\ObjectTypes.h" />
     <ClInclude Include="include\Objects\Plane.h" />
+    <ClInclude Include="include\Objects\MeshBuilder.h" />
     <ClInclude Include="include\Objects\SkyBox.h" />
     <ClInclude Include="include\Objects\Sphere.h" />
     <ClInclude Include="include\Objects\Texture.h" />

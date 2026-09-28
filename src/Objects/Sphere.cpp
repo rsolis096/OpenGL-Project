@@ -2,7 +2,7 @@
 
 #include "DebugUtils.h"
 #include "Lighting/Shader.h"
-#include "Objects/Mesh.h"
+#include "Objects/MeshBuilder.h"
 #include "Objects/Texture.h"
 
 #include <cstddef>
@@ -76,7 +76,7 @@ void Sphere::DrawMesh()
 
 void Sphere::buildSphere()
 {
-    const MeshData meshData = buildSphereMesh();
+    const MeshData meshData = MeshBuilder::build(PrimitiveKind::Sphere);
     m_IndexCount = static_cast<unsigned int>(meshData.indices.size());
 
     //Setup VAO and VBO

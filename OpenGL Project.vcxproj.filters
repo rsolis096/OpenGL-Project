@@ -150,9 +150,6 @@
     <ClCompile Include="src\Objects\Object.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\ObjectTypes.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="src\Objects\Plane.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
@@ -184,6 +181,9 @@
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\Objects\Material.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\MeshBuilder.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
   </ItemGroup>
@@ -306,6 +306,9 @@
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="include\Objects\Material.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\MeshBuilder.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
