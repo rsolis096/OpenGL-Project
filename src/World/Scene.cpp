@@ -369,7 +369,16 @@ std::string Scene::makeDefaultName(const Object& entity, EntityId id) const
 		return "Cube " + std::to_string(id);
 
 	case ObjectType::Plane:
-			return "Plane " + std::to_string(id);
+		return "Plane " + std::to_string(id);
+
+	case ObjectType::Cylinder:
+		return "Cylinder " + std::to_string(id);
+
+	case ObjectType::Cone:
+		return "Cone " + std::to_string(id);
+
+	case ObjectType::Torus:
+		return "Torus " + std::to_string(id);
 	default:
 		return "Entity " + std::to_string(id);
 	}

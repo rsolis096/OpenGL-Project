@@ -7,6 +7,9 @@ enum class PrimitiveKind
     Cube,
     Sphere,
     Plane,
+    Cylinder,
+    Cone,
+    Torus,
     Count
 };
 
@@ -21,4 +24,7 @@ private:
     static MeshData buildCubeMesh();
     static MeshData buildSphereMesh();
     static MeshData buildPlaneMesh();
+    static MeshData buildCylinderMesh();
+    static MeshData buildConeMesh();
+    static MeshData buildTorusMesh();
 };

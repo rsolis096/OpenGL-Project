@@ -44,6 +44,12 @@ ObjectType Primitive::GetType() const
         return ObjectType::Sphere;
     case PrimitiveKind::Plane:
         return ObjectType::Plane;
+    case PrimitiveKind::Cylinder:
+        return ObjectType::Cylinder;
+    case PrimitiveKind::Cone:
+        return ObjectType::Cone;
+    case PrimitiveKind::Torus:
+        return ObjectType::Torus;
     default:
         return ObjectType::Object;
     }

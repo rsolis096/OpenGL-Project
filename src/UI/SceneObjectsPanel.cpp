@@ -139,6 +139,12 @@ void SceneObjectsPanel::drawSidebar()
         m_SelectedEntityId = scene.createEntity<Primitive>(PrimitiveKind::Sphere).id();
     if (ImGui::Button("Add Plane"))
         m_SelectedEntityId = scene.createEntity<Primitive>(PrimitiveKind::Plane).id();
+    if (ImGui::Button("Add Cylinder"))
+        m_SelectedEntityId = scene.createEntity<Primitive>(PrimitiveKind::Cylinder).id();
+    if (ImGui::Button("Add Cone"))
+        m_SelectedEntityId = scene.createEntity<Primitive>(PrimitiveKind::Cone).id();
+    if (ImGui::Button("Add Torus"))
+        m_SelectedEntityId = scene.createEntity<Primitive>(PrimitiveKind::Torus).id();
 
     if (ImGui::Button(m_ShowModelDialog ? "Cancel" : "Add Model"))
     {

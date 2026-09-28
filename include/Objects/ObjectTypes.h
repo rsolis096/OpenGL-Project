@@ -36,6 +36,9 @@ enum class ObjectType
     Model,
     Sphere,
     Plane,
+    Cylinder,
+    Cone,
+    Torus,
     Object,
 };
 

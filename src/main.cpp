@@ -226,6 +226,9 @@ void demoScene(Scene& demoScene)
 	Primitive& cube = demoScene.createEntity<Primitive>(PrimitiveKind::Cube, "assets/textures/container2.png", "assets/textures/container2_specular.png");
 	Primitive& sphere = demoScene.createEntity<Primitive>(PrimitiveKind::Sphere, "assets/textures/globe.jpg", "assets/textures/globe.jpg");
     Primitive& plane = demoScene.createEntity<Primitive>(PrimitiveKind::Plane);
+    Primitive& cylinder =  demoScene.createEntity<Primitive>(PrimitiveKind::Cylinder);
+    Primitive& cone = demoScene.createEntity<Primitive>(PrimitiveKind::Cone);
+    Primitive& torus = demoScene.createEntity<Primitive>(PrimitiveKind::Torus);
 
     glm::vec3 spotLightPos1 = glm::vec3(3.0f, 3.0f, -1.0f);
     glm::vec3 spotLightDir1 = glm::vec3(-7.0f, 0.0f, 0.0f);
