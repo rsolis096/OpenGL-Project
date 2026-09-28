@@ -59,7 +59,7 @@ void GUI::drawWorkspace()
             scene.m_mainCamera->m_LookFrom[1],
             scene.m_mainCamera->m_LookFrom[2]);
     }
-    ImGui::Text("Object Count: %zu", scene.m_Entities.size());
+    ImGui::Text("Object Count: %zu", scene.getEntityCount());
 
     ImGui::BeginGroup();
     switch (m_ActivePanel)

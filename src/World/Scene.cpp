@@ -317,7 +317,7 @@ bool Scene::destroyEntity(EntityId id)
 		m_Entities.end(),
 		[id](const std::unique_ptr<Object>& entity)
 		{
-			return entity->m_EntityInfo.id == id;
+			return entity->id() == id;
 		}
 	);
 
@@ -365,7 +365,22 @@ std::string Scene::makeDefaultName(const Object& entity, EntityId id) const
 	case ObjectType::Sphere:
 		return "Sphere " + std::to_string(id);
 
+	case ObjectType::Cube:
+		return "Cube " + std::to_string(id);
+
+	case ObjectType::Plane:
+			return "Plane " + std::to_string(id);
 	default:
 		return "Entity " + std::to_string(id);
 	}
+}
+
+std::size_t Scene::getEntityCount() const
+{
+	return m_Entities.size();
+}
+
+const std::vector<std::unique_ptr<Object>>& Scene::entities() const
+{
+	return m_Entities;
 }

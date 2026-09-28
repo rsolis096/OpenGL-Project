@@ -314,8 +314,8 @@ unsigned int TextureFromFile(const char* path, const string& directory, bool gam
     return textureID;
 }
 
-void Model::updateTexture(std::vector<std::string> texturePaths)
-{
+void Model::updateTexture(const MaterialPaths& paths)
+{    
     // Not supported yet!
     return;
 }

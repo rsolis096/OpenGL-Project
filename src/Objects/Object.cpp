@@ -35,18 +35,14 @@ Object::~Object()
     m_InterleavedVertices.shrink_to_fit();
 }
 
-void Object::updateTexture(std::vector<std::string> texturePaths)
+void Object::updateTexture(const MaterialPaths& paths)
 {
     // Three Scenarios
     // 1. Updating a texture of an Object that already has textures
     // 2. Updating a texture of an Object with no initial texture
     // 3. Updating the texture of a model object
 
-    MaterialPaths paths;
-    paths.diffuse = texturePaths[0];
-    paths.specular = texturePaths[1];
-    m_Material.setTextures(paths);
-    
+    m_Material.setTextures(paths); 
 }
 
 void Object::assignIdentity(EntityId id, std::string name)

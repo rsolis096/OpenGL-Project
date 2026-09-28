@@ -23,7 +23,7 @@ public:
     Transform m_Transform;
     Material m_Material;
 
-    virtual void updateTexture(std::vector<std::string> texturePaths);
+    virtual void updateTexture(const MaterialPaths& paths);
 
     //Draw the object. Each object type draws differently
     virtual void Draw(Shader& shader) = 0;

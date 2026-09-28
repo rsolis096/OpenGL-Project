@@ -31,8 +31,11 @@ public:
     void Draw(Shader& shader) override;
     void ShadowPassDraw(Shader& shader) override;
     void DrawGeometryPass(Shader& shader) override;
+    ObjectType GetType() const override { return ObjectType::Model; }
 
     static const aiScene* CheckPath(std::string const& path);
+
+    virtual void updateTexture(const MaterialPaths& paths);
 
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
@@ -46,7 +49,6 @@ private:
     // checks all material textures of a given type and loads the textures if they're not loaded yet.
     // the required info is returned as a Texture struct.
     vector<ModelTexture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
-    void updateTexture(std::vector<std::string> texturePaths) override;
 
     static Assimp::Importer importer;
 

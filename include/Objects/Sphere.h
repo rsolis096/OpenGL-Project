@@ -13,7 +13,7 @@ public:
     void Draw(Shader& shader) override;
     void ShadowPassDraw(Shader& shader) override;    
     void DrawGeometryPass(Shader& shader) override;
-
+    ObjectType GetType() const override { return ObjectType::Sphere; }
 
 private:
     //Used for construction of primitives

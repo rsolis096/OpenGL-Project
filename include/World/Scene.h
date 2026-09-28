@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <memory>
 #include <unordered_map>
 #include <utility>
@@ -71,7 +72,9 @@ public:
 	Object* findEntity(EntityId id);
 	const Object* findEntity(EntityId id) const;
 
-	std::vector<std::unique_ptr<Object>> m_Entities;
+	std::size_t getEntityCount() const;
+
+	const std::vector<std::unique_ptr<Object>>& entities() const ;
 
 private:
 	unsigned int m_quadVAO = 0;
@@ -80,6 +83,7 @@ private:
 	void RenderFullscreenQuad();
 
 	EntityId m_NextEntityId = 1;
+	std::vector<std::unique_ptr<Object>> m_Entities;
 	std::unordered_map<EntityId, Object*> m_EntityLookup;
 	std::string makeDefaultName(const Object& entity, EntityId id) const;
 };

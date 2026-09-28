@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Objects/ObjectTypes.h"
+
 #include <array>
 
 struct UIContext;
@@ -19,10 +21,12 @@ private:
     void drawModelDialog();
 
     UIContext& m_Context;
-    int m_SelectedIndex = 0;
+
+    EntityId m_SelectedEntityId = InvalidEntityId;
+
     bool m_ShowModelDialog = false;
     bool m_ModelLoadFailed = false;
-    Object* m_TexturePathObject = nullptr;
+    EntityId m_TexturePathEntityId = InvalidEntityId;
     std::array<char, 128> m_ModelPath{};
     std::array<char, 256> m_DiffusePath{};
     std::array<char, 256> m_SpecularPath{};
