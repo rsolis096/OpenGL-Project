@@ -266,11 +266,6 @@ void Model::ApplyMaterialUniforms(Shader& shader)
     shader.setMaterial(m_Material);
 }
 
-void Model::DrawMesh()
-{
-    // doesnt do anything for Models since the mesh are what are drawn
-}
-
 unsigned int TextureFromFile(const char* path, const string& directory, bool gamma)
 {
     string filename = string(path);

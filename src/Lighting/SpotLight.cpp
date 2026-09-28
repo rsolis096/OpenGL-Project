@@ -2,7 +2,7 @@
 
 #include "DebugUtils.h"
 #include "Lighting/Shader.h"
-#include "Objects/Sphere.h"
+#include "Objects/Primitive.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -35,7 +35,7 @@ SpotLight::SpotLight(Shader* lightingShader, Shader* lightSourceShader, glm::vec
 
 
 	//m_SpotLight takes the shape of a sphere
-	m_LightShape = new Sphere();
+	m_LightShape = new Primitive(PrimitiveKind::Sphere);
 	m_LightShape->m_Transform.setPosition(pos);
 	m_LightShape->m_Transform.setScale(glm::vec3(0.2f));
 

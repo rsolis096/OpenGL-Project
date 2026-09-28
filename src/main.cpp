@@ -9,9 +9,7 @@
 #include "Lighting/Shader.h"
 
 #include "Objects/Model.h"
-#include "Objects/Sphere.h"
-#include "Objects/Cube.h"
-#include "Objects/Plane.h"
+#include "Objects/Primitive.h"
 
 #include "UI/GUI.h"
 #include "World/Scene.h"
@@ -225,9 +223,9 @@ void demoScene(Scene& demoScene)
 {
     //GENERATE INITIAL SCENE (ALL OF THESE CAN BE CHANGED IN REAL TIME)
     Model& sponza = demoScene.createEntity<Model>("assets/models/sponza/sponza.obj");
-	Cube& cube = demoScene.createEntity<Cube>("assets/textures/container2.png", "assets/textures/container2_specular.png");
-	Sphere& sphere = demoScene.createEntity<Sphere>("assets/textures/globe.jpg", "assets/textures/globe.jpg");
-    Plane& plane = demoScene.createEntity<Plane>();
+	Primitive& cube = demoScene.createEntity<Primitive>(PrimitiveKind::Cube, "assets/textures/container2.png", "assets/textures/container2_specular.png");
+	Primitive& sphere = demoScene.createEntity<Primitive>(PrimitiveKind::Sphere, "assets/textures/globe.jpg", "assets/textures/globe.jpg");
+    Primitive& plane = demoScene.createEntity<Primitive>(PrimitiveKind::Plane);
 
     glm::vec3 spotLightPos1 = glm::vec3(3.0f, 3.0f, -1.0f);
     glm::vec3 spotLightDir1 = glm::vec3(-7.0f, 0.0f, 0.0f);

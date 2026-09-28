@@ -1,11 +1,9 @@
 #include "UI/SceneObjectsPanel.h"
 
 #include "UI/UIContext.h"
-#include "Objects/Cube.h"
 #include "Objects/Model.h"
 #include "Objects/Object.h"
-#include "Objects/Plane.h"
-#include "Objects/Sphere.h"
+#include "Objects/Primitive.h"
 #include "World/Scene.h"
 
 #include <imgui/imgui.h>
@@ -136,11 +134,11 @@ void SceneObjectsPanel::drawSidebar()
     ImGui::EndChild();
 
     if (ImGui::Button("Add Cube"))
-        m_SelectedEntityId = scene.createEntity<Cube>().id();
+        m_SelectedEntityId = scene.createEntity<Primitive>(PrimitiveKind::Cube).id();
     if (ImGui::Button("Add Sphere"))
-        m_SelectedEntityId = scene.createEntity<Sphere>().id();
+        m_SelectedEntityId = scene.createEntity<Primitive>(PrimitiveKind::Sphere).id();
     if (ImGui::Button("Add Plane"))
-        m_SelectedEntityId = scene.createEntity<Plane>().id();
+        m_SelectedEntityId = scene.createEntity<Primitive>(PrimitiveKind::Plane).id();
 
     if (ImGui::Button(m_ShowModelDialog ? "Cancel" : "Add Model"))
     {

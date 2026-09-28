@@ -138,9 +138,6 @@
     <ClCompile Include="src\Lighting\SpotLight.cpp">
       <Filter>Source Files\Lighting</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\Cube.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="src\Objects\Mesh.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
@@ -150,13 +147,7 @@
     <ClCompile Include="src\Objects\Object.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\Plane.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="src\Objects\SkyBox.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Objects\Sphere.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\Objects\Texture.cpp">
@@ -184,6 +175,9 @@
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\Objects\MeshBuilder.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Primitive.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
   </ItemGroup>
@@ -248,9 +242,6 @@
     <ClInclude Include="include\Lighting\SpotLight.h">
       <Filter>Header Files\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="include\Objects\Cube.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="include\Objects\Mesh.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
@@ -263,13 +254,7 @@
     <ClInclude Include="include\Objects\ObjectTypes.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="include\Objects\Plane.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="include\Objects\SkyBox.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Objects\Sphere.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="include\Objects\Texture.h">
@@ -309,6 +294,12 @@
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="include\Objects\MeshBuilder.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\MeshData.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Objects\Primitive.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>

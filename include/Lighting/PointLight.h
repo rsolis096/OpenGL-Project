@@ -8,7 +8,7 @@
 #include <array>
 #include <string>
 
-class Cube;
+class Primitive;
 class Shader;
 
 class PointLight : public Light
@@ -54,7 +54,7 @@ class PointLight : public Light
 		//Shaders (for lighting and for light object itself
 		Shader* m_LightSourceShader;
 		//Light Object (light is not invisible)
-		Cube* m_LightShape;
+		Primitive* m_LightShape;
 
 		//Light properties
 		glm::vec3 m_LightPos;

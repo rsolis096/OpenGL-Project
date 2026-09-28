@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
+Object::Object()
 {
     //Set default Cube properties
     m_Material.setAmbient(glm::vec3(0.0f));
@@ -16,12 +16,6 @@ Object::Object() : m_ebo(0), m_vao(0), m_vbo(0)
 Object::~Object()
 {
     std::cout << "Destructor called on " << m_EntityInfo.id << std::endl;
-    glDeleteVertexArrays(1, &m_vao);
-    glDeleteBuffers(1, &m_vbo);
-    glDeleteBuffers(1, &m_ebo);
-    m_vao = 0;
-    m_vbo = 0;
-    m_ebo = 0;
 }
 
 void Object::updateTexture(const MaterialPaths& paths)
@@ -50,5 +44,3 @@ const std::string& Object::displayName() const
 }
 
 void Object::ApplyMaterialUniforms(Shader& shader) {}
-
-void Object::DrawMesh() {}

@@ -37,10 +37,6 @@ public:
     const std::string& displayName() const;
 
 protected:
-    //Rendering info
-    unsigned int m_vao, m_vbo, m_ebo;
-
     virtual void ApplyMaterialUniforms(Shader& shader);
-    virtual void DrawMesh();
 
 };

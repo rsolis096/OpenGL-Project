@@ -8,7 +8,7 @@
 #include <string>
 
 class Shader;
-class Sphere;
+class Primitive;
 
 //Flashlight should inherit from spotlight or find another way to continuously update camera position
 //Flashlights arent typically at eye sight anyways so i may be better to lower is position relative to cam
@@ -66,7 +66,7 @@ private:
 	Shader* m_LightSourceShader;
 
 	//Light Object (light is not invisible)
-	Sphere* m_LightShape;
+	Primitive* m_LightShape;
 
 	//Light properties
 	glm::vec3 m_LightPos;

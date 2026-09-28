@@ -54,6 +54,5 @@ private:
 
 protected:
     void ApplyMaterialUniforms(Shader& shader) override;
-    void DrawMesh() override;
 
 };

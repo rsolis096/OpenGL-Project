@@ -6,6 +6,12 @@
 #include <cstddef>
 #include <utility>
 
+Mesh::Mesh(MeshData meshData) :
+    m_MeshData(std::move(meshData))
+{
+    setupMesh();
+}
+
 Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<ModelTexture> textures)
 {
     m_MeshData.vertices = vertices;
@@ -30,7 +36,7 @@ Mesh::Mesh(Mesh&& other) noexcept :
 
 
 // Move assignment operator
-Mesh& Mesh::operator=(Mesh&& other)
+Mesh& Mesh::operator=(Mesh&& other) noexcept
 {
     std::cout << "Move assignment operator called\n";
     if (this != &other)

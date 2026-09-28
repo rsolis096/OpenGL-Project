@@ -2,7 +2,7 @@
 
 #include "DebugUtils.h"
 #include "Lighting/Shader.h"
-#include "Objects/Cube.h"
+#include "Objects/Primitive.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -25,7 +25,7 @@ PointLight::PointLight(Shader* lightingShader, Shader* objectShader, const glm::
 	m_LightID = m_PointLightCount;
 	m_PointLightCount++;
 
-	m_LightShape = new Cube(); //Create the physical light object
+	m_LightShape = new Primitive(PrimitiveKind::Cube); //Create the physical light object
 	setLightPos(pos); //Need to update light object too
 	m_LightShape->m_Transform.setScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	m_LightShape->m_EntityInfo.displayName = "PointLight" + std::to_string(m_LightID);
