@@ -3,21 +3,30 @@
 void Transform::setPosition(glm::vec3 newPosition)
 {
     m_Position = newPosition;
+    m_Revision++;
 }
 
 void Transform::setRotation(glm::vec3 newRotation)
 {
      m_Rotation = newRotation;
+     m_Revision++;
 }
 
 void Transform::setScale(glm::vec3 newScale)
 {
     m_Scale = newScale;
+    m_Revision++;
 }
 
 void Transform::translatePosition(glm::vec3 newPosition)
 {
     m_Position += newPosition;
+    m_Revision++;
+}
+
+std::uint64_t Transform::revision() const
+{
+    return m_Revision;
 }
 
 glm::mat4 Transform::matrix() const
@@ -36,4 +45,19 @@ glm::mat4 Transform::matrix() const
     model = glm::scale(model, m_Scale);
 
     return model;
+}
+
+const glm::vec3& Transform::position() const
+{
+    return m_Position;
+}
+
+const glm::vec3& Transform::rotation() const
+{
+    return m_Rotation;
+}
+
+const glm::vec3& Transform::scale() const
+{
+    return m_Scale;
 }

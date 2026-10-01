@@ -214,6 +214,8 @@
     <ClInclude Include="include\Objects\Texture.h" />
     <ClInclude Include="include\Objects\Transform.h" />
     <ClInclude Include="include\Objects\Vertex.h" />
+    <ClInclude Include="include\Shared\EntityTypes.h" />
+    <ClInclude Include="include\Shared\NetworkTypes.h" />
     <ClInclude Include="include\UI\GUI.h" />
     <ClInclude Include="include\UI\LightingPanel.h" />
     <ClInclude Include="include\UI\SceneObjectsPanel.h" />

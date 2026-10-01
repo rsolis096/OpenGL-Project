@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Objects/ObjectTypes.h"
+#include "Shared/EntityTypes.h"
 
 #include <array>
 

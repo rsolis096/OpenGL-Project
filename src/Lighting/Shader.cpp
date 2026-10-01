@@ -1,6 +1,7 @@
 #include "Lighting/Shader.h"
 
 #include "DebugUtils.h"
+#include "Objects/Material.h"
 
 Shader::Shader(const char* vertex_path, const char* fragment_path, const char* geometry_path)
 {

@@ -11,7 +11,8 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "../Objects/ObjectTypes.h"
+
+class Material;
 
 class Shader
 {

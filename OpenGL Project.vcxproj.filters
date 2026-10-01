@@ -61,6 +61,9 @@
     <Filter Include="Header Files\UI">
       <UniqueIdentifier>{38df8013-15b5-4b65-999f-505ff97cbc21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Shared">
+      <UniqueIdentifier>{9d9b52ae-4007-4e59-b284-456f2cbf4e9e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files\UI">
       <UniqueIdentifier>{f8882871-c361-49aa-9cce-4327afcdc373}</UniqueIdentifier>
     </Filter>
@@ -301,6 +304,12 @@
     </ClInclude>
     <ClInclude Include="include\Objects\Primitive.h">
       <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Shared\EntityTypes.h">
+      <Filter>Header Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Shared\NetworkTypes.h">
+      <Filter>Header Files\Shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

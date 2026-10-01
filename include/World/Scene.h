@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-#include <Objects/ObjectTypes.h>
+#include "Shared/EntityTypes.h"
 
 class Camera;
 class GBuffer;

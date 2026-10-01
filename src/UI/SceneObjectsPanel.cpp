@@ -169,16 +169,16 @@ void SceneObjectsPanel::drawInspector()
     ImGui::Text("Selected Item: %s", object->displayName().c_str());
     ImGui::Spacing();
 
-    glm::vec3 position = object->m_Transform.m_Position;
+    glm::vec3 position = object->m_Transform.position();
     ImGui::Text("Current Object Position: x: %.2f, y: %.2f, z: %.2f", position.x, position.y, position.z);
     if (ImGui::DragFloat3("Position", &position.x, 0.25f, -1000.0f, 1000.0f, "%.2f"))
         object->m_Transform.setPosition(position);
 
-    glm::vec3 scale = object->m_Transform.m_Scale;
+    glm::vec3 scale = object->m_Transform.scale();
     if (ImGui::DragFloat3("Scale", &scale.x, 0.1f, 0.0f, 360.0f, "%.2f"))
         object->m_Transform.setScale(scale);
 
-    glm::vec3 rotation = object->m_Transform.m_Rotation;
+    glm::vec3 rotation = object->m_Transform.rotation();
     if (ImGui::DragFloat3("Rotation", &rotation.x, 0.5f, 0.0f, 360.0f, "%.2f"))
         object->m_Transform.setRotation(rotation);
 

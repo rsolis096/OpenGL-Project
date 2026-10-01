@@ -3,7 +3,10 @@
 
 #include <glm/glm.hpp>
 
-#include "ObjectTypes.h"
+#include "Objects/Material.h"
+#include "Objects/ObjectTypes.h"
+#include "Objects/Transform.h"
+#include "Shared/EntityTypes.h"
 
 class Shader;
 class Texture;
